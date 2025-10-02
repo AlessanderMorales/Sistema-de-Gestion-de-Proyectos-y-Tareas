@@ -1,0 +1,40 @@
+﻿@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos.IndexModel
+@{
+    ViewData["Title"] = "Lista de Proyectos";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Crear Nuevo Proyecto</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr class="table-dark">
+            <th>ID</th>
+            <th>Nombre del Proyecto</th>
+            <th>Descripción</th>
+            <th>Fecha de Inicio</th>
+            <th>Fecha de Fin</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.ProyectosTable.Rows)
+        {
+            <tr>
+                <td>@row["id_proyecto"]</td>
+                <td>@row["nombre"]</td>
+                <td>@row["descripcion"]</td>
+                <td>@Convert.ToDateTime(row["fecha_inicio"]).ToString("dd/MM/yyyy")</td>
+                <td>@Convert.ToDateTime(row["fecha_fin"]).ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@row["id_proyecto"]">Editar</a>
+                    <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@row["id_proyecto"]">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

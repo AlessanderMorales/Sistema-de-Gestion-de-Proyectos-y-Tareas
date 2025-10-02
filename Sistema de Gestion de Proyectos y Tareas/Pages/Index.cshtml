@@ -1,10 +1,22 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Página Principal";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Bienvenido al Sistema de Gestión</h1>
+    <p class="lead">Selecciona una de las opciones del menú para comenzar a trabajar.</p>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Gestionar Proyectos</h5>
+                <p class="card-text">Ver, crear y administrar los proyectos de la organización.</p>
+                <a asp-page="/Proyectos/Index" class="btn btn-primary">Ir a Proyectos</a>
+            </div>
+        </div>
+    </div>
 </div>

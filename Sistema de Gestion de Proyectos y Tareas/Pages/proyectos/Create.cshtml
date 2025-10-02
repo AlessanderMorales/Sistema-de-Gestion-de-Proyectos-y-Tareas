@@ -1,0 +1,42 @@
+﻿@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos.CreateModel
+@{
+    ViewData["Title"] = "Crear Nuevo Proyecto";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h4>Rellena los datos del proyecto</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                <strong>Error:</strong> @Model.ErrorMessage
+            </div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Nombre del Proyecto</label>
+                <input type="text" class="form-control" asp-for="Proyecto.Nombre">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea class="form-control" asp-for="Proyecto.Descripcion" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Fecha de Inicio</label>
+                <input type="date" class="form-control" asp-for="Proyecto.FechaInicio">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Fecha de Fin</label>
+                <input type="date" class="form-control" asp-for="Proyecto.FechaFin">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
+            <a href="/Proyectos/Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
