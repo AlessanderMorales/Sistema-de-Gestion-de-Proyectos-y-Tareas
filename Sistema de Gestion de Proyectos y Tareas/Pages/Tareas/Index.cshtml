@@ -1,0 +1,40 @@
+﻿@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas.IndexModel
+@{
+    ViewData["Title"] = "Lista de Tareas";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Prioridad</th>
+            <th>Fecha de Registro</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.TareasTable.Rows)
+        {
+            <tr>
+                <td>@row["id_tarea"]</td>
+                <td>@row["titulo"]</td>
+                <td>@row["descripcion"]</td>
+                <td>@row["prioridad"]</td>
+                <td>@Convert.ToDateTime(row["fechaRegistro"]).ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@row["id_tarea"]">Editar</a>
+                    <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@row["id_tarea"]">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
