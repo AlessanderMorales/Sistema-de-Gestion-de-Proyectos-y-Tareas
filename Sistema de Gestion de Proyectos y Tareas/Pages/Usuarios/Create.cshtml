@@ -1,0 +1,45 @@
+﻿@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios.CreateModel
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                <strong>Error:</strong> @Model.ErrorMessage
+            </div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Primer Nombre</label>
+                <input type="text" class="form-control" asp-for="Usuario.PrimerNombre">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Segundo Nombre</label>
+                <input type="text" class="form-control" asp-for="Usuario.SegundoNombre">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Apellidos</label>
+                <input type="text" class="form-control" asp-for="Usuario.Apellidos">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Rol</label>
+                <input type="text" class="form-control" asp-for="Usuario.Rol">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-control" asp-for="Usuario.Contraseña">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+            <a href="/Usuarios/Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
