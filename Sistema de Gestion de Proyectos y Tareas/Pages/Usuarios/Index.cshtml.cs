@@ -1,39 +1,21 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MySql.Data.MySqlClient;
-using System.Data;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
     public class IndexModel : PageModel
     {
-        public DataTable UsuariosTable { get; set; } = new DataTable();
-        private readonly IConfiguration _configuration;
+        private readonly IDB<Tarea> _tareaRepository;
+        public IEnumerable<Tarea> Tareas { get; private set; } = new List<Tarea>();
 
-        public IndexModel(IConfiguration configuration)
+        public IndexModel(IDB<Tarea> tareaRepository)
         {
-            _configuration = configuration;
+            _tareaRepository = tareaRepository;
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            SelectUsuarios();
-        }
-
-        private void SelectUsuarios()
-        {
-            string connectionString = _configuration.GetConnectionString("MySqlConecction")!;
-            string query = @"SELECT id_usuario, primer_nombre, segundo_nombre, apellidos, rol 
-                             FROM Usuario
-                             WHERE estado = 1
-                             ORDER BY apellidos, primer_nombre";
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                MySqlCommand command = new MySqlCommand(query, connection);
-                connection.Open();
-                MySqlDataAdapter adapter = new MySqlDataAdapter(command);
-                adapter.Fill(UsuariosTable);
-            }
+            Tareas = await _tareaRepository.GetAllAsync();
         }
     }
 }

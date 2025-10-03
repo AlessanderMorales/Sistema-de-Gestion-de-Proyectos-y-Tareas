@@ -1,34 +1,32 @@
 ﻿@page
-@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios.IndexModel
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas.IndexModel
 @{
-    ViewData["Title"] = "Lista de Usuarios";
+    ViewData["Title"] = "Lista de Tareas";
 }
-
 <h1>@ViewData["Title"]</h1>
-
-<p>
-    <a asp-page="Create" class="btn btn-primary">Crear Nuevo Usuario</a>
-</p>
+<p><a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a></p>
 
 <table class="table table-striped">
-    <thead>
+    <thead class="table-dark">
         <tr>
             <th>ID</th>
-            <th>Nombre Completo</th>
-            <th>Rol</th>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Prioridad</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (System.Data.DataRow row in Model.UsuariosTable.Rows)
+        @foreach (var item in Model.Tareas)
         {
             <tr>
-                <td>@row["id_usuario"]</td>
-                <td>@($"{row["primer_nombre"]} {row["segundo_nombre"]} {row["apellidos"]}")</td>
-                <td>@row["rol"]</td>
+                <td>@item.Id</td>
+                <td>@item.Titulo</td>
+                <td>@item.Descripcion</td>
+                <td>@item.Prioridad</td>
                 <td>
-                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@row["id_usuario"]">Editar</a>
-                    <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@row["id_usuario"]">Eliminar</a>
+                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                    <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@item.Id">Eliminar</a>
                 </td>
             </tr>
         }

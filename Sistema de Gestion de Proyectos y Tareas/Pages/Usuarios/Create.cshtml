@@ -3,43 +3,33 @@
 @{
     ViewData["Title"] = "Crear Usuario";
 }
-
 <h1>@ViewData["Title"]</h1>
 <hr />
-
 <div class="row">
     <div class="col-md-6">
-        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-        {
-            <div class="alert alert-danger" role="alert">
-                <strong>Error:</strong> @Model.ErrorMessage
-            </div>
-        }
-
         <form method="post">
             <div class="mb-3">
-                <label class="form-label">Primer Nombre</label>
-                <input type="text" class="form-control" asp-for="Usuario.PrimerNombre">
+                <label asp-for="Usuario.PrimerNombre" class="form-label"></label>
+                <input asp-for="Usuario.PrimerNombre" class="form-control" />
             </div>
             <div class="mb-3">
-                <label class="form-label">Segundo Nombre</label>
-                <input type="text" class="form-control" asp-for="Usuario.SegundoNombre">
+                <label asp-for="Usuario.SegundoNombre" class="form-label"></label>
+                <input asp-for="Usuario.SegundoNombre" class="form-control" />
             </div>
             <div class="mb-3">
-                <label class="form-label">Apellidos</label>
-                <input type="text" class="form-control" asp-for="Usuario.Apellidos">
+                <label asp-for="Usuario.Apellidos" class="form-label"></label>
+                <input asp-for="Usuario.Apellidos" class="form-control" />
             </div>
             <div class="mb-3">
-                <label class="form-label">Rol</label>
-                <input type="text" class="form-control" asp-for="Usuario.Rol">
+                <label asp-for="Usuario.Rol" class="form-label"></label>
+                <input asp-for="Usuario.Rol" class="form-control" />
             </div>
             <div class="mb-3">
-                <label class="form-label">Contraseña</label>
-                <input type="password" class="form-control" asp-for="Usuario.Contraseña">
+                <label asp-for="Usuario.Contraseña" class="form-label"></label>
+                <input asp-for="Usuario.Contraseña" class="form-control" type="password" />
             </div>
-            
-            <button type="submit" class="btn btn-primary">Guardar Usuario</button>
-            <a href="/Usuarios/Index" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>
 </div>

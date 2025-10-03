@@ -1,7 +1,20 @@
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// ---> INICIO DE NUESTROS SERVICIOS
+// 1. La fábrica de conexiones
+builder.Services.AddSingleton<IDbConnectionFactory, MySqlConnectionFactory>();
+
+// 2. Los repositorios
+builder.Services.AddTransient<IDB<Proyecto>, ProyectoRepository>();
+builder.Services.AddTransient<IDB<Usuario>, UsuarioRepository>();
+builder.Services.AddTransient<IDB<Tarea>, TareaRepository>();
+// ---> FIN DE NUESTROS SERVICIOS
 
 var app = builder.Build();
 
@@ -9,7 +22,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
