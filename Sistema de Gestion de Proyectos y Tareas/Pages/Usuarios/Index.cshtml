@@ -1,29 +1,22 @@
 ﻿@page
-@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas.IndexModel
-@{
-    ViewData["Title"] = "Lista de Tareas";
-}
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios.IndexModel
+@{ ViewData["Title"] = "Lista de Usuarios"; }
+
 <h1>@ViewData["Title"]</h1>
-<p><a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a></p>
+<p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Usuario</a></p>
 
 <table class="table table-striped">
     <thead class="table-dark">
         <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th>Descripción</th>
-            <th>Prioridad</th>
-            <th>Acciones</th>
+            <th>ID</th><th>Nombre Completo</th><th>Rol</th><th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Tareas)
-        {
+        @foreach (var item in Model.Usuarios) {
             <tr>
                 <td>@item.Id</td>
-                <td>@item.Titulo</td>
-                <td>@item.Descripcion</td>
-                <td>@item.Prioridad</td>
+                <td>@($"{item.PrimerNombre} {item.SegundoNombre} {item.Apellidos}")</td>
+                <td>@item.Rol</td>
                 <td>
                     <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
                     <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@item.Id">Eliminar</a>

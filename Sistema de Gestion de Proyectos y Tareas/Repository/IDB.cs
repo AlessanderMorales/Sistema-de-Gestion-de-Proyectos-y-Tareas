@@ -1,8 +1,5 @@
 ﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Repository
 {
-
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     public interface IDB<T> where T : class
     {
         Task<IEnumerable<T>> GetAllAsync();

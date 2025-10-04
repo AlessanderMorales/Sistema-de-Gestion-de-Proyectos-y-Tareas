@@ -1,33 +1,26 @@
 ﻿@page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos.CreateModel
-@{
-    ViewData["Title"] = "Crear Proyecto";
-}
-<h1>@ViewData["Title"]</h1>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="mb-3">
-                <label asp-for="Proyecto.Nombre" class="form-label"></label>
-                <input asp-for="Proyecto.Nombre" class="form-control" />
-                <span asp-validation-for="Proyecto.Nombre" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Proyecto.Descripcion" class="form-label"></label>
-                <textarea asp-for="Proyecto.Descripcion" class="form-control" rows="3"></textarea>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Proyecto.FechaInicio" class="form-label"></label>
-                <input asp-for="Proyecto.FechaInicio" class="form-control" type="date" />
-            </div>
-            <div class="mb-3">
-                <label asp-for="Proyecto.FechaFin" class="form-label"></label>
-                <input asp-for="Proyecto.FechaFin" class="form-control" type="date" />
-            </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-        </form>
-    </div>
-</div>
+@{ ViewData["Title"] = "Crear Proyecto"; }
+<h1>@ViewData["Title"]</h1><hr />
+<div class="row"><div class="col-md-6">
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="Proyecto.Nombre" class="form-label"></label>
+            <input asp-for="Proyecto.Nombre" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Proyecto.Descripcion" class="form-label"></label>
+            <textarea asp-for="Proyecto.Descripcion" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Proyecto.FechaInicio" class="form-label"></label>
+            <input asp-for="Proyecto.FechaInicio" class="form-control" type="date" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Proyecto.FechaFin" class="form-label"></label>
+            <input asp-for="Proyecto.FechaFin" class="form-control" type="date" />
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div></div>

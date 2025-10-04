@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-public interface IDbConnectionFactory
+public interface IDbConnectionSingleton
 {
     IDbConnection CreateConnection();
-}
+} 

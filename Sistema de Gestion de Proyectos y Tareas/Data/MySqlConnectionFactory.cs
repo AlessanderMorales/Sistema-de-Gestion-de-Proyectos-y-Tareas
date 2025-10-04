@@ -1,11 +1,9 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Data;
 
-
-public class MySqlConnectionFactory : IDbConnectionFactory
+public class MySqlConnectionFactory : IDbConnectionSingleton
 {
     private readonly string _connectionString;
-
 
     public MySqlConnectionFactory(IConfiguration configuration)
     {

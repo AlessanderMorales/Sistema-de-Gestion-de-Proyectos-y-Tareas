@@ -1,40 +1,8 @@
 ﻿@page
 @model IndexModel
-@{
-    ViewData["Title"] = "Página Principal";
-}
+@{ ViewData["Title"] = "Página Principal"; }
 
 <div class="text-center">
     <h1 class="display-4">Bienvenido al Sistema de Gestión</h1>
-    <p class="lead">Selecciona una de las opciones del menú para comenzar a trabajar.</p>
-</div>
-
-<div class="row mt-5">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h5 class="card-title">Gestionar Proyectos</h5>
-                <p class="card-text">Ver, crear y administrar los proyectos.</p>
-                <a asp-page="/Proyectos/Index" class="btn btn-primary">Ir a Proyectos</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h5 class="card-title">Gestionar Usuarios</h5>
-                <p class="card-text">Administrar los usuarios del sistema.</p>
-                <a asp-page="/Usuarios/Index" class="btn btn-primary">Ir a Usuarios</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h5 class="card-title">Gestionar Tareas</h5>
-                <p class="card-text">Organizar y seguir las tareas pendientes.</p>
-                <a asp-page="/Tareas/Index" class="btn btn-primary">Ir a Tareas</a>
-            </div>
-        </div>
-    </div>
+    <p class="lead">Usa el menú de navegación para administrar proyectos, usuarios y tareas.</p>
 </div>

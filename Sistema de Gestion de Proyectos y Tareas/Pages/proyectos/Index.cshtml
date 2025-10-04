@@ -1,8 +1,6 @@
 ﻿@page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos.IndexModel
-@{
-    ViewData["Title"] = "Lista de Proyectos";
-}
+@{ ViewData["Title"] = "Lista de Proyectos"; }
 
 <h1>@ViewData["Title"]</h1>
 <p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Proyecto</a></p>
@@ -10,23 +8,17 @@
 <table class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
-            <th>ID</th>
-            <th>Nombre del Proyecto</th>
-            <th>Descripción</th>
-            <th>Fecha de Inicio</th>
-            <th>Fecha de Fin</th>
-            <th>Acciones</th>
+            <th>ID</th><th>Nombre</th><th>Descripción</th><th>Inicio</th><th>Fin</th><th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Proyectos)
-        {
+        @foreach (var item in Model.Proyectos) {
             <tr>
                 <td>@item.Id</td>
                 <td>@item.Nombre</td>
                 <td>@item.Descripcion</td>
-                <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
-                <td>@item.FechaFin.ToString("dd/MM/yyyy")</td>
+                <td>@item.FechaInicio.ToShortDateString()</td>
+                <td>@item.FechaFin.ToShortDateString()</td>
                 <td>
                     <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
                     <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@item.Id">Eliminar</a>

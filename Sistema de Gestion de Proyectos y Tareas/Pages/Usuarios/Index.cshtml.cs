@@ -1,21 +1,20 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Factories;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {
     public class IndexModel : PageModel
     {
-        private readonly IDB<Tarea> _tareaRepository;
-        public IEnumerable<Tarea> Tareas { get; private set; } = new List<Tarea>();
+        private readonly IRepositoryFactory _factory;
+        public IEnumerable<Usuario> Usuarios { get; private set; } = new List<Usuario>();
 
-        public IndexModel(IDB<Tarea> tareaRepository)
-        {
-            _tareaRepository = tareaRepository;
-        }
+        public IndexModel(IRepositoryFactory factory) => _factory = factory;
 
         public async Task OnGetAsync()
         {
-            Tareas = await _tareaRepository.GetAllAsync();
+            var repo = _factory.CreateUsuarioRepository();
+            Usuarios = await repo.GetAllAsync();
         }
     }
 }
