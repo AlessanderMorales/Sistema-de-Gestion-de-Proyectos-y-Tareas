@@ -1,38 +1,27 @@
 ﻿@page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos.IndexModel
-@{
-    ViewData["Title"] = "Lista de Proyectos";
-}
+@{ ViewData["Title"] = "Lista de Proyectos"; }
 
 <h1>@ViewData["Title"]</h1>
-
-<p>
-    <a asp-page="Create" class="btn btn-primary">Crear Nuevo Proyecto</a>
-</p>
+<p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Proyecto</a></p>
 
 <table class="table table-bordered table-striped">
-    <thead>
-        <tr class="table-dark">
-            <th>ID</th>
-            <th>Nombre del Proyecto</th>
-            <th>Descripción</th>
-            <th>Fecha de Inicio</th>
-            <th>Fecha de Fin</th>
-            <th>Acciones</th>
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th><th>Nombre</th><th>Descripción</th><th>Inicio</th><th>Fin</th><th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (System.Data.DataRow row in Model.ProyectosTable.Rows)
-        {
+        @foreach (var item in Model.Proyectos) {
             <tr>
-                <td>@row["id_proyecto"]</td>
-                <td>@row["nombre"]</td>
-                <td>@row["descripcion"]</td>
-                <td>@Convert.ToDateTime(row["fecha_inicio"]).ToString("dd/MM/yyyy")</td>
-                <td>@Convert.ToDateTime(row["fecha_fin"]).ToString("dd/MM/yyyy")</td>
+                <td>@item.Id</td>
+                <td>@item.Nombre</td>
+                <td>@item.Descripcion</td>
+                <td>@item.FechaInicio.ToShortDateString()</td>
+                <td>@item.FechaFin.ToShortDateString()</td>
                 <td>
-                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@row["id_proyecto"]">Editar</a>
-                    <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@row["id_proyecto"]">Eliminar</a>
+                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                    <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@item.Id">Eliminar</a>
                 </td>
             </tr>
         }
