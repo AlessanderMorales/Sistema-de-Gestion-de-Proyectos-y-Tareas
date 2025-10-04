@@ -1,37 +1,22 @@
 ﻿@page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas.CreateModel
-@{
-    ViewData["Title"] = "Crear Tarea";
-}
-
-<h1>@ViewData["Title"]</h1>
-<hr />
-
-<div class="row">
-    <div class="col-md-6">
-        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-        {
-            <div class="alert alert-danger" role="alert">
-                <strong>Error:</strong> @Model.ErrorMessage
-            </div>
-        }
-
-        <form method="post">
-            <div class="mb-3">
-                <label class="form-label">Título</label>
-                <input type="text" class="form-control" asp-for="Tarea.Titulo">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Descripción</label>
-                <textarea class="form-control" asp-for="Tarea.Descripcion" rows="3"></textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Prioridad</label>
-                <input type="text" class="form-control" asp-for="Tarea.Prioridad">
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Guardar Tarea</button>
-            <a href="/Tareas/Index" class="btn btn-secondary">Cancelar</a>
-        </form>
-    </div>
-</div>
+@{ ViewData["Title"] = "Crear Tarea"; }
+<h1>@ViewData["Title"]</h1><hr />
+<div class="row"><div class="col-md-6">
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="Tarea.Titulo" class="form-label"></label>
+            <input asp-for="Tarea.Titulo" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Tarea.Descripcion" class="form-label"></label>
+            <textarea asp-for="Tarea.Descripcion" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Tarea.Prioridad" class="form-label"></label>
+            <input asp-for="Tarea.Prioridad" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div></div>
