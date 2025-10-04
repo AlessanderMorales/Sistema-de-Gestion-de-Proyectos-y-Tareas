@@ -12,4 +12,9 @@
     <PackageReference Include="MySql.Data" Version="9.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Tareas\" />
+    <Folder Include="Pages\Usuarios\" />
+  </ItemGroup>
+
 </Project>

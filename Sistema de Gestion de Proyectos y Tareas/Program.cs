@@ -7,15 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddSingleton<IDbConnectionSingleton, MySqlConnectionFactory>();
+builder.Services.AddSingleton<MySqlConnectionSingleton>();
 
-
-builder.Services.AddSingleton<IRepositoryFactory, MySqlRepositoryFactory>();
-
-
-builder.Services.AddTransient<IDB<Proyecto>, ProyectoRepository>();
-builder.Services.AddTransient<IDB<Usuario>, UsuarioRepository>();
-builder.Services.AddTransient<IDB<Tarea>, TareaRepository>();
+builder.Services.AddScoped<ProyectoryRepositoryCreator>();
 
 var app = builder.Build();
 

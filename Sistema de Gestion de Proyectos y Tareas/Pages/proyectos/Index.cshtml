@@ -8,7 +8,11 @@
 <table class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
-            <th>ID</th><th>Nombre</th><th>Descripción</th><th>Inicio</th><th>Fin</th><th>Acciones</th>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th><th>Inicio</th><th>Fin</th>
+            <th>Estado</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -19,8 +23,12 @@
                 <td>@item.Descripcion</td>
                 <td>@item.FechaInicio.ToShortDateString()</td>
                 <td>@item.FechaFin.ToShortDateString()</td>
+                <td>@item.Estado</td>
                 <td>
                     <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
+					</form>
                     <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@item.Id">Eliminar</a>
                 </td>
             </tr>

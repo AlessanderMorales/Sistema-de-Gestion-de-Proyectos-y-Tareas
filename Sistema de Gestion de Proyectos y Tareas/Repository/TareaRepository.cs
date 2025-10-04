@@ -28,5 +28,35 @@
         public Task<Tarea?> GetByIdAsync(int id) => throw new NotImplementedException();
         public Task UpdateAsync(Tarea entity) => throw new NotImplementedException();
         public Task DeleteAsync(int id) => throw new NotImplementedException();
+
+        IEnumerable<Tarea> IDB<Tarea>.GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        Tarea IDB<Tarea>.GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDB<Tarea>.AddAsync(Tarea entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDB<Tarea>.UpdateAsync(Tarea entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDB<Tarea>.DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteAsync(Tarea entity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

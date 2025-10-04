@@ -27,5 +27,35 @@
         public Task<Usuario?> GetByIdAsync(int id) => throw new NotImplementedException();
         public Task UpdateAsync(Usuario entity) => throw new NotImplementedException();
         public Task DeleteAsync(int id) => throw new NotImplementedException();
+
+        IEnumerable<Usuario> IDB<Usuario>.GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        Usuario IDB<Usuario>.GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDB<Usuario>.AddAsync(Usuario entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDB<Usuario>.UpdateAsync(Usuario entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDB<Usuario>.DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteAsync(Usuario entity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
