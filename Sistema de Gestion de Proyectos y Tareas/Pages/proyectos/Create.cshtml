@@ -7,20 +7,28 @@
         <div class="mb-3">
             <label asp-for="Proyecto.Nombre" class="form-label"></label>
             <input asp-for="Proyecto.Nombre" class="form-control" />
+            <span asp-validation-for="Proyecto.Nombre" class="text-danger"></span> @* <-- ¡Añade o verifica esta línea! *@
         </div>
         <div class="mb-3">
             <label asp-for="Proyecto.Descripcion" class="form-label"></label>
             <textarea asp-for="Proyecto.Descripcion" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Proyecto.Descripcion" class="text-danger"></span> @* <-- ¡Añade o verifica esta línea! *@
         </div>
         <div class="mb-3">
             <label asp-for="Proyecto.FechaInicio" class="form-label"></label>
             <input asp-for="Proyecto.FechaInicio" class="form-control" type="date" />
+            <span asp-validation-for="Proyecto.FechaInicio" class="text-danger"></span> @* <-- ¡Añade o verifica esta línea! *@
         </div>
         <div class="mb-3">
             <label asp-for="Proyecto.FechaFin" class="form-label"></label>
             <input asp-for="Proyecto.FechaFin" class="form-control" type="date" />
+            <span asp-validation-for="Proyecto.FechaFin" class="text-danger"></span> @* <-- ¡Añade o verifica esta línea! *@
         </div>
         <button type="submit" class="btn btn-primary">Guardar</button>
         <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
     </form>
 </div></div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
