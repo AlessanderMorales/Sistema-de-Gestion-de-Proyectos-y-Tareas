@@ -1,0 +1,56 @@
+﻿@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas.CreateModel
+@{
+    ViewData["Title"] = "Crear Tarea";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Tarea.Titulo" class="form-label"></label>
+                <input asp-for="Tarea.Titulo" class="form-control" />
+                <span asp-validation-for="Tarea.Titulo" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Tarea.Descripcion" class="form-label"></label>
+                <textarea asp-for="Tarea.Descripcion" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Tarea.Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Tarea.Prioridad" class="form-label"></label>
+                @* Se usa un <select> para facilitar el ingreso de la prioridad *@
+                <select asp-for="Tarea.Prioridad" class="form-control">
+                    <option value="">-- Seleccione Prioridad --</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Media">Media</option>
+                    <option value="Baja">Baja</option>
+                </select>
+                <span asp-validation-for="Tarea.Prioridad" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Tarea.ProyectoId" class="form-label"></label>
+                @* Idealmente, esto sería un <select> poblado con la lista de Proyectos *@
+                <input asp-for="Tarea.ProyectoId" class="form-control" type="number" />
+                <span asp-validation-for="Tarea.ProyectoId" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

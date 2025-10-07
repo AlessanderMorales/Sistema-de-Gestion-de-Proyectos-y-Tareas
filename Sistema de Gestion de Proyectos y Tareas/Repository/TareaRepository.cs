@@ -2,61 +2,72 @@
 {
     using Dapper;
     using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
-    
+    using System.Collections.Generic; // Para IEnumerable
 
     public class TareaRepository : IDB<Tarea>
     {
-        private readonly IDbConnectionSingleton _connectionFactory;
-        public TareaRepository(IDbConnectionSingleton connectionFactory) => _connectionFactory = connectionFactory;
+        private readonly MySqlConnectionSingleton _connectionSignleton;
 
-        public async Task<IEnumerable<Tarea>> GetAllAsync()
+        public TareaRepository(MySqlConnectionSingleton mySqlConnectionSingleton)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryAsync<Tarea>(
-                @"SELECT id_tarea AS Id, titulo, descripcion, prioridad 
-              FROM Tareas WHERE estado = 1 ORDER BY prioridad");
+            _connectionSignleton = mySqlConnectionSingleton;
         }
 
-        public async Task AddAsync(Tarea entity)
+        public IEnumerable<Tarea> GetAllAsync() // Aunque dice "Async", la implementación es síncrona aquí
         {
-            using var connection = _connectionFactory.CreateConnection();
-            await connection.ExecuteAsync(
-                @"INSERT INTO Tareas (titulo, descripcion, prioridad) 
-              VALUES (@Titulo, @Descripcion, @Prioridad);", entity);
+            string query = @"SELECT id_tarea AS Id, titulo, descripcion, prioridad, estado
+                              FROM Tareas -- ¡Usando el nombre de tabla corregido!
+                              WHERE estado = 1 
+                              ORDER BY id_tarea DESC";
+
+            return _connectionSignleton.ExcuteCommandWithDataReturn<Tarea>(query);
         }
 
-        public Task<Tarea?> GetByIdAsync(int id) => throw new NotImplementedException();
-        public Task UpdateAsync(Tarea entity) => throw new NotImplementedException();
-        public Task DeleteAsync(int id) => throw new NotImplementedException();
-
-        IEnumerable<Tarea> IDB<Tarea>.GetAllAsync()
+        public void AddAsync(Tarea entity) // Aunque dice "Async", la implementación es síncrona
         {
-            throw new NotImplementedException();
+            string query = @"INSERT INTO Tareas (titulo, descripcion, prioridad)
+                              VALUES (@Titulo, @Descripcion, @Prioridad);";
+
+            _connectionSignleton.ExcuteCommand<Tarea>(query, entity);
         }
 
-        Tarea IDB<Tarea>.GetByIdAsync(int id)
+        // Implementación corregida para GetByIdAsync (SÍNCRONA)
+        public Tarea GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            string query = @"SELECT id_tarea AS Id, titulo, descripcion, prioridad, estado
+                              FROM Tareas
+                              WHERE id_tarea = @Id AND estado = 1;"; // Tareas activas
+
+            var parameters = new { Id = id }; // Objeto anónimo para los parámetros
+
+            // ¡Usar el nuevo método QueryFirstOrDefault del singleton!
+            return _connectionSignleton.QueryFirstOrDefault<Tarea>(query, parameters);
         }
 
-        void IDB<Tarea>.AddAsync(Tarea entity)
+        public void UpdateAsync(Tarea entity) // Aunque dice "Async", la implementación es síncrona
         {
-            throw new NotImplementedException();
+            string query = @"UPDATE Tareas
+                              SET titulo = @Titulo,
+                              descripcion = @Descripcion,
+                              prioridad = @Prioridad
+                              WHERE id_tarea = @Id;";
+
+            _connectionSignleton.ExcuteCommand<Tarea>(query, entity);
         }
 
-        void IDB<Tarea>.UpdateAsync(Tarea entity)
-        {
-            throw new NotImplementedException();
-        }
-
+        // Implementación explícita para IDB<Tarea>.DeleteAsync(int id)
         void IDB<Tarea>.DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            string query = @"UPDATE Tareas SET estado = 0 WHERE id_tarea = @Id;";
+            _connectionSignleton.ExcuteCommand<dynamic>(query, new { Id = id }); // Pasa el ID como objeto anónimo
         }
 
         public void DeleteAsync(Tarea entity)
         {
-            throw new NotImplementedException();
+            string query = @"UPDATE Tareas
+                             SET estado = 0
+                             WHERE id_tarea = @Id;";
+            _connectionSignleton.ExcuteCommand<Tarea>(query, entity);
         }
     }
 }

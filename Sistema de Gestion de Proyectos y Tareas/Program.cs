@@ -12,6 +12,8 @@ builder.Services.AddSingleton<MySqlConnectionSingleton>();
 builder.Services.AddScoped<ProyectoryRepositoryCreator>();
 builder.Services.AddScoped<UsuarioRepositoryCreator>();
 
+builder.Services.AddScoped<TareaRepositoryCreator>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

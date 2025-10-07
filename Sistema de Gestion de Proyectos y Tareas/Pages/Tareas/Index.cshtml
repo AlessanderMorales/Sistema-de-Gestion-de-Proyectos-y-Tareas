@@ -1,0 +1,37 @@
+﻿@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas.IndexModel
+@{
+    ViewData["Title"] = "Lista de Tareas";
+}
+
+<h1>@ViewData["Title"]</h1>
+<p><a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a></p>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Tareas.FirstOrDefault().Id)</th>
+            <th>@Html.DisplayNameFor(model => model.Tareas.FirstOrDefault().Titulo)</th>
+            <th>@Html.DisplayNameFor(model => model.Tareas.FirstOrDefault().Prioridad)</th>
+            <th>@Html.DisplayNameFor(model => model.Tareas.FirstOrDefault().ProyectoId)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Tareas)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td><a asp-page="./Mostrar" asp-route-id="@item.Id">@item.Titulo</a></td> @* Enlace a la vista Mostrar *@
+                <td>@item.Prioridad</td>
+                <td>@item.ProyectoId</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-secondary" onclick="return confirm('¿Estás seguro de que quieres eliminar esta tarea?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
