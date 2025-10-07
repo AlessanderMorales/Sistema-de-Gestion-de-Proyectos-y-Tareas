@@ -1,0 +1,38 @@
+@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios.CreateModel
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
+<h1>@ViewData["Title"]</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Usuario.PrimerNombre" class="form-label"></label>
+                <input asp-for="Usuario.PrimerNombre" class="form-control" />
+                <span asp-validation-for="Usuario.PrimerNombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Usuario.SegundoNombre" class="form-label"></label>
+                <input asp-for="Usuario.SegundoNombre" class="form-control" />
+                <span asp-validation-for="Usuario.SegundoNombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Usuario.Apellidos" class="form-label"></label>
+                <input asp-for="Usuario.Apellidos" class="form-control" />
+                <span asp-validation-for="Usuario.Apellidos" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Usuario.Contraseña" class="form-label"></label>
+                <input asp-for="Usuario.Contraseña" class="form-control" type="password" />
+                <span asp-validation-for="Usuario.Contraseña" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
