@@ -15,7 +15,10 @@
 <body class="bg-light">
     <div class="d-flex" id="wrapper">
         <div class="bg-white border-end" id="sidebar-wrapper">
-            <div class="sidebar-heading text-center py-4 fs-4 fw-bold text-primary">Gestión</div>
+            <div class="sidebar-heading text-center py-4">
+                <img src="~/Image/Logo.png" alt="Logo de Gestión" style="height:40px; margin-bottom:5px;" />
+                <div class="fs-4 fw-bold text-primary">Gestión</div>
+            </div>
             <div class="list-group list-group-flush">
                 <a asp-page="/Index" class="list-group-item list-group-item-action bg-white">Home</a>
                 <a asp-page="/proyectos/Create" class="list-group-item list-group-item-action bg-white">Crear Proyectos</a>
@@ -28,7 +31,10 @@
             <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
                 <div class="container-fluid">
                     <button class="btn btn-primary" id="sidebarToggle">☰</button>
-                    <span class="navbar-text ms-3 fw-bold">Sistema de Gestión</span>
+                    <span class="navbar-text ms-3 fw-bold d-flex align-items-center">
+                        <img src="~/Image/Logo.png" alt="Logo" style="height:30px; margin-right:10px;" />
+                        Sistema de Gestión
+                    </span>
                 </div>
             </nav>
 
@@ -58,6 +64,7 @@
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
