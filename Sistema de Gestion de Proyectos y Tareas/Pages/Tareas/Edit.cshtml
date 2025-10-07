@@ -36,12 +36,6 @@
                 <span asp-validation-for="Tarea.Prioridad" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Tarea.ProyectoId" class="form-label"></label>
-                <input asp-for="Tarea.ProyectoId" class="form-control" type="number" />
-                <span asp-validation-for="Tarea.ProyectoId" class="text-danger"></span>
-            </div>
-
             <button type="submit" class="btn btn-primary">Actualizar</button>
             <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
         </form>

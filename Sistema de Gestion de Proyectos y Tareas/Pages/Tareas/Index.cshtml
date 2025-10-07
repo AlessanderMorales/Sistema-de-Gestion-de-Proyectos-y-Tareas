@@ -13,7 +13,6 @@
             <th>@Html.DisplayNameFor(model => model.Tareas.FirstOrDefault().Id)</th>
             <th>@Html.DisplayNameFor(model => model.Tareas.FirstOrDefault().Titulo)</th>
             <th>@Html.DisplayNameFor(model => model.Tareas.FirstOrDefault().Prioridad)</th>
-            <th>@Html.DisplayNameFor(model => model.Tareas.FirstOrDefault().ProyectoId)</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -24,7 +23,6 @@
                 <td>@item.Id</td>
                 <td><a asp-page="./Mostrar" asp-route-id="@item.Id">@item.Titulo</a></td>
                 <td>@item.Prioridad</td>
-                <td>@item.ProyectoId</td>
                 <td>
                     <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
                     <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">

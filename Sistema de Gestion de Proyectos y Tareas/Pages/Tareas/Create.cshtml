@@ -26,7 +26,6 @@
 
             <div class="mb-3">
                 <label asp-for="Tarea.Prioridad" class="form-label"></label>
-                @* Se usa un <select> para facilitar el ingreso de la prioridad *@
                 <select asp-for="Tarea.Prioridad" class="form-control">
                     <option value="">-- Seleccione Prioridad --</option>
                     <option value="Alta">Alta</option>
@@ -34,12 +33,6 @@
                     <option value="Baja">Baja</option>
                 </select>
                 <span asp-validation-for="Tarea.Prioridad" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Tarea.ProyectoId" class="form-label"></label>
-                <input asp-for="Tarea.ProyectoId" class="form-control" type="number" />
-                <span asp-validation-for="Tarea.ProyectoId" class="text-danger"></span>
             </div>
 
             <button type="submit" class="btn btn-primary">Guardar</button>
