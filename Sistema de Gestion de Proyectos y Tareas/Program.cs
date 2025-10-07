@@ -10,6 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddSingleton<MySqlConnectionSingleton>();
 
 builder.Services.AddScoped<ProyectoryRepositoryCreator>();
+builder.Services.AddScoped<UsuarioRepositoryCreator>();
 
 var app = builder.Build();
 
