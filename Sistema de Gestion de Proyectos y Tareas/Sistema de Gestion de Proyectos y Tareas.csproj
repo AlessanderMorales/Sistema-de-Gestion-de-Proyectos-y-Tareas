@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\Image\" />
     <Folder Include="Pages\Tareas\" />
     <Folder Include="Pages\Usuarios\" />
   </ItemGroup>
