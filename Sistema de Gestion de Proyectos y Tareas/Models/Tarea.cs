@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
-{
+{//agregar validaciones
     public class Tarea
     {
         [Key] // Clave Primaria, al igual que en Proyecto.cs
