@@ -25,7 +25,10 @@
             </div>
             <div class="mb-3">
                 <label asp-for="Usuario.Contraseña" class="form-label"></label>
-                <input asp-for="Usuario.Contraseña" class="form-control" type="password" />
+                <div class="input-group">
+                    <input asp-for="Usuario.Contraseña" class="form-control" type="password" id="contraseñaInput" />
+                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">Mostrar</button>
+                </div>
                 <span asp-validation-for="Usuario.Contraseña" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -43,4 +46,16 @@
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const input = document.getElementById('contraseñaInput');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.textContent = 'Ocultar';
+            } else {
+                input.type = 'password';
+                this.textContent = 'Mostrar';
+            }
+        });
+    </script>
 }
