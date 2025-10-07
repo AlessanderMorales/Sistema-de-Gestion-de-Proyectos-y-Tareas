@@ -1,0 +1,35 @@
+﻿@page "{id:int}"
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas.MostrarModel
+@{
+    ViewData["Title"] = "Detalle de Tarea";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+@if (Model.Tarea != null)
+{
+    <div>
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Tarea.Titulo)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Tarea.Titulo)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Tarea.Descripcion)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Tarea.Descripcion)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Tarea.Prioridad)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Tarea.Prioridad)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Tarea.ProyectoId)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Tarea.ProyectoId)</dd>
+        </dl>
+    </div>
+    <div>
+        <a asp-page="./Edit" asp-route-id="@Model.Tarea.Id" class="btn btn-sm btn-info">Editar</a> |
+        <a asp-page="./Index" class="btn btn-sm btn-secondary">Volver a la Lista</a>
+    </div>
+}
+else
+{
+    <p>Tarea no encontrada.</p>
+}
