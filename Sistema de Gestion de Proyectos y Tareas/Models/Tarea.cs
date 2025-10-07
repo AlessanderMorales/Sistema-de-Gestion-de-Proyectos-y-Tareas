@@ -5,10 +5,10 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
 {//agregar validaciones
     public class Tarea
     {
-        [Key] // Clave Primaria, al igual que en Proyecto.cs
+        [Key]
         public int Id { get; set; }
         
-        [Required(ErrorMessage = "El título de la tarea es obligatorio.")] // Validación como en Proyecto.cs
+        [Required(ErrorMessage = "El título de la tarea es obligatorio.")] 
         [StringLength(100, ErrorMessage = "El título no puede exceder los 100 caracteres.")]
         [Display(Name = "Título")]
         public string Titulo { get; set; } = string.Empty;
@@ -19,14 +19,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
         
         [Required(ErrorMessage = "La prioridad es obligatoria.")]
         [Display(Name = "Prioridad")]
-        public string? Prioridad { get; set; } // Ejemplo: Alta, Media, Baja
+        public string? Prioridad { get; set; } 
 
-        // --- Relación con Proyecto (Clave Foránea) ---
         [Required(ErrorMessage = "Debes asignar un proyecto.")]
         [Display(Name = "Proyecto Asignado")]
         public int ProyectoId { get; set; }
-
-        // Propiedad de navegación (necesita 'using System.ComponentModel.DataAnnotations.Schema;' si no está)
         [ForeignKey("ProyectoId")]
         public Proyecto? Proyecto { get; set; } 
     }

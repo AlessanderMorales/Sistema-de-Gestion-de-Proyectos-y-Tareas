@@ -38,7 +38,6 @@
 
             <div class="mb-3">
                 <label asp-for="Tarea.ProyectoId" class="form-label"></label>
-                @* Idealmente, esto sería un <select> poblado con la lista de Proyectos *@
                 <input asp-for="Tarea.ProyectoId" class="form-control" type="number" />
                 <span asp-validation-for="Tarea.ProyectoId" class="text-danger"></span>
             </div>
