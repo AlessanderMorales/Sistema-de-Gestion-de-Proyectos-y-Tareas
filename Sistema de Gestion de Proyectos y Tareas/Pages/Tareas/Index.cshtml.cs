@@ -9,8 +9,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
     public class IndexModel : PageModel
     {
         private readonly TareaRepositoryCreator _tareaRepositoryCreator;
-
-        // Lista de tareas para mostrar en la vista
         public IEnumerable<Tarea> Tareas { get; private set; } = new List<Tarea>();
 
         public IndexModel(TareaRepositoryCreator tareaRepositoryCreator)
@@ -20,16 +18,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 
         public void OnGet()
         {
-            // Cargar todas las tareas (se asume que GetAllAsync retorna IEnumerable<Tarea>)
             IDB<Tarea> repo = _tareaRepositoryCreator.CreateRepository();
             Tareas = repo.GetAllAsync();
         }
 
         public IActionResult OnPost(int id)
         {
-            // Lógica para el borrado lógico (Estado = 0)
             var repo = _tareaRepositoryCreator.CreateRepository();
-            var tarea = repo.GetByIdAsync(id); // Obtener la tarea por ID
+            var tarea = repo.GetByIdAsync(id);
 
             if (tarea != null)
             {

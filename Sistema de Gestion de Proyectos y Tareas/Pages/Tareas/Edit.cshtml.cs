@@ -25,7 +25,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
                 return NotFound();
             }
 
-            // Busca la Tarea por ID
             IDB<Tarea> repo = _repositoryCreator.CreateRepository();
             var tarea = repo.GetByIdAsync(id.Value);
 
@@ -44,7 +43,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
                 return Page();
             }
 
-            // Actualiza la Tarea
             IDB<Tarea> repo = _repositoryCreator.CreateRepository();
             repo.UpdateAsync(Tarea);
 

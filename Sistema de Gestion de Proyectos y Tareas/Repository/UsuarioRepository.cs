@@ -3,15 +3,11 @@
     using Dapper;
     using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
     using System.Data;
-    using System.Collections.Generic; // Necesario para IEnumerable
+    using System.Collections.Generic;
 
-    // Asumo que IDB<T> es una interfaz que define los métodos CRUD básicos
-    // (GetAllAsync, GetByIdAsync, AddAsync, UpdateAsync, DeleteAsync).
     public class UsuarioRepository : IDB<Usuario>
     {
         private readonly IDbConnectionSingleton _connectionFactory;
-
-        // Constructor para inyectar la dependencia de la fábrica de conexiones
         public UsuarioRepository(IDbConnectionSingleton connectionFactory)
         {
             _connectionFactory = connectionFactory;
@@ -42,8 +38,6 @@
         public void AddAsync(Usuario entity)
         {
             using var connection = _connectionFactory.CreateConnection();
-            // Incluye 'rol' y 'estado' en la inserción.
-            // Los valores se toman de las propiedades correspondientes de 'entity'.
             connection.Execute(
                 @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, rol, estado) 
                   VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, @Rol, @Estado);",
@@ -53,8 +47,6 @@
         public void UpdateAsync(Usuario entity)
         {
             using var connection = _connectionFactory.CreateConnection();
-            // Actualiza todas las propiedades modificables, incluyendo 'rol'.
-            // El 'estado' no se actualiza aquí, ya que se maneja por DeleteAsync.
             connection.Execute(
                 @"UPDATE Usuario 
                   SET primer_nombre = @PrimerNombre, 
@@ -66,21 +58,16 @@
                 entity);
         }
 
-        // Método principal para la eliminación lógica por ID
         public void DeleteAsync(int id)
         {
             using var connection = _connectionFactory.CreateConnection();
-            // Esta es la consulta clave: cambia el 'estado' a 0.
             connection.Execute(
                 @"UPDATE Usuario SET estado = 0 WHERE id_usuario = @Id;",
                 new { Id = id });
         }
 
-        // Sobrecarga para eliminar lógicamente pasando un objeto Usuario
         public void DeleteAsync(Usuario entity)
         {
-            // Simplemente llama al método por ID, extrayendo el Id de la entidad.
-            // Asegúrate de que 'entity.Id' tenga un valor válido.
             DeleteAsync(entity.Id);
         }
     }
