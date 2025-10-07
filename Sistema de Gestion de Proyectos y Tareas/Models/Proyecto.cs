@@ -1,24 +1,25 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations; // ¡NECESITAS esta importación!
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
 {
-    public class Proyecto
+    public class Proyecto : IValidatableObject
     {
-        [Key] // Indica que esta propiedad es la clave primaria
+        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El nombre del proyecto es obligatorio.")]
         [StringLength(100, ErrorMessage = "El nombre no puede exceder los 100 caracteres.")]
-        [Display(Name = "Nombre del Proyecto")] // Etiqueta amigable para la interfaz de usuario
+        [Display(Name = "Nombre del Proyecto")]
         public string Nombre { get; set; } = string.Empty;
 
         [StringLength(500, ErrorMessage = "La descripción no puede exceder los 500 caracteres.")]
         [Display(Name = "Descripción")]
-        public string? Descripcion { get; set; } // Puede ser nullable si tu base de datos lo permite
+        public string? Descripcion { get; set; }
 
         [Required(ErrorMessage = "La fecha de inicio es obligatoria.")]
-        [DataType(DataType.Date)] // Ayuda a renderizar un control de fecha en HTML
+        [DataType(DataType.Date)]
         [Display(Name = "Fecha de Inicio")]
         public DateTime FechaInicio { get; set; }
 
@@ -28,8 +29,23 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
         public DateTime FechaFin { get; set; }
 
         [Display(Name = "Estado")]
-        public byte Estado { get; set; } // O int, dependiendo de cómo lo uses (ej. 0/1)
+        public byte Estado { get; set; }
 
-        // @Nombre, @Descripcion, @FechaInicio, @FechaFin
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (FechaFin < FechaInicio)
+            {
+                yield return new ValidationResult(
+                    "La fecha de finalización no puede ser anterior a la fecha de inicio.",
+                    new[] { nameof(FechaFin) });
+            }
+
+            if (FechaFin == FechaInicio)
+            {
+                yield return new ValidationResult(
+                    "La fecha de finalización no puede ser igual a la fecha de inicio.",
+                    new[] { nameof(FechaFin) });
+            }
+        }
     }
 }
