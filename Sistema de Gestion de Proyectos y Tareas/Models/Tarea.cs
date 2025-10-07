@@ -1,5 +1,5 @@
 ﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
-{
+{//agregar validaciones
     public class Tarea
     {
         public int Id { get; set; }
