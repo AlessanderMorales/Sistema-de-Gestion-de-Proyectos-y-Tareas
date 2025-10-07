@@ -13,9 +13,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Image\" />
+    <Folder Include="wwwroot\Image\" />
     <Folder Include="Pages\Tareas\" />
     <Folder Include="Pages\Usuarios\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Image\Logo.png" />
   </ItemGroup>
 
 </Project>
