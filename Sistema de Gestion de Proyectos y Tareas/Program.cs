@@ -6,11 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddRazorPages();
-
 builder.Services.AddSingleton<MySqlConnectionSingleton>();
-builder.Services.AddScoped<ProyectoryRepositoryCreator>();
-builder.Services.AddScoped<UsuarioRepositoryCreator>();
-builder.Services.AddScoped<TareaRepositoryCreator>();
+builder.Services.AddScoped<MySqlRepositoryFactory<Proyecto>, ProyectoryRepositoryCreator>();
+builder.Services.AddScoped<MySqlRepositoryFactory<Usuario>, UsuarioRepositoryCreator>();
+builder.Services.AddScoped<MySqlRepositoryFactory<Tarea>, TareaRepositoryCreator>();
+
 
 var app = builder.Build();
 

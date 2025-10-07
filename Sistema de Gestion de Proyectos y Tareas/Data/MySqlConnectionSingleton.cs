@@ -10,17 +10,7 @@ public class MySqlConnectionSingleton : IDbConnectionSingleton
 {
     private readonly string _connectionString;
     private static MySqlConnectionSingleton? _instance;
-    public static MySqlConnectionSingleton Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                throw new InvalidOperationException("MySqlConnectionSingleton debe ser inicializado antes de acceder a su instancia estática si se requiere IConfiguration.");
-            }
-            return _instance;
-        }
-    }
+   
     public MySqlConnectionSingleton()
     {
         _connectionString = "Server=localhost;Database=proyectos_tareas_db;User=root;Password=your_password;";

@@ -7,13 +7,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {
     public class CreateModel : PageModel
     {
-        private readonly UsuarioRepositoryCreator _repositoryCreator;
+        private readonly MySqlRepositoryFactory<Usuario> _repositoryFactory;
         [BindProperty]
         public Usuario Usuario { get; set; } = new();
 
-        public CreateModel(UsuarioRepositoryCreator repositoryCreator)
+        public CreateModel(MySqlRepositoryFactory<Usuario> repositoryFactory)
         {
-            _repositoryCreator = repositoryCreator;
+            _repositoryFactory = repositoryFactory;
         }
 
         public void OnGet() { }
@@ -21,7 +21,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid) return Page();
-            var repo = _repositoryCreator.CreateRepository();
+            var repo = _repositoryFactory.CreateRepository();
             repo.AddAsync(Usuario);
             return RedirectToPage("./Index");
         }

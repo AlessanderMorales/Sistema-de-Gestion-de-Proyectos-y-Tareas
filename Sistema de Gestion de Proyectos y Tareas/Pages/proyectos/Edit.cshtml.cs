@@ -8,11 +8,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 {
     public class EditModel : PageModel
     {
-        private readonly ProyectoryRepositoryCreator _repositoryCreator;
+        private readonly MySqlRepositoryFactory<Proyecto> _repositoryFactory;
 
-        public EditModel(ProyectoryRepositoryCreator repositoryCreator)
+        public EditModel(MySqlRepositoryFactory<Proyecto> repositoryFactory)
         {
-            _repositoryCreator = repositoryCreator;
+            _repositoryFactory = repositoryFactory;
         }
 
         [BindProperty]
@@ -25,7 +25,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
                 return NotFound();
             }
 
-            IDB<Proyecto> repo = _repositoryCreator.CreateRepository();
+            IDB<Proyecto> repo = _repositoryFactory.CreateRepository();
             var proyecto = repo.GetByIdAsync(id.Value);
 
             if (proyecto == null)
@@ -43,7 +43,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
                 return Page();
             }
 
-            IDB<Proyecto> repo = _repositoryCreator.CreateRepository();
+            IDB<Proyecto> repo = _repositoryFactory.CreateRepository();
             repo.UpdateAsync(Proyecto); 
 
             return RedirectToPage("./Index");

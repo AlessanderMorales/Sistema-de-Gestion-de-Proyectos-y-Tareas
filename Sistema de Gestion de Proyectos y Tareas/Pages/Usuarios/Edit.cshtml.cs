@@ -7,19 +7,19 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {
     public class EditModel : PageModel
     {
-        private readonly UsuarioRepositoryCreator _repositoryCreator;
+        private readonly MySqlRepositoryFactory<Usuario> _repositoryFactory;
         [BindProperty]
         public Usuario Usuario { get; set; } = default!;
 
-        public EditModel(UsuarioRepositoryCreator repositoryCreator)
+        public EditModel(MySqlRepositoryFactory<Usuario> repositoryFactory)
         {
-            _repositoryCreator = repositoryCreator;
+            _repositoryFactory = repositoryFactory;
         }
 
         public IActionResult OnGet(int? id)
         {
             if (id == null) return NotFound();
-            var repo = _repositoryCreator.CreateRepository();
+            var repo = _repositoryFactory.CreateRepository();
             var usuario = repo.GetByIdAsync(id.Value);
             if (usuario == null) return NotFound();
             Usuario = usuario;
@@ -29,7 +29,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid) return Page();
-            var repo = _repositoryCreator.CreateRepository();
+            var repo = _repositoryFactory.CreateRepository();
             repo.UpdateAsync(Usuario);
             return RedirectToPage("./Index");
         }

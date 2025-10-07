@@ -8,14 +8,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
     public class CreateModel : PageModel
     {
-        private readonly TareaRepositoryCreator _repositoryCreator;
+        private readonly MySqlRepositoryFactory<Tarea> _repositoryFactory;
 
         [BindProperty]
         public Tarea Tarea { get; set; } = new();
 
-        public CreateModel(TareaRepositoryCreator repositoryCreator)
+        public CreateModel(MySqlRepositoryFactory<Tarea> repositoryFactory)
         {
-            _repositoryCreator = repositoryCreator;
+            _repositoryFactory = repositoryFactory;
         }
 
         public void OnGet() { }
@@ -24,7 +24,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
         {
             if (!ModelState.IsValid) return Page();
 
-            IDB<Tarea> repo = _repositoryCreator.CreateRepository();
+            IDB<Tarea> repo = _repositoryFactory.CreateRepository();
             repo.AddAsync(Tarea);
 
             return RedirectToPage("./Index");

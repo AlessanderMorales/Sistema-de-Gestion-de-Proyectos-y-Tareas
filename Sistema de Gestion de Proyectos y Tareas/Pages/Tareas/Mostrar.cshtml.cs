@@ -7,11 +7,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
     public class MostrarModel : PageModel
     {
-        private readonly TareaRepositoryCreator _repositoryCreator;
+        private readonly MySqlRepositoryFactory<Tarea> _repositoryFactory;
 
-        public MostrarModel(TareaRepositoryCreator repositoryCreator)
+        public MostrarModel(MySqlRepositoryFactory<Tarea> repositoryFactory)
         {
-            _repositoryCreator = repositoryCreator;
+            _repositoryFactory = repositoryFactory;
         }
         public Tarea Tarea { get; set; } = default!;
 
@@ -22,7 +22,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
                 return NotFound();
             }
 
-            var repo = _repositoryCreator.CreateRepository();
+            var repo = _repositoryFactory.CreateRepository();
             var tarea = repo.GetByIdAsync(id.Value);
 
             if (tarea == null)

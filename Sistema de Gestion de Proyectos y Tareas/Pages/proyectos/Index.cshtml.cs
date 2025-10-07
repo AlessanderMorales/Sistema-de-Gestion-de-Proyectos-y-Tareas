@@ -8,19 +8,19 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
     public class IndexModel : PageModel
     {
         public IEnumerable<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
-        private readonly ProyectoryRepositoryCreator _proyectoryRepositoryCreator;
-        public IndexModel(ProyectoryRepositoryCreator proyectoryRepositoryCreator  ) {
-            _proyectoryRepositoryCreator = proyectoryRepositoryCreator;
+        private readonly MySqlRepositoryFactory<Proyecto> _proyectoryRepositoryFactory;
+        public IndexModel(MySqlRepositoryFactory<Proyecto> proyectoryRepositoryFactory) {
+            _proyectoryRepositoryFactory = proyectoryRepositoryFactory;
         }
 
         public void OnGet()
         {
-            Proyectos = _proyectoryRepositoryCreator.CreateRepository().GetAllAsync();
+            Proyectos = _proyectoryRepositoryFactory.CreateRepository().GetAllAsync();
         }
 
         public IActionResult OnPost(int id)
         {
-            var repo = _proyectoryRepositoryCreator.CreateRepository();
+            var repo = _proyectoryRepositoryFactory.CreateRepository();
             var proyecto = repo.GetAllAsync().FirstOrDefault(p => p.Id == id);
             if (proyecto != null)
             {
