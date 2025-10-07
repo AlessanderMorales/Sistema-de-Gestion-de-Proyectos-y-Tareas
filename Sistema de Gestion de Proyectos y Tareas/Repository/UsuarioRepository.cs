@@ -2,60 +2,55 @@
 {
     using Dapper;
     using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
+    using System.Data;
 
     public class UsuarioRepository : IDB<Usuario>
     {
         private readonly IDbConnectionSingleton _connectionFactory;
         public UsuarioRepository(IDbConnectionSingleton connectionFactory) => _connectionFactory = connectionFactory;
 
-        public async Task<IEnumerable<Usuario>> GetAllAsync()
+        public IEnumerable<Usuario> GetAllAsync()
         {
             using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryAsync<Usuario>(
-                @"SELECT id_usuario AS Id, primer_nombre as PrimerNombre, segundo_nombre as SegundoNombre, apellidos, rol 
-              FROM Usuario WHERE estado = 1 ORDER BY apellidos");
+            return connection.Query<Usuario>(
+                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, apellidos, contraseña, rol 
+                  FROM Usuario WHERE estado = 1 ORDER BY apellidos");
         }
 
-        public async Task AddAsync(Usuario entity)
+        public Usuario GetByIdAsync(int id)
         {
             using var connection = _connectionFactory.CreateConnection();
-            await connection.ExecuteAsync(
-                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, rol) 
-              VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, @Rol);", entity);
+            return connection.QueryFirstOrDefault<Usuario>(
+                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, apellidos, contraseña, rol 
+                  FROM Usuario WHERE id_usuario = @Id AND estado = 1", new { Id = id });
         }
 
-        public Task<Usuario?> GetByIdAsync(int id) => throw new NotImplementedException();
-        public Task UpdateAsync(Usuario entity) => throw new NotImplementedException();
-        public Task DeleteAsync(int id) => throw new NotImplementedException();
-
-        IEnumerable<Usuario> IDB<Usuario>.GetAllAsync()
+        public void AddAsync(Usuario entity)
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Execute(
+                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, rol, estado) 
+                  VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, @Rol, 1);", entity);
         }
 
-        Usuario IDB<Usuario>.GetByIdAsync(int id)
+        public void UpdateAsync(Usuario entity)
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Execute(
+                @"UPDATE Usuario SET primer_nombre = @PrimerNombre, segundo_nombre = @SegundoNombre, apellidos = @Apellidos, 
+                  contraseña = @Contraseña, rol = @Rol WHERE id_usuario = @Id;", entity);
         }
 
-        void IDB<Usuario>.AddAsync(Usuario entity)
+        public void DeleteAsync(int id)
         {
-            throw new NotImplementedException();
-        }
-
-        void IDB<Usuario>.UpdateAsync(Usuario entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IDB<Usuario>.DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Execute(
+                @"UPDATE Usuario SET estado = 0 WHERE id_usuario = @Id;", new { Id = id });
         }
 
         public void DeleteAsync(Usuario entity)
         {
-            throw new NotImplementedException();
+            DeleteAsync(entity.Id);
         }
     }
 }

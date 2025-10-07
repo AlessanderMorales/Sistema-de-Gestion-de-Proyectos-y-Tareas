@@ -1,0 +1,33 @@
+@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios.IndexModel
+@{ ViewData["Title"] = "Usuarios"; }
+<h1>@ViewData["Title"]</h1>
+<a asp-page="Create" class="btn btn-primary mb-3">Crear Usuario</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Primer Nombre</th>
+            <th>Segundo Nombre</th>
+            <th>Apellidos</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model.Usuarios)
+        {
+            <tr>
+                <td>@usuario.PrimerNombre</td>
+                <td>@usuario.SegundoNombre</td>
+                <td>@usuario.Apellidos</td>
+                <td>@usuario.Rol</td>
+                <td>
+                    <a asp-page="Edit" asp-route-id="@usuario.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@usuario.Id" style="display:inline" onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>    
