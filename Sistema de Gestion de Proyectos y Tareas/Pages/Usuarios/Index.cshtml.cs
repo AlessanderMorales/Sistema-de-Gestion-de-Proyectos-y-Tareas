@@ -18,7 +18,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
         public IActionResult OnGet()
         {
             var repo = _repositoryCreator.CreateRepository();
-            Usuarios = repo.GetAllAsync(); // Sin await, método síncrono
+            Usuarios = repo.GetAllAsync();
             return Page();
         }
 
@@ -27,7 +27,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
             if (id.HasValue)
             {
                 var repo = _repositoryCreator.CreateRepository();
-                repo.DeleteAsync(id.Value); // Usar .Value para convertir int? a int
+                repo.DeleteAsync(id.Value);
             }
             return RedirectToPage("Index");
         }

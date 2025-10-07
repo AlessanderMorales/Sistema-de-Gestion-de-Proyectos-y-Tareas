@@ -24,33 +24,48 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
         [DataType(DataType.Password)]
         public string Contraseña { get; set; } = string.Empty;
 
+        // Corresponde a 'rol' en la DB
+        public string Rol { get; set; } = "Usuario"; // Valor predeterminado para nuevos usuarios
+
+        // Corresponde a 'estado' en la DB, para eliminación lógica (0 = inactivo, 1 = activo)
+        public int Estado { get; set; } = 1; // Valor predeterminado para nuevos usuarios (activo)
+
+
+        // --- Implementación de IValidatableObject para validaciones personalizadas ---
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            // Patrón para nombres que solo contengan letras y un espacio entre palabras.
             string nombrePattern = @"^(?! )[A-Za-zÁÉÍÓÚáéíóúÑñ]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$";
+            // Patrón para detectar múltiples espacios.
             string sinEspaciosMultiples = @" {2,}";
 
+            // Validaciones para PrimerNombre
             if (string.IsNullOrWhiteSpace(PrimerNombre) || !Regex.IsMatch(PrimerNombre.Trim(), nombrePattern) || Regex.IsMatch(PrimerNombre, sinEspaciosMultiples))
                 yield return new ValidationResult("El primer nombre solo puede contener letras y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(PrimerNombre) });
 
+            // Validaciones para SegundoNombre (si no es nulo/vacío)
             if (!string.IsNullOrWhiteSpace(SegundoNombre))
             {
                 if (!Regex.IsMatch(SegundoNombre.Trim(), nombrePattern) || Regex.IsMatch(SegundoNombre, sinEspaciosMultiples))
                     yield return new ValidationResult("El segundo nombre solo puede contener letras y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(SegundoNombre) });
             }
 
+            // Validaciones para Apellidos
             if (string.IsNullOrWhiteSpace(Apellidos) || !Regex.IsMatch(Apellidos.Trim(), nombrePattern) || Regex.IsMatch(Apellidos, sinEspaciosMultiples))
                 yield return new ValidationResult("El apellido solo puede contener letras y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(Apellidos) });
 
+            // Validaciones de Contraseña
             if (string.IsNullOrWhiteSpace(Contraseña) ||
                 Contraseña.Length < 8 || Contraseña.Length > 15 ||
-                !Regex.IsMatch(Contraseña, @"[A-Z]") ||
-                !Regex.IsMatch(Contraseña, @"[a-z]") ||
-                !Regex.IsMatch(Contraseña, @"\d") ||
-                !Regex.IsMatch(Contraseña, @"[\W_]"))
+                !Regex.IsMatch(Contraseña, @"[A-Z]") ||        // Al menos una mayúscula
+                !Regex.IsMatch(Contraseña, @"[a-z]") ||        // Al menos una minúscula
+                !Regex.IsMatch(Contraseña, @"\d") ||           // Al menos un número
+                !Regex.IsMatch(Contraseña, @"[\W_]"))          // Al menos un carácter especial
             {
                 yield return new ValidationResult("La contraseña debe tener entre 8 y 15 caracteres, incluir al menos una mayúscula, una minúscula, un número y un carácter especial.", new[] { nameof(Contraseña) });
             }
 
+            // Validaciones de espacios al inicio/final
             if (PrimerNombre != PrimerNombre.Trim())
                 yield return new ValidationResult("El primer nombre no debe empezar ni terminar con espacios.", new[] { nameof(PrimerNombre) });
             if (!string.IsNullOrEmpty(SegundoNombre) && SegundoNombre != SegundoNombre.Trim())
@@ -58,6 +73,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
             if (!string.IsNullOrEmpty(Apellidos) && Apellidos != Apellidos.Trim())
                 yield return new ValidationResult("El apellido no debe empezar ni terminar con espacios.", new[] { nameof(Apellidos) });
 
+            // --- Validaciones de inyección SQL (una capa adicional de seguridad) ---
             string[] sqlKeywords = { "SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "UNION", "ALTER", "CREATE", "EXEC", "TRUNCATE", "MERGE", "CALL", "GRANT", "REVOKE", "WHERE", "FROM" };
             string[] sqlOperators = { "--", ";--", ";", "/*", "*/", "@@", "@", "char", "nchar", "varchar", "nvarchar", "alter", "begin", "cast", "create", "cursor", "declare", "end", "exec", "execute", "fetch", "kill", "open", "sys", "sysobjects", "syscolumns", "table", "update", "or", "and", "=", "%", "'", "\"", "(", ")" };
 
