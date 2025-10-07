@@ -1,49 +1,74 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var tokens = Antiforgery.GetAndStoreTokens(ViewContext.HttpContext);
+}
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sistema de Gestión</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Sistema_de_Gestion_de_Proyectos_y_Tareas.styles.css" asp-append-version="true" />
+    <meta name="request-verification-token" content="@tokens.RequestToken" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">
-                    <img src="~/Image/Logo.png" alt="Logo de Gestión de Proyectos" style="height: 30px; margin-right: 10px;" />
-                    Gestión de Proyectos
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item"><a class="nav-link text-light" asp-page="/Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link text-light" asp-page="/proyectos/Create">Crear Proyectos</a></li>
-                        <li class="nav-item"><a class="nav-link text-light" asp-page="/proyectos/Index">Mostrar proyectos</a></li>
-                        <li class="nav-item"><a class="nav-link text-light" asp-page="/Tareas/Index">Tareas</a></li>
-                        <li class="nav-item"><a class="nav-link text-light" asp-page="/Usuarios/Index">Usuarios</a></li>
-                    </ul>
+<body class="bg-light">
+    <div class="d-flex" id="wrapper">
+        <div class="bg-white border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4 fs-4 fw-bold text-primary">Gestión</div>
+            <div class="list-group list-group-flush">
+                <a asp-page="/Index" class="list-group-item list-group-item-action bg-white">Home</a>
+                <a asp-page="/proyectos/Create" class="list-group-item list-group-item-action bg-white">Crear Proyectos</a>
+                <a asp-page="/proyectos/Index" class="list-group-item list-group-item-action bg-white">Mostrar proyectos</a>
+                <a asp-page="/Tareas/Index" class="list-group-item list-group-item-action bg-white">Tareas</a>
+                <a asp-page="/Usuarios/Index" class="list-group-item list-group-item-action bg-white">Usuarios</a>
+            </div>
+        </div>
+        <div id="page-content-wrapper" class="w-100">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+                <div class="container-fluid">
+                    <button class="btn btn-primary" id="sidebarToggle">☰</button>
+                    <span class="navbar-text ms-3 fw-bold">Sistema de Gestión</span>
+                </div>
+            </nav>
+
+            <div class="container-fluid py-4">
+                @RenderBody()
+            </div>
+            <footer class="border-top text-muted py-2 text-center">
+                &copy; 2025 - Sistema de Gestión - <a asp-page="/Privacy">Privacy</a>
+            </footer>
+        </div>
+    </div>
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Seguro que quieres eliminar al usuario <strong id="modalUserName"></strong>?</p>
+                    <div id="modalAlert" class="alert d-none" role="alert"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button id="confirmDeleteBtn" type="button" class="btn btn-danger">Eliminar</button>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Sistema de Gestión - <a asp-page="/Privacy">Privacy</a>
         </div>
-    </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const wrapper = document.getElementById('wrapper');
+        sidebarToggle.addEventListener('click', () => {
+            wrapper.classList.toggle('toggled');
+        });
+    </script>
 </body>
 </html>
