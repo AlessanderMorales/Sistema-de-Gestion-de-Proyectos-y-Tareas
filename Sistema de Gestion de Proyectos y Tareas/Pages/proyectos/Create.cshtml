@@ -7,22 +7,22 @@
         <div class="mb-3">
             <label asp-for="Proyecto.Nombre" class="form-label"></label>
             <input asp-for="Proyecto.Nombre" class="form-control" />
-            <span asp-validation-for="Proyecto.Nombre" class="text-danger"></span> @* <-- ¡Añade o verifica esta línea! *@
+            <span asp-validation-for="Proyecto.Nombre" class="text-danger"></span>
         </div>
         <div class="mb-3">
             <label asp-for="Proyecto.Descripcion" class="form-label"></label>
             <textarea asp-for="Proyecto.Descripcion" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Proyecto.Descripcion" class="text-danger"></span> @* <-- ¡Añade o verifica esta línea! *@
+            <span asp-validation-for="Proyecto.Descripcion" class="text-danger"></span> 
         </div>
         <div class="mb-3">
             <label asp-for="Proyecto.FechaInicio" class="form-label"></label>
             <input asp-for="Proyecto.FechaInicio" class="form-control" type="date" />
-            <span asp-validation-for="Proyecto.FechaInicio" class="text-danger"></span> @* <-- ¡Añade o verifica esta línea! *@
+            <span asp-validation-for="Proyecto.FechaInicio" class="text-danger"></span> 
         </div>
         <div class="mb-3">
             <label asp-for="Proyecto.FechaFin" class="form-label"></label>
             <input asp-for="Proyecto.FechaFin" class="form-control" type="date" />
-            <span asp-validation-for="Proyecto.FechaFin" class="text-danger"></span> @* <-- ¡Añade o verifica esta línea! *@
+            <span asp-validation-for="Proyecto.FechaFin" class="text-danger"></span>
         </div>
         <button type="submit" class="btn btn-primary">Guardar</button>
         <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
@@ -30,5 +30,33 @@
 </div></div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fechaInicio = document.querySelector('#Proyecto_FechaInicio');
+            const fechaFin = document.querySelector('#Proyecto_FechaFin');
+            const form = document.querySelector('form');
+
+            form.addEventListener('submit', function (event) {
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFin.value);
+                const errorSpan = fechaFin.parentElement.querySelector('.text-danger');
+
+                if (errorSpan) errorSpan.textContent = '';
+
+                if (fechaInicio.value && fechaFin.value) {
+                    if (fin < inicio) {
+                        event.preventDefault();
+                        errorSpan.textContent = 'La fecha de finalización no puede ser anterior a la fecha de inicio.';
+                    } else if (fin.getTime() === inicio.getTime()) {
+                        event.preventDefault();
+                        errorSpan.textContent = 'La fecha de finalización no puede ser igual a la fecha de inicio.';
+                    }
+                }
+            });
+        });
+    </script>
 }
