@@ -64,7 +64,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
                 }
                 foreach (var op in sqlOperators)
                 {
-                    if (lowerInput.Contains(op)) return true;
+                    if (Regex.IsMatch(op, @"^[a-zA-Z]+$"))
+                    {
+                        if (Regex.IsMatch(lowerInput, $@"\b{op.ToLowerInvariant()}\b")) return true;
+                    }
+                    else
+                    {
+                        if (lowerInput.Contains(op)) return true;
+                    }
                 }
                 return false;
             }

@@ -10,11 +10,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El nombre del proyecto es obligatorio.")]
-        [StringLength(100, ErrorMessage = "El nombre no puede exceder los 100 caracteres.")]
+        [StringLength(30, ErrorMessage = "El nombre no puede exceder los 30 caracteres.")]
         [Display(Name = "Nombre del Proyecto")]
         public string Nombre { get; set; } = string.Empty;
 
-        [StringLength(500, ErrorMessage = "La descripción no puede exceder los 500 caracteres.")]
+        [StringLength(30, ErrorMessage = "La descripción no puede exceder los 30 caracteres.")]
         [Display(Name = "Descripción")]
         public string? Descripcion { get; set; }
 
