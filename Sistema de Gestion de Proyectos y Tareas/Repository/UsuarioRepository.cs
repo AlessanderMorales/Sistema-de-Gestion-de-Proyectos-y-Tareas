@@ -13,7 +13,7 @@
         {
             using var connection = _connectionFactory.CreateConnection();
             return connection.Query<Usuario>(
-                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, apellidos, contraseña, rol 
+                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, apellidos, contraseña 
                   FROM Usuario WHERE estado = 1 ORDER BY apellidos");
         }
 
@@ -21,7 +21,7 @@
         {
             using var connection = _connectionFactory.CreateConnection();
             return connection.QueryFirstOrDefault<Usuario>(
-                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, apellidos, contraseña, rol 
+                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, apellidos, contraseña 
                   FROM Usuario WHERE id_usuario = @Id AND estado = 1", new { Id = id });
         }
 
@@ -29,8 +29,8 @@
         {
             using var connection = _connectionFactory.CreateConnection();
             connection.Execute(
-                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, rol, estado) 
-                  VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, @Rol, 1);", entity);
+                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, estado) 
+                  VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, 1);", entity);
         }
 
         public void UpdateAsync(Usuario entity)
@@ -38,7 +38,7 @@
             using var connection = _connectionFactory.CreateConnection();
             connection.Execute(
                 @"UPDATE Usuario SET primer_nombre = @PrimerNombre, segundo_nombre = @SegundoNombre, apellidos = @Apellidos, 
-                  contraseña = @Contraseña, rol = @Rol WHERE id_usuario = @Id;", entity);
+                  contraseña = @Contraseña WHERE id_usuario = @Id;", entity);
         }
 
         public void DeleteAsync(int id)

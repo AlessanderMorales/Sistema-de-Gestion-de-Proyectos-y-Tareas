@@ -1,33 +1,37 @@
 @page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios.IndexModel
-@{ ViewData["Title"] = "Usuarios"; }
+@{
+    ViewData["Title"] = "Lista de Usuarios";
+}
 <h1>@ViewData["Title"]</h1>
-<a asp-page="Create" class="btn btn-primary mb-3">Crear Usuario</a>
-<table class="table table-bordered">
-    <thead>
+<p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Usuario</a></p>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
         <tr>
+            <th>ID</th>
             <th>Primer Nombre</th>
             <th>Segundo Nombre</th>
             <th>Apellidos</th>
-            <th>Rol</th>
+            <th>Contraseña</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var usuario in Model.Usuarios)
+        @foreach (var item in Model.Usuarios)
         {
             <tr>
-                <td>@usuario.PrimerNombre</td>
-                <td>@usuario.SegundoNombre</td>
-                <td>@usuario.Apellidos</td>
-                <td>@usuario.Rol</td>
+                <td>@item.Id</td>
+                <td>@item.PrimerNombre</td>
+                <td>@item.SegundoNombre</td>
+                <td>@item.Apellidos</td>
+                <td>@item.Contraseña</td>
                 <td>
-                    <a asp-page="Edit" asp-route-id="@usuario.Id" class="btn btn-sm btn-warning">Editar</a>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@usuario.Id" style="display:inline" onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?');">
-                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
                     </form>
                 </td>
             </tr>
         }
     </tbody>
-</table>    
+</table>

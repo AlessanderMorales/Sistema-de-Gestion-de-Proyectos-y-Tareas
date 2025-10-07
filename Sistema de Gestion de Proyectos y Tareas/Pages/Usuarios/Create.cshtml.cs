@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Factories;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Factories;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {
@@ -23,7 +23,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
             if (!ModelState.IsValid) return Page();
             var repo = _repositoryCreator.CreateRepository();
             repo.AddAsync(Usuario);
-            return RedirectToPage("Index");
+            return RedirectToPage("./Index");
         }
     }
 }

@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Factories;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Factories;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {
     public class EditModel : PageModel
     {
         private readonly UsuarioRepositoryCreator _repositoryCreator;
-
         [BindProperty]
-        public Usuario Usuario { get; set; } = new();
+        public Usuario Usuario { get; set; } = default!;
 
         public EditModel(UsuarioRepositoryCreator repositoryCreator)
         {
@@ -19,26 +18,20 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 
         public IActionResult OnGet(int? id)
         {
-            if (!id.HasValue)
-                return NotFound();
-
+            if (id == null) return NotFound();
             var repo = _repositoryCreator.CreateRepository();
-            var usuario = repo.GetByIdAsync(id.Value); // int? a int
-            if (usuario == null)
-                return NotFound();
-
+            var usuario = repo.GetByIdAsync(id.Value);
+            if (usuario == null) return NotFound();
             Usuario = usuario;
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-                return Page();
-
+            if (!ModelState.IsValid) return Page();
             var repo = _repositoryCreator.CreateRepository();
-            repo.UpdateAsync(Usuario); // Sin await
-            return RedirectToPage("Index");
+            repo.UpdateAsync(Usuario);
+            return RedirectToPage("./Index");
         }
     }
 }
