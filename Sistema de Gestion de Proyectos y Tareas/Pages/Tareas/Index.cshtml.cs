@@ -1,35 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
     public class IndexModel : PageModel
     {
-        private readonly MySqlRepositoryFactory<Tarea> _repositoryFactory;
+        private readonly TareaService _tareaService;
         public IEnumerable<Tarea> Tareas { get; private set; } = new List<Tarea>();
 
-        public IndexModel(MySqlRepositoryFactory<Tarea> repositoryFactory)
+        public IndexModel(TareaService tareaService)
         {
-            _repositoryFactory = repositoryFactory;
+            _tareaService = tareaService;
         }
 
         public void OnGet()
         {
-            IDB<Tarea> repo = _repositoryFactory.CreateRepository();
-            Tareas = repo.GetAllAsync();
+            Tareas = _tareaService.ObtenerTodasLasTareas();
         }
 
         public IActionResult OnPost(int id)
         {
-            var repo = _repositoryFactory.CreateRepository();
-            var tarea = repo.GetByIdAsync(id);
-
+            var tarea = _tareaService.ObtenerTareaPorId(id);
             if (tarea != null)
             {
-                repo.DeleteAsync(tarea);
+                _tareaService.EliminarTarea(tarea);
             }
             return RedirectToPage("./Index");
         }

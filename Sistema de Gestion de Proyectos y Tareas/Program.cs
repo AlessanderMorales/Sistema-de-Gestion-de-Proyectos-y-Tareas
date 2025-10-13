@@ -14,7 +14,7 @@ builder.Services.AddScoped<MySqlRepositoryFactory<Proyecto>, ProyectoryRepositor
 builder.Services.AddScoped<MySqlRepositoryFactory<Usuario>, UsuarioRepositoryCreator>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Tarea>, TareaRepositoryCreator>();
 builder.Services.AddScoped<ProyectoService>();
-
+builder.Services.AddScoped<TareaService>();
 
 var app = builder.Build();
 
