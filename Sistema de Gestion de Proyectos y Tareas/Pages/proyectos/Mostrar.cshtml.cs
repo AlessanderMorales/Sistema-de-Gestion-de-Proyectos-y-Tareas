@@ -1,24 +1,22 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities; 
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
-
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.proyectos
 {
     public class MostrarModel : PageModel
     {
+        private readonly ProyectoService _proyectoService;
         public IEnumerable<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
-        private readonly MySqlRepositoryFactory<Proyecto> _repositoryFactory;
-        public MostrarModel(MySqlRepositoryFactory<Proyecto> repositoryFactory)
+        public MostrarModel(ProyectoService proyectoService)
         {
-            _repositoryFactory = repositoryFactory;
+            _proyectoService = proyectoService;
         }
-
         public IActionResult OnGet()
         {
-            Proyectos = _repositoryFactory.CreateRepository().GetAllAsync();
+            Proyectos = _proyectoService.ObtenerTodosLosProyectos();
             return Page();
         }
     }

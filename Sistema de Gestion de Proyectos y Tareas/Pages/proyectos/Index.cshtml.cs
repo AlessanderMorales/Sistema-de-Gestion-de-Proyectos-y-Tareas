@@ -1,30 +1,31 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 {
     public class IndexModel : PageModel
     {
+        private readonly ProyectoService _proyectoService;
         public IEnumerable<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
-        private readonly MySqlRepositoryFactory<Proyecto> _proyectoryRepositoryFactory;
-        public IndexModel(MySqlRepositoryFactory<Proyecto> proyectoryRepositoryFactory) {
-            _proyectoryRepositoryFactory = proyectoryRepositoryFactory;
+        public IndexModel(ProyectoService proyectoService)
+        {
+            _proyectoService = proyectoService;
         }
 
         public void OnGet()
         {
-            Proyectos = _proyectoryRepositoryFactory.CreateRepository().GetAllAsync();
+            Proyectos = _proyectoService.ObtenerTodosLosProyectos();
         }
 
         public IActionResult OnPost(int id)
         {
-            var repo = _proyectoryRepositoryFactory.CreateRepository();
-            var proyecto = repo.GetAllAsync().FirstOrDefault(p => p.Id == id);
+            var proyecto = _proyectoService.ObtenerProyectoPorId(id);
             if (proyecto != null)
             {
-                repo.DeleteAsync(proyecto);
+                _proyectoService.EliminarProyecto(proyecto);
             }
             return RedirectToPage("./Index");
         }

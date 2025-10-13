@@ -1,19 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
     public class MostrarModel : PageModel
     {
-        private readonly MySqlRepositoryFactory<Tarea> _repositoryFactory;
+        private readonly TareaService _tareaService;
 
-        public MostrarModel(MySqlRepositoryFactory<Tarea> repositoryFactory)
-        {
-            _repositoryFactory = repositoryFactory;
-        }
         public Tarea Tarea { get; set; } = default!;
+        public MostrarModel(TareaService tareaService)
+        {
+            _tareaService = tareaService;
+        }
 
         public IActionResult OnGet(int? id)
         {
@@ -21,9 +22,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
             {
                 return NotFound();
             }
-
-            var repo = _repositoryFactory.CreateRepository();
-            var tarea = repo.GetByIdAsync(id.Value);
+            var tarea = _tareaService.ObtenerTareaPorId(id.Value);
 
             if (tarea == null)
             {

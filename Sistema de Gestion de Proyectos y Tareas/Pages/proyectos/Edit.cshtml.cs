@@ -1,22 +1,22 @@
+// Archivo: Pages/Proyectos/Edit.cshtml.cs (Versión Corregida)
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 {
     public class EditModel : PageModel
     {
-        private readonly MySqlRepositoryFactory<Proyecto> _repositoryFactory;
-
-        public EditModel(MySqlRepositoryFactory<Proyecto> repositoryFactory)
-        {
-            _repositoryFactory = repositoryFactory;
-        }
+        private readonly ProyectoService _proyectoService;
 
         [BindProperty]
         public Proyecto Proyecto { get; set; } = default!;
+        public EditModel(ProyectoService proyectoService)
+        {
+            _proyectoService = proyectoService;
+        }
 
         public IActionResult OnGet(int? id)
         {
@@ -24,9 +24,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             {
                 return NotFound();
             }
-
-            IDB<Proyecto> repo = _repositoryFactory.CreateRepository();
-            var proyecto = repo.GetByIdAsync(id.Value);
+            var proyecto = _proyectoService.ObtenerProyectoPorId(id.Value);
 
             if (proyecto == null)
             {
@@ -36,15 +34,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync() 
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
-
-            IDB<Proyecto> repo = _repositoryFactory.CreateRepository();
-            repo.UpdateAsync(Proyecto); 
+            _proyectoService.ActualizarProyecto(Proyecto);
 
             return RedirectToPage("./Index");
         }

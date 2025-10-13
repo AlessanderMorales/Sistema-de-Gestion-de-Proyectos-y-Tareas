@@ -1,36 +1,46 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {
     public class EditModel : PageModel
     {
-        private readonly MySqlRepositoryFactory<Usuario> _repositoryFactory;
+        private readonly UsuarioService _usuarioService;
+
         [BindProperty]
         public Usuario Usuario { get; set; } = default!;
-
-        public EditModel(MySqlRepositoryFactory<Usuario> repositoryFactory)
+        public EditModel(UsuarioService usuarioService)
         {
-            _repositoryFactory = repositoryFactory;
+            _usuarioService = usuarioService;
         }
 
         public IActionResult OnGet(int? id)
         {
-            if (id == null) return NotFound();
-            var repo = _repositoryFactory.CreateRepository();
-            var usuario = repo.GetByIdAsync(id.Value);
-            if (usuario == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var usuario = _usuarioService.ObtenerUsuarioPorId(id.Value);
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
             Usuario = usuario;
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid) return Page();
-            var repo = _repositoryFactory.CreateRepository();
-            repo.UpdateAsync(Usuario);
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+            _usuarioService.ActualizarUsuario(Usuario);
+
             return RedirectToPage("./Index");
         }
     }
