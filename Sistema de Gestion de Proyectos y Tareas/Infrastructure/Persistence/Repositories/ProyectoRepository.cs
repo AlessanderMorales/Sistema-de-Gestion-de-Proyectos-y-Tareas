@@ -1,7 +1,9 @@
-﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Repository
+﻿using Sistema_de_Gestion_de_Proyectos_y_Tareas.Repository;
+
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories
 {
     using Dapper;
-    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
+    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
     using System.Collections.Generic;
 
     public class ProyectoRepository : IDB<Proyecto>
@@ -25,7 +27,7 @@
             string query = @"INSERT INTO Proyecto (nombre, descripcion, fecha_inicio, fecha_fin)
                              VALUES (@Nombre, @Descripcion, @FechaInicio, @FechaFin);";
 
-            _connectionSignleton.ExcuteCommand<Proyecto>(query, entity);
+            _connectionSignleton.ExcuteCommand(query, entity);
         }
 
         public Proyecto GetByIdAsync(int id)
@@ -47,7 +49,7 @@
                              fecha_fin = @FechaFin
                              WHERE id_proyecto = @Id;";
 
-            _connectionSignleton.ExcuteCommand<Proyecto>(query, entity);
+            _connectionSignleton.ExcuteCommand(query, entity);
         }
         void IDB<Proyecto>.DeleteAsync(int id)
         {
@@ -60,7 +62,7 @@
             string query = @"UPDATE Proyecto
                             SET Estado = 0
                             WHERE id_proyecto = @Id;";
-            _connectionSignleton.ExcuteCommand<Proyecto>(query, entity);
+            _connectionSignleton.ExcuteCommand(query, entity);
         }
     }
 }

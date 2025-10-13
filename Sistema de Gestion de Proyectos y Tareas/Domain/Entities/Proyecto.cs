@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 {
     public class Proyecto : IValidatableObject
     {
