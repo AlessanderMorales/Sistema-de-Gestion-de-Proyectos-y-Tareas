@@ -3,9 +3,10 @@ using Dapper;
 using MySql.Data.MySqlClient; 
 using System.Collections.Generic;
 using System.Data; 
-using Microsoft.Extensions.Configuration; 
-
-public class MySqlConnectionSingleton : IDbConnectionSingleton
+using Microsoft.Extensions.Configuration;
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data
+{
+    public class MySqlConnectionSingleton : IDbConnectionSingleton
 {
     private readonly string _connectionString;
     private static MySqlConnectionSingleton? _instance;
@@ -47,4 +48,5 @@ public class MySqlConnectionSingleton : IDbConnectionSingleton
             return connection.QueryFirstOrDefault<Q>(query, parameters);
         }
     }
+  }
 }
