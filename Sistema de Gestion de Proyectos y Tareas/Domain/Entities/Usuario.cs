@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 {
     public class Usuario : IValidatableObject
     {
@@ -88,8 +88,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
             }
 
             if (ContainsSqlInjection(PrimerNombre) ||
-                (!string.IsNullOrEmpty(SegundoNombre) && ContainsSqlInjection(SegundoNombre)) ||
-                (!string.IsNullOrEmpty(Apellidos) && ContainsSqlInjection(Apellidos)))
+                !string.IsNullOrEmpty(SegundoNombre) && ContainsSqlInjection(SegundoNombre) ||
+                !string.IsNullOrEmpty(Apellidos) && ContainsSqlInjection(Apellidos))
             {
                 yield return new ValidationResult("No se permiten palabras clave ni caracteres peligrosos en los nombres o apellidos.", new[] { nameof(PrimerNombre), nameof(SegundoNombre), nameof(Apellidos) });
             }

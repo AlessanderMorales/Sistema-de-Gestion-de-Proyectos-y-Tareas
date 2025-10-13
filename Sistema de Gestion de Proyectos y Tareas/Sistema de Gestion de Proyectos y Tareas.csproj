@@ -13,9 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\" />
+    <Folder Include="Application\Services\" />
     <Folder Include="Domain\Ports\Factories\" />
+    <Folder Include="Factories\" />
     <Folder Include="Pages\Usuarios\" />
+    <Folder Include="Repository\" />
     <Folder Include="wwwroot\Image\" />
     <Folder Include="Pages\Tareas\" />
   </ItemGroup>

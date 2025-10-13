@@ -1,7 +1,6 @@
 ﻿
 using Dapper;
 using MySql.Data.MySqlClient; 
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
 using System.Collections.Generic;
 using System.Data; 
 using Microsoft.Extensions.Configuration; 

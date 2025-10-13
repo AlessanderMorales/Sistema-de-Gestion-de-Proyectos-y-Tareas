@@ -1,7 +1,8 @@
-﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Repository
+﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories
 {
     using Dapper;
-    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Models;
+    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
     using System.Collections.Generic;
 
     public class TareaRepository : IDB<Tarea>
@@ -28,7 +29,7 @@
             string query = @"INSERT INTO Tareas (titulo, descripcion, prioridad)
                               VALUES (@Titulo, @Descripcion, @Prioridad);";
 
-            _connectionSignleton.ExcuteCommand<Tarea>(query, entity);
+            _connectionSignleton.ExcuteCommand(query, entity);
         }
         public Tarea GetByIdAsync(int id)
         {
@@ -48,7 +49,7 @@
                               prioridad = @Prioridad
                               WHERE id_tarea = @Id;";
 
-            _connectionSignleton.ExcuteCommand<Tarea>(query, entity);
+            _connectionSignleton.ExcuteCommand(query, entity);
         }
 
         void IDB<Tarea>.DeleteAsync(int id)
@@ -62,7 +63,7 @@
             string query = @"UPDATE Tareas
                              SET estado = 0
                              WHERE id_tarea = @Id;";
-            _connectionSignleton.ExcuteCommand<Tarea>(query, entity);
+            _connectionSignleton.ExcuteCommand(query, entity);
         }
     }
 }

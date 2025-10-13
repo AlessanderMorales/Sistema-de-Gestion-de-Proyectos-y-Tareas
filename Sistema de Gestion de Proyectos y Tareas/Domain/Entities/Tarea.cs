@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 {
     public class Tarea : IValidatableObject
     {
@@ -77,8 +77,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Models
             }
 
             if (ContainsSqlInjection(Titulo) ||
-                (!string.IsNullOrEmpty(Descripcion) && ContainsSqlInjection(Descripcion)) ||
-                (!string.IsNullOrEmpty(Prioridad) && ContainsSqlInjection(Prioridad)))
+                !string.IsNullOrEmpty(Descripcion) && ContainsSqlInjection(Descripcion) ||
+                !string.IsNullOrEmpty(Prioridad) && ContainsSqlInjection(Prioridad))
             {
                 yield return new ValidationResult("No se permiten palabras clave ni caracteres peligrosos en los campos de texto.", new[] { nameof(Titulo), nameof(Descripcion), nameof(Prioridad) });
             }
