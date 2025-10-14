@@ -22,6 +22,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 
         public IActionResult OnPost(int id)
         {
+
             var tarea = _tareaService.ObtenerTareaPorId(id);
             if (tarea != null)
             {

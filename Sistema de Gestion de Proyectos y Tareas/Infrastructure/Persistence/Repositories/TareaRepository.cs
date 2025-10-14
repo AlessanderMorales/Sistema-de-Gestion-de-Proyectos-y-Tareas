@@ -1,11 +1,10 @@
-﻿// Archivo: Infrastructure/Persistence/Repositories/TareaRepository.cs
-
+﻿
 using Dapper;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
 using System.Collections.Generic;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
-using System.Linq; // <-- Añade este 'using'
+using System.Linq;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories
 {
@@ -19,18 +18,33 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
             _connectionSignleton = mySqlConnectionSingleton;
         }
 
+
+
         public IEnumerable<Tarea> GetAllAsync()
         {
             using var connection = _connectionSignleton.CreateConnection();
-
             string query = @"
-                SELECT 
-                    t.*, -- Todos los campos de Tareas
-                    p.*  -- Todos los campos de Proyecto
-                FROM Tareas t
-                LEFT JOIN Proyecto p ON t.id_proyecto = p.id_proyecto
-                WHERE t.estado = 1 
-                ORDER BY t.id_tarea DESC";
+        SELECT 
+            -- Seleccionamos explícitamente las columnas de Tarea
+            t.id_tarea AS Id, 
+            t.titulo, 
+            t.descripcion, 
+            t.prioridad, 
+            t.estado,
+            t.id_proyecto,
+
+            -- Seleccionamos explícitamente las columnas de Proyecto
+            p.id_proyecto AS Id,
+            p.nombre,
+            p.descripcion,
+            p.fecha_inicio AS FechaInicio,
+            p.fecha_fin AS FechaFin,
+            p.estado
+        FROM Tareas t
+        LEFT JOIN Proyecto p ON t.id_proyecto = p.id_proyecto
+        WHERE t.estado = 1 
+        ORDER BY t.id_tarea DESC";
+
             var tareas = connection.Query<Tarea, Proyecto, Tarea>(
                 query,
                 (tarea, proyecto) =>
@@ -38,7 +52,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
                     tarea.Proyecto = proyecto;
                     return tarea;
                 },
-                splitOn: "id_proyecto" 
+
+                splitOn: "Id"
             );
             return tareas;
         }
@@ -79,7 +94,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
         public void DeleteAsync(int id)
         {
             string query = @"UPDATE Tareas SET estado = 0 WHERE id_tarea = @Id;";
-            _connectionSignleton.ExcuteCommand<dynamic>(query, new { Id = id });
+            using var connection = _connectionSignleton.CreateConnection();
+            connection.Execute(query, new { Id = id });
         }
 
         public void DeleteAsync(Tarea entity)

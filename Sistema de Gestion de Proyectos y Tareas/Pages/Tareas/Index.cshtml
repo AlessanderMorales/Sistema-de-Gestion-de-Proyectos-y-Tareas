@@ -23,6 +23,7 @@
     <tbody>
         @foreach (var item in Model.Tareas)
         {
+            <p>Debug: El ID de este item es @item.Id</p>
             <tr>
                 <td>@item.Id</td>
                 <td>@item.Titulo</td>
