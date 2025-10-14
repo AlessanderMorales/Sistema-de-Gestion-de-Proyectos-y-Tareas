@@ -35,7 +35,13 @@
                 </select>
                 <span asp-validation-for="Tarea.Prioridad" class="text-danger"></span>
             </div>
-
+            <div class="mb-3">
+                <label asp-for="Tarea.id_proyecto" class="form-label">Proyecto</label>
+                <select asp-for="Tarea.id_proyecto" class="form-control" asp-items="Model.ProyectosDisponibles">
+                    <option value="">-- Seleccione un Proyecto --</option>
+                </select>
+                <span asp-validation-for="Tarea.id_proyecto" class="text-danger"></span>
+            </div>
             <button type="submit" class="btn btn-primary">Actualizar</button>
             <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
         </form>

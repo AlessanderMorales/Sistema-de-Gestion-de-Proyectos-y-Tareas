@@ -6,24 +6,21 @@
 
 <h1>@ViewData["Title"]</h1>
 <hr />
+
 <div class="row">
     <div class="col-md-6">
         <form method="post">
-
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
             <div class="mb-3">
                 <label asp-for="Tarea.Titulo" class="form-label"></label>
                 <input asp-for="Tarea.Titulo" class="form-control" />
                 <span asp-validation-for="Tarea.Titulo" class="text-danger"></span>
             </div>
-
             <div class="mb-3">
                 <label asp-for="Tarea.Descripcion" class="form-label"></label>
                 <textarea asp-for="Tarea.Descripcion" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Tarea.Descripcion" class="text-danger"></span>
             </div>
-
             <div class="mb-3">
                 <label asp-for="Tarea.Prioridad" class="form-label"></label>
                 <select asp-for="Tarea.Prioridad" class="form-control">
@@ -34,7 +31,13 @@
                 </select>
                 <span asp-validation-for="Tarea.Prioridad" class="text-danger"></span>
             </div>
-
+            <div class="mb-3">
+                <label asp-for="Tarea.id_proyecto" class="control-label">Proyecto</label>
+                <select asp-for="Tarea.id_proyecto" class="form-control" asp-items="Model.ProyectosDisponibles">
+                    <option value="">-- Seleccione un Proyecto --</option>
+                </select>
+                <span asp-validation-for="Tarea.id_proyecto" class="text-danger"></span>
+            </div>
             <button type="submit" class="btn btn-primary">Guardar</button>
             <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
         </form>

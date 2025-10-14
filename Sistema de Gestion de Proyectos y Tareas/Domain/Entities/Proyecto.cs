@@ -47,5 +47,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     new[] { nameof(FechaFin) });
             }
         }
+
+        public ICollection<Tarea> Tareas { get; set; } = new List<Tarea>();
     }
 }

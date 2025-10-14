@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 
@@ -9,12 +10,16 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
     public class EditModel : PageModel
     {
         private readonly TareaService _tareaService;
+        private readonly ProyectoService _proyectoService;
 
         [BindProperty]
         public Tarea Tarea { get; set; } = default!;
-        public EditModel(TareaService tareaService)
+
+        public SelectList ProyectosDisponibles { get; set; }
+        public EditModel(TareaService tareaService, ProyectoService proyectoService)
         {
             _tareaService = tareaService;
+            _proyectoService = proyectoService;
         }
 
         public IActionResult OnGet(int? id)
@@ -23,6 +28,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
             {
                 return NotFound();
             }
+
             var tarea = _tareaService.ObtenerTareaPorId(id.Value);
 
             if (tarea == null)
@@ -30,6 +36,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
                 return NotFound();
             }
             Tarea = tarea;
+            var proyectos = _proyectoService.ObtenerTodosLosProyectos();
+            ProyectosDisponibles = new SelectList(proyectos, "Id", "Nombre", Tarea.id_proyecto);
+
             return Page();
         }
 
@@ -37,8 +46,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
         {
             if (!ModelState.IsValid)
             {
+                var proyectos = _proyectoService.ObtenerTodosLosProyectos();
+                ProyectosDisponibles = new SelectList(proyectos, "Id", "Nombre", Tarea.id_proyecto);
                 return Page();
             }
+
             _tareaService.ActualizarTarea(Tarea);
 
             return RedirectToPage("./Index");

@@ -1,11 +1,16 @@
-﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories
+﻿// Archivo: Infrastructure/Persistence/Repositories/TareaRepository.cs
+
+using Dapper;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
+using System.Collections.Generic;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
+using System.Linq; // <-- Añade este 'using'
+
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories
 {
-    using Dapper;
-    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
-    using System.Collections.Generic;
-    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
-    public class TareaRepository : IDB<Tarea>
+
+    public class TareaRepository : ITareaRepository
     {
         private readonly MySqlConnectionSingleton _connectionSignleton;
 
@@ -14,23 +19,40 @@
             _connectionSignleton = mySqlConnectionSingleton;
         }
 
-        public IEnumerable<Tarea> GetAllAsync() 
+        public IEnumerable<Tarea> GetAllAsync()
         {
-            string query = @"SELECT id_tarea AS Id, titulo, descripcion, prioridad, estado
-                              FROM Tareas -- ¡Usando el nombre de tabla corregido!
-                              WHERE estado = 1 
-                              ORDER BY id_tarea DESC";
+            using var connection = _connectionSignleton.CreateConnection();
 
-            return _connectionSignleton.ExcuteCommandWithDataReturn<Tarea>(query);
+            string query = @"
+                SELECT 
+                    t.*, -- Todos los campos de Tareas
+                    p.*  -- Todos los campos de Proyecto
+                FROM Tareas t
+                LEFT JOIN Proyecto p ON t.id_proyecto = p.id_proyecto
+                WHERE t.estado = 1 
+                ORDER BY t.id_tarea DESC";
+            var tareas = connection.Query<Tarea, Proyecto, Tarea>(
+                query,
+                (tarea, proyecto) =>
+                {
+                    tarea.Proyecto = proyecto;
+                    return tarea;
+                },
+                splitOn: "id_proyecto" 
+            );
+            return tareas;
         }
+
 
         public void AddAsync(Tarea entity)
         {
-            string query = @"INSERT INTO Tareas (titulo, descripcion, prioridad)
-                              VALUES (@Titulo, @Descripcion, @Prioridad);";
+
+            string query = @"INSERT INTO Tareas (titulo, descripcion, prioridad, id_proyecto)
+                              VALUES (@Titulo, @Descripcion, @Prioridad, @id_proyecto);";
 
             _connectionSignleton.ExcuteCommand(query, entity);
         }
+
         public Tarea GetByIdAsync(int id)
         {
             string query = @"SELECT id_tarea AS Id, titulo, descripcion, prioridad, estado
@@ -46,13 +68,15 @@
             string query = @"UPDATE Tareas
                               SET titulo = @Titulo,
                               descripcion = @Descripcion,
-                              prioridad = @Prioridad
+                              prioridad = @Prioridad,
+                              id_proyecto = @id_proyecto
                               WHERE id_tarea = @Id;";
 
             _connectionSignleton.ExcuteCommand(query, entity);
         }
 
-        void IDB<Tarea>.DeleteAsync(int id)
+
+        public void DeleteAsync(int id)
         {
             string query = @"UPDATE Tareas SET estado = 0 WHERE id_tarea = @Id;";
             _connectionSignleton.ExcuteCommand<dynamic>(query, new { Id = id });

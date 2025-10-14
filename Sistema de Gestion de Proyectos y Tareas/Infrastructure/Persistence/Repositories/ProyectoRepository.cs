@@ -64,5 +64,47 @@
                             WHERE id_proyecto = @Id;";
             _connectionSignleton.ExcuteCommand(query, entity);
         }
+
+
+        public Proyecto GetByIdConTareas(int idProyecto)
+        {
+            using var connection = _connectionSignleton.CreateConnection();
+            var sql = @"
+        SELECT 
+            p.*, -- Seleccionamos todos los campos de Proyecto con sus nombres originales
+            t.*  -- Seleccionamos todos los campos de Tareas con sus nombres originales
+        FROM Proyecto p
+        LEFT JOIN Tareas t ON p.id_proyecto = t.id_proyecto
+        WHERE p.id_proyecto = @Id;";
+
+            var proyectoDictionary = new Dictionary<int, Proyecto>();
+
+            var proyectos = connection.Query<Proyecto, Tarea, Proyecto>(
+                sql,
+                (proyecto, tarea) =>
+                {
+                    if (!proyectoDictionary.TryGetValue(proyecto.Id, out var proyectoActual))
+                    {
+                        proyectoActual = proyecto;
+                        proyectoActual.Tareas = new List<Tarea>();
+                        proyectoDictionary.Add(proyectoActual.Id, proyectoActual);
+                    }
+
+                    if (tarea != null)
+                    {
+                        proyectoActual.Tareas.Add(tarea);
+                    }
+
+                    return proyectoActual;
+                },
+                new { Id = idProyecto },
+                splitOn: "id_tarea"
+            ).Distinct().ToList();
+
+            return proyectos.FirstOrDefault();
+        }
+
+
+
     }
 }

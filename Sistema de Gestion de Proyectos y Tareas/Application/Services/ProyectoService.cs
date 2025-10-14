@@ -1,8 +1,7 @@
-﻿// Archivo: Application/Services/ProyectoService.cs
-
-// --- USINGS NECESARIOS ---
+﻿
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories; // Usamos la fábrica que ya tienes
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories; 
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
 {
@@ -39,5 +38,18 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
             var repo = _proyectoFactory.CreateRepository();
             repo.DeleteAsync(proyecto);
         }
+
+        public Proyecto ObtenerProyectoConTareas(int idProyecto)
+        {
+            var repoBase = _proyectoFactory.CreateRepository();
+            var repoConcreto = repoBase as ProyectoRepository;
+            if (repoConcreto != null)
+            {
+                return repoConcreto.GetByIdConTareas(idProyecto);
+            }
+            return null;
+        }
+
+
     }
 }

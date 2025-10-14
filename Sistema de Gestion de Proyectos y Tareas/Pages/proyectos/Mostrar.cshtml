@@ -1,4 +1,74 @@
-﻿@page
+﻿@page "{id:int}"
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.proyectos.MostrarModel
 @{
+    ViewData["Title"] = "Detalles del Proyecto";
+}
+
+@if (Model.Proyecto != null)
+{
+    <h1>@ViewData["Title"]: @Model.Proyecto.Nombre</h1>
+    <hr />
+    <div>
+        <h4>Información del Proyecto</h4>
+        <dl class="row">
+            <dt class="col-sm-2">ID</dt>
+            <dd class="col-sm-10">@Model.Proyecto.Id</dd>
+
+            <dt class="col-sm-2">Descripción</dt>
+            <dd class="col-sm-10">@Model.Proyecto.Descripcion</dd>
+
+            <dt class="col-sm-2">Fecha de Inicio</dt>
+            <dd class="col-sm-10">@Model.Proyecto.FechaInicio.ToShortDateString()</dd>
+
+            <dt class="col-sm-2">Fecha de Fin</dt>
+            <dd class="col-sm-10">@Model.Proyecto.FechaFin.ToShortDateString()</dd>
+        </dl>
+    </div>
+    <hr />
+    <div>
+        <h4>Tareas Asociadas</h4>
+        @if (Model.Proyecto.Tareas != null && Model.Proyecto.Tareas.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID Tarea</th>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Prioridad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tarea in Model.Proyecto.Tareas)
+                    {
+                        <tr>
+                            <td>@tarea.Id</td>
+                            <td>@tarea.Titulo</td>
+                            <td>@tarea.Descripcion</td>
+                            <td>@tarea.Prioridad</td>
+                            <td>
+                                <a asp-page="/Tareas/Edit" asp-route-id="@tarea.Id" class="btn btn-sm btn-outline-primary">Editar Tarea</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Este proyecto no tiene tareas asignadas todavía.</p>
+        }
+    </div>
+
+    <div class="mt-3">
+        <a asp-page="/Tareas/Create" asp-route-idProyecto="@Model.Proyecto.Id" class="btn btn-success">Añadir Nueva Tarea</a>
+        <a asp-page="./Index" class="btn btn-secondary">Volver a la Lista</a>
+    </div>
+}
+else
+{
+    <h1>Proyecto no encontrado</h1>
+    <p>El proyecto que buscas no existe o fue eliminado.</p>
+    <a asp-page="./Index" class="btn btn-primary">Volver a la Lista</a>
 }
