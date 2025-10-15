@@ -42,10 +42,21 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
 
         public void UpdateAsync(Comentario entity)
         {
+            // Recuperamos el estado actual de la base de datos para no perderlo
+            string getQuery = "SELECT estado FROM Comentario WHERE id_comentario = @Id;";
+            var actual = _connectionSingleton.QueryFirstOrDefault<Comentario>(getQuery, new { entity.Id });
+
+            int estadoActual = actual != null ? actual.Estado : 1;
+
             string query = @"UPDATE Comentario 
-                             SET contenido = @Contenido, estado = @Estado
-                             WHERE id_comentario = @Id;";
-            _connectionSingleton.ExcuteCommand(query, entity);
+                     SET contenido = @Contenido, estado = @Estado
+                     WHERE id_comentario = @Id;";
+            _connectionSingleton.ExcuteCommand(query, new
+            {
+                entity.Contenido,
+                Estado = estadoActual,
+                entity.Id
+            });
         }
 
         public void DeleteAsync(int id)
