@@ -1,0 +1,17 @@
+﻿@page "{id:int}"
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios.MostrarModel
+
+<h2>Detalle del Comentario</h2>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <p><strong>ID:</strong> @Model.Comentario.Id</p>
+        <p><strong>Contenido:</strong> @Model.Comentario.Contenido</p>
+        <p><strong>Fecha:</strong> @Model.Comentario.Fecha</p>
+        <p><strong>ID Tarea:</strong> @Model.Comentario.IdTarea</p>
+        <p><strong>ID Usuario:</strong> @Model.Comentario.IdUsuario</p>
+        <p><strong>Estado:</strong> @(Model.Comentario.Estado == 1 ? "Activo" : "Inactivo")</p>
+    </div>
+</div>
+
+<a asp-page="Index" class="btn btn-secondary mt-3">Volver</a>

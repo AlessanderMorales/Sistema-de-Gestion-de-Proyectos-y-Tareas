@@ -1,0 +1,40 @@
+﻿@page
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios.IndexModel
+
+<h2>Lista de Comentarios</h2>
+<a asp-page="Create" class="btn btn-primary mb-3">Nuevo Comentario</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Contenido</th>
+            <th>Fecha</th>
+            <th>ID Tarea</th>
+            <th>ID Usuario</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model.Comentarios)
+        {
+            <tr>
+                <td>@c.Id</td>
+                <td>@c.Contenido</td>
+                <td>@c.Fecha</td>
+                <td>@c.IdTarea</td>
+                <td>@c.IdUsuario</td>
+                <td>
+                    <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-info btn-sm">Ver</a>
+                    <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Deseas desactivar este comentario?');">
+                            Eliminar
+                        </button>
+                    </form>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
