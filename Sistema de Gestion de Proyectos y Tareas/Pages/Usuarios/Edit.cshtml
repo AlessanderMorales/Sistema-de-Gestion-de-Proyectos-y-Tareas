@@ -24,16 +24,31 @@
                 <span asp-validation-for="Usuario.Apellidos" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label asp-for="Usuario.Username" class="form-label"></label>
+                <input asp-for="Usuario.Username" class="form-control" readonly />
+                <span class="form-text text-muted">El nombre de usuario no se puede editar.</span>
+            </div>
+            <div class="mb-3">
                 <label asp-for="Usuario.Contraseña" class="form-label"></label>
                 <input asp-for="Usuario.Contraseña" class="form-control" type="password" />
                 <span asp-validation-for="Usuario.Contraseña" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label asp-for="Usuario.Rol" class="form-label"></label>
-                <select asp-for="Usuario.Rol" class="form-control">
-                    <option value="empleado">Empleado</option>
-                    <option value="jefe de proyecto">Jefe de Proyecto</option>
-                </select>
+                @if (Model.CanEditRole)
+                {
+                    <label asp-for="Usuario.Rol" class="form-label"></label>
+                    <select asp-for="Usuario.Rol" class="form-control">
+                        <option value="empleado">Empleado</option>
+                        <option value="admin">Admin</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="jefe de proyecto">Jefe de proyecto</option>
+                    </select>
+                }
+                else
+                {
+                    <label class="form-label">Rol</label>
+                    <input class="form-control" value="@Model.Usuario.Rol" readonly />
+                }
                 <span asp-validation-for="Usuario.Rol" class="text-danger"></span>
             </div>
             <button type="submit" class="btn btn-primary">Guardar</button>

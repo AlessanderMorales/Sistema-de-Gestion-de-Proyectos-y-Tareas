@@ -1,18 +1,30 @@
 @page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios.IndexModel
+@using System.Security.Claims
 @{
     ViewData["Title"] = "Lista de Usuarios";
+    var user = User;
+    var role = user?.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
+    var isAdmin = !string.IsNullOrEmpty(role) && role.ToLowerInvariant() == "admin";
+    var isSupervisor = !string.IsNullOrEmpty(role) && role.ToLowerInvariant() == "supervisor";
 }
 <h1>@ViewData["Title"]</h1>
-<p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Usuario</a></p>
+@if (isAdmin)
+{
+    <p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Usuario</a></p>
+}
 <table class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
-            <th>ID</th>
             <th>Primer Nombre</th>
             <th>Segundo Nombre</th>
             <th>Apellidos</th>
-            <th>Contraseña</th>
+            <th>Rol</th>
+            @* password column removed for supervisors *@
+            @if (isAdmin)
+            {
+                <th>Contraseña</th>
+            }
             <th>Acciones</th>
         </tr>
     </thead>
@@ -20,18 +32,72 @@
         @foreach (var item in Model.Usuarios)
         {
             <tr>
-                <td>@item.Id</td>
                 <td>@item.PrimerNombre</td>
                 <td>@item.SegundoNombre</td>
                 <td>@item.Apellidos</td>
-                <td>****</td>
+                <td>@item.Rol</td>
+                @if (isAdmin)
+                {
+                    <td>****</td>
+                }
                 <td>
-                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                    </form>
+                    @if (isAdmin)
+                    {
+                        <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="showDeleteModal('@item.Id','@item.PrimerNombre @item.Apellidos')">Eliminar</button>
+                    }
+                    else if (isSupervisor)
+                    {
+                        <span class="text-muted">Sin permisos</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin permisos</span>
+                    }
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        function showDeleteModal(id, name) {
+            const body = `¿Seguro que quieres eliminar al usuario <strong>${name}</strong>?`;
+            window.showModal('Confirmar eliminación', body + `<div class='mt-3 text-end'><form method='post' action='?handler=Delete&id=${id}'><button type='submit' class='btn btn-danger'>Eliminar</button></form></div>`);
+        }
+
+        // If TempData contains generated password, show modal
+        (function() {
+            var generated = '@(TempData["GeneratedPassword"] ?? string.Empty)';
+            var username = '@(TempData["GeneratedForUser"] ?? string.Empty)';
+            if (generated && generated.length > 0) {
+                // create modal markup
+                var modalHtml = `
+<div class="modal fade" id="generatedPwdModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Contraseña generada</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Se ha generado la contraseña por defecto para el usuario <strong>${username}</strong>:</p>
+        <p class="fw-bold">${generated}</p>
+        <p class="small text-muted">Asegúrate de cambiarla después del primer acceso.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+                var placeholder = document.createElement('div');
+                placeholder.innerHTML = modalHtml;
+                document.body.appendChild(placeholder);
+                var modal = new bootstrap.Modal(document.getElementById('generatedPwdModal'));
+                modal.show();
+            }
+        })();
+    </script>
+}

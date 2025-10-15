@@ -1,4 +1,3 @@
-
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
@@ -24,6 +23,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         public string? Prioridad { get; set; }
         public int id_proyecto { get; set; }
         public Proyecto? Proyecto { get; set; }
+
+        // Nuevo: usuario asignado
+        public int? AssignedUserId { get; set; }
+        public Usuario? AssignedUser { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             string pattern = @"^(?! )[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+)*$";

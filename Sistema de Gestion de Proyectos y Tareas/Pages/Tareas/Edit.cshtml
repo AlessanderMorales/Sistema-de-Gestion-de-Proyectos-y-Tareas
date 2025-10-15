@@ -29,9 +29,9 @@
                 <label asp-for="Tarea.Prioridad" class="form-label"></label>
                 <select asp-for="Tarea.Prioridad" class="form-control">
                     <option value="">-- Seleccione Prioridad --</option>
-                    <option value="Alta">Alta</option>
-                    <option value="Media">Media</option>
-                    <option value="Baja">Baja</option>
+                    <option value="Alta" selected="@(Model.Tarea.Prioridad=="Alta")">Alta</option>
+                    <option value="Media" selected="@(Model.Tarea.Prioridad=="Media")">Media</option>
+                    <option value="Baja" selected="@(Model.Tarea.Prioridad=="Baja")">Baja</option>
                 </select>
                 <span asp-validation-for="Tarea.Prioridad" class="text-danger"></span>
             </div>
@@ -42,6 +42,25 @@
                 </select>
                 <span asp-validation-for="Tarea.id_proyecto" class="text-danger"></span>
             </div>
+
+            @* Assigned user: show select only for admins/supervisors/jefes; otherwise show read-only name *@
+            @if (Model.CanAssignUsers)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Asignado a</label>
+                    <select asp-for="Tarea.AssignedUserId" class="form-control" asp-items="Model.UsuariosDisponibles">
+                        <option value="">-- Sin asignar --</option>
+                    </select>
+                </div>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <label class="form-label">Asignado a</label>
+                    <input class="form-control" value="@(Model.Tarea.AssignedUser?.PrimerNombre ?? "Sin asignar")" readonly />
+                </div>
+            }
+
             <button type="submit" class="btn btn-primary">Actualizar</button>
             <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
         </form>

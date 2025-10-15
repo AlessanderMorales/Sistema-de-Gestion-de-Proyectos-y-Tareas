@@ -8,6 +8,7 @@
 <div class="row">
     <div class="col-md-6">
         <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Usuario.PrimerNombre" class="form-label"></label>
                 <input asp-for="Usuario.PrimerNombre" class="form-control" />
@@ -24,18 +25,32 @@
                 <span asp-validation-for="Usuario.Apellidos" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label asp-for="Usuario.Username" class="form-label"></label>
+                <input asp-for="Usuario.Username" class="form-control" />
+                <small class="form-text text-muted">El nombre de usuario debe ser único y no podrá editarse después.</small>
+                <span asp-validation-for="Usuario.Username" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
                 <label asp-for="Usuario.Contraseña" class="form-label"></label>
                 <div class="input-group">
-                    <input asp-for="Usuario.Contraseña" class="form-control" type="password" id="contraseñaInput" />
+                    <input asp-for="Usuario.Contraseña" class="form-control" type="password" id="contrasenaInput" />
                     <button type="button" class="btn btn-outline-secondary" id="togglePassword">Mostrar</button>
                 </div>
                 <span asp-validation-for="Usuario.Contraseña" class="text-danger"></span>
+                <div class="form-text">Si dejas el campo vacío, se generará una contraseña por defecto.</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Confirmar contraseña</label>
+                <input asp-for="ConfirmPassword" id="confirmPassword" class="form-control" type="password" />
+                <div id="confirmPasswordFeedback" class="text-danger"></div>
             </div>
             <div class="mb-3">
                 <label asp-for="Usuario.Rol" class="form-label"></label>
                 <select asp-for="Usuario.Rol" class="form-control">
                     <option value="empleado">Empleado</option>
-                    <option value="jefe de proyecto">Jefe de Proyecto</option>
+                    <option value="jefe de proyecto">Jefe de proyecto</option>
+                    <option value="admin">Admin</option>
+                    <option value="supervisor">Supervisor</option>
                 </select>
                 <span asp-validation-for="Usuario.Rol" class="text-danger"></span>
             </div>
@@ -44,18 +59,28 @@
         </form>
     </div>
 </div>
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        document.getElementById('togglePassword').addEventListener('click', function () {
-            const input = document.getElementById('contraseñaInput');
-            if (input.type === 'password') {
-                input.type = 'text';
-                this.textContent = 'Ocultar';
-            } else {
-                input.type = 'password';
-                this.textContent = 'Mostrar';
-            }
-        });
+        var toggleBtn = document.getElementById('togglePassword');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function () {
+                var input = document.getElementById('contrasenaInput');
+                if (input.type === 'password') { input.type = 'text'; this.textContent = 'Ocultar'; }
+                else { input.type = 'password'; this.textContent = 'Mostrar'; }
+            });
+        }
+
+        var confirmInput = document.getElementById('confirmPassword');
+        var passInput = document.getElementById('contrasenaInput');
+        function validateConfirm() {
+            var fb = document.getElementById('confirmPasswordFeedback');
+            if (!confirmInput.value) { fb.textContent = ''; return; }
+            if (passInput.value !== confirmInput.value) fb.textContent = 'Las contraseñas no coinciden.'; else fb.textContent = '';
+        }
+        if (confirmInput && passInput) {
+            confirmInput.addEventListener('input', validateConfirm);
+            passInput.addEventListener('input', validateConfirm);
+        }
     </script>
 }

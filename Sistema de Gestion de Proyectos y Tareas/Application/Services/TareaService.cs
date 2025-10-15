@@ -1,6 +1,4 @@
-﻿
-
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+﻿using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
@@ -18,6 +16,20 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         {
             var repo = _tareaFactory.CreateRepository();
             return repo.GetAllAsync();
+        }
+
+        public IEnumerable<Tarea> ObtenerTareasPorUsuario(int userId)
+        {
+            var repo = _tareaFactory.CreateRepository() as dynamic;
+            try
+            {
+                return repo.GetAllByUserId(userId);
+            }
+            catch
+            {
+                // fallback: return all if repo doesn't implement specific method
+                return repo.GetAllAsync();
+            }
         }
 
         public Tarea ObtenerTareaPorId(int id)

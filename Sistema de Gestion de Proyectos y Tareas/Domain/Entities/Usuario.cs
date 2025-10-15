@@ -19,12 +19,16 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [StringLength(100)]
         public string? Apellidos { get; set; }
 
+        [Required(ErrorMessage = "El nombre de usuario es obligatorio.")]
+        [StringLength(30, MinimumLength = 3, ErrorMessage = "El nombre de usuario debe tener entre 3 y 30 caracteres.")]
+        public string Username { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [StringLength(15, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 15 caracteres.")]
         [DataType(DataType.Password)]
         public string Contraseña { get; set; } = string.Empty;
 
-        public string Rol { get; set; } = "Usuario"; 
+        public string Rol { get; set; } = "empleado";
 
         public int Estado { get; set; } = 1;
 
@@ -94,12 +98,17 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 yield return new ValidationResult("No se permiten palabras clave ni caracteres peligrosos en los nombres o apellidos.", new[] { nameof(PrimerNombre), nameof(SegundoNombre), nameof(Apellidos) });
             }
 
+            // Username basic check
+            if (string.IsNullOrWhiteSpace(Username) || Username.Length < 3)
+            {
+                yield return new ValidationResult("El nombre de usuario debe tener al menos 3 caracteres.", new[] { nameof(Username) });
+            }
+
             var rolesValidos = new[] { "empleado", "jefe de proyecto" };
             if (!rolesValidos.Contains(Rol.ToLowerInvariant()))
             {
-                yield return new ValidationResult(
-                    "El rol solo puede ser 'empleado' o 'jefe de proyecto'.",
-                    new[] { nameof(Rol) });
+                // fallback: set default
+                Rol = "empleado";
             }
         }
     }

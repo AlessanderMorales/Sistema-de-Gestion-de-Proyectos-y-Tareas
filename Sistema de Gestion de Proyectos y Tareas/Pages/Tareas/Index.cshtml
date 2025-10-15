@@ -1,53 +1,63 @@
 ﻿@page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas.IndexModel
+@using System.Security.Claims
 @{
     ViewData["Title"] = "Lista de Tareas";
+    var user = User;
+    var role = user?.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
+    var isAdmin = !string.IsNullOrEmpty(role) && role.ToLowerInvariant() == "admin";
 }
 
 <h1>@ViewData["Title"]</h1>
-<p><a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a></p>
+@if (isAdmin)
+{
+    <div class="alert alert-info">Los administradores no pueden ver las tareas. Si eres administrador, utiliza la sección de Usuarios.</div>
+}
+else
+{
+    <p><a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a></p>
 
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th>Descripción</th>
-            <th>Prioridad</th>
-            <th>Proyecto Asignado</th>
-
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Tareas)
-        {
-            <p>Debug: El ID de este item es @item.Id</p>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
             <tr>
-                <td>@item.Id</td>
-                <td>@item.Titulo</td>
-                <td>@item.Descripcion</td>
-                <td>@item.Prioridad</td>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Prioridad</th>
+                <th>Proyecto Asignado</th>
 
-                <td>
-                    @if (item.Proyecto != null)
-                    {
-                        <a asp-page="/Proyectos/Mostrar" asp-route-id="@item.Proyecto.Id">@item.Proyecto.Nombre</a>
-                    }
-                    else
-                    {
-                        <span class="text-muted">No asignado</span>
-                    }
-                </td>
-
-                <td>
-                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
-                    </form>
-                </td>
+                <th>Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Tareas)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Titulo</td>
+                    <td>@item.Descripcion</td>
+                    <td>@item.Prioridad</td>
+
+                    <td>
+                        @if (item.Proyecto != null)
+                        {
+                            <a asp-page="/Proyectos/Mostrar" asp-route-id="@item.Proyecto.Id">@item.Proyecto.Nombre</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No asignado</span>
+                        }
+                    </td>
+
+                    <td>
+                        <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                        <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

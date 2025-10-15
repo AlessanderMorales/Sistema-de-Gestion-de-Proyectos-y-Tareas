@@ -1,40 +1,53 @@
 ﻿@page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos.IndexModel
-@{ ViewData["Title"] = "Lista de Proyectos"; }
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Lista de Proyectos";
+    var user = User;
+    var role = user?.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
+    var isAdmin = !string.IsNullOrEmpty(role) && role.ToLowerInvariant() == "admin";
+}
 
 <h1>@ViewData["Title"]</h1>
-<p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Proyecto</a></p>
+@if (isAdmin)
+{
+    <div class="alert alert-info">Los administradores no pueden ver los proyectos. Si eres administrador, gestiona usuarios desde esa sección.</div>
+}
+else
+{
+    <p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Proyecto</a></p>
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th><th>Inicio</th><th>Fin</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Proyectos) {
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
             <tr>
-                <td>@item.Id</td>
-                <td>@item.Nombre</td>
-                <td>@item.Descripcion</td>
-                <td>@item.FechaInicio.ToShortDateString()</td>
-                <td>@item.FechaFin.ToShortDateString()</td>
-                <td>@item.Estado</td>
-                <td>
-                    <a class="btn btn-sm btn-success" asp-page="./Mostrar" asp-route-id="@item.Id">Ver Tareas</a>
-                    <a class="btn btn-sm btn-info" asp-page="./Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-route-id="@item.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-danger">
-                            Eliminar
-                        </button>
-
-                    </form>
-                </td>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th><th>Inicio</th><th>Fin</th>
+                <th>Estado</th>
+                <th>Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Proyectos) {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Descripcion</td>
+                    <td>@item.FechaInicio.ToShortDateString()</td>
+                    <td>@item.FechaFin.ToShortDateString()</td>
+                    <td>@item.Estado</td>
+                    <td>
+                        <a class="btn btn-sm btn-success" asp-page="./Mostrar" asp-route-id="@item.Id">Ver Tareas</a>
+                        <a class="btn btn-sm btn-info" asp-page="./Edit" asp-route-id="@item.Id">Editar</a>
+                        <form method="post" asp-route-id="@item.Id" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Eliminar
+                            </button>
+
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

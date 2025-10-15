@@ -38,6 +38,17 @@
                 </select>
                 <span asp-validation-for="Tarea.id_proyecto" class="text-danger"></span>
             </div>
+
+            @if (Model.CanAssignUsers && Model.UsuariosDisponibles != null)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Asignar a usuario</label>
+                    <select asp-for="Tarea.AssignedUserId" class="form-control" asp-items="Model.UsuariosDisponibles">
+                        <option value="">-- Sin asignar --</option>
+                    </select>
+                </div>
+            }
+
             <button type="submit" class="btn btn-primary">Guardar</button>
             <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
         </form>

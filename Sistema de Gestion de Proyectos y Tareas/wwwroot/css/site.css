@@ -19,4 +19,90 @@ html {
 
 body {
   margin-bottom: 60px;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+  background-color: #121214;
+  color: #e6eef8;
+}
+
+body.dark-mode a {
+  color: #8ab4ff;
+}
+
+body.dark-mode .bg-white {
+  background-color: #1e1f22 !important;
+  color: #e6eef8;
+}
+
+body.dark-mode .border-end, body.dark-mode .border-top, body.dark-mode .border-bottom {
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+body.dark-mode .navbar, body.dark-mode .navbar-light {
+  background-color: #161619 !important;
+  color: #e6eef8;
+}
+
+body.dark-mode .list-group-item {
+  background-color: transparent;
+  color: #e6eef8;
+  border: none;
+}
+
+body.dark-mode .list-group-item-action:hover {
+  background-color: rgba(255,255,255,0.02);
+}
+
+body.dark-mode .table {
+  color: #e6eef8;
+}
+
+body.dark-mode .table thead {
+  background-color: #1f2124;
+}
+
+body.dark-mode .table-striped>tbody>tr:nth-of-type(odd) {
+  background-color: rgba(255,255,255,0.02);
+}
+
+body.dark-mode .btn-primary {
+  background-color: #2563eb;
+  border-color: #1e40af;
+}
+
+body.dark-mode .btn-outline-secondary {
+  color: #e6eef8;
+  border-color: rgba(255,255,255,0.12);
+}
+
+/* Modal tweaks */
+body.dark-mode .modal-content {
+  background-color: #1c1d20;
+  color: #e6eef8;
+}
+
+/* Inputs */
+body.dark-mode .form-control {
+  background-color: #121214;
+  color: #e6eef8;
+  border-color: rgba(255,255,255,0.08);
+}
+
+/* Footer */
+body.dark-mode footer {
+  color: rgba(230,238,248,0.8);
+}
+
+/* Sidebar toggled */
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: -250px;
+}
+
+/* small helpers */
+.text-muted.dark-mode {
+  color: rgba(230,238,248,0.6);
 }

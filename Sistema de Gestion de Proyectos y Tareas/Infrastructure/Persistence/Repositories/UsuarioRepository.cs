@@ -19,8 +19,14 @@
         {
             using var connection = _connectionFactory.CreateConnection();
             return connection.Query<Usuario>(
-                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, 
-                         apellidos, contraseña, rol AS Rol, estado AS Estado 
+                @"SELECT id_usuario AS Id, 
+                         primer_nombre AS PrimerNombre, 
+                         segundo_nombre AS SegundoNombre, 
+                         apellidos, 
+                         username AS Username, 
+                         contraseña AS Contraseña, 
+                         rol AS Rol, 
+                         estado AS Estado 
                   FROM Usuario 
                   WHERE estado = 1 
                   ORDER BY apellidos");
@@ -30,19 +36,42 @@
         {
             using var connection = _connectionFactory.CreateConnection();
             return connection.QueryFirstOrDefault<Usuario>(
-                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, 
-                         apellidos, contraseña, rol AS Rol, estado AS Estado 
+                @"SELECT id_usuario AS Id, 
+                         primer_nombre AS PrimerNombre, 
+                         segundo_nombre AS SegundoNombre, 
+                         apellidos, 
+                         username AS Username, 
+                         contraseña AS Contraseña, 
+                         rol AS Rol, 
+                         estado AS Estado 
                   FROM Usuario 
                   WHERE id_usuario = @Id AND estado = 1;",
                 new { Id = id });
+        }
+
+        public Usuario GetByUsername(string username)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            return connection.QueryFirstOrDefault<Usuario>(
+                @"SELECT id_usuario AS Id, 
+                         primer_nombre AS PrimerNombre, 
+                         segundo_nombre AS SegundoNombre, 
+                         apellidos, 
+                         username AS Username, 
+                         contraseña AS Contraseña, 
+                         rol AS Rol, 
+                         estado AS Estado 
+                  FROM Usuario 
+                  WHERE username = @Username AND estado = 1;",
+                new { Username = username });
         }
 
         public void AddAsync(Usuario entity)
         {
             using var connection = _connectionFactory.CreateConnection();
             connection.Execute(
-                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, rol, estado) 
-                  VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, @Rol, @Estado);",
+                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, username, contraseña, rol, estado) 
+                  VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Username, @Contraseña, @Rol, @Estado);",
                 entity);
         }
 

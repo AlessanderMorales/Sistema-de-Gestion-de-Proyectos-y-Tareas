@@ -55,6 +55,10 @@
         {
             string query = @"UPDATE Proyecto SET Estado = 0 WHERE id_proyecto = @Id;";
             _connectionSignleton.ExcuteCommand<dynamic>(query, new { Id = id });
+
+            // also deactivate related tasks
+            string query2 = @"UPDATE Tareas SET estado = 0 WHERE id_proyecto = @Id;";
+            _connectionSignleton.ExcuteCommand<dynamic>(query2, new { Id = id });
         }
 
         public void DeleteAsync(Proyecto entity)
@@ -63,6 +67,20 @@
                             SET Estado = 0
                             WHERE id_proyecto = @Id;";
             _connectionSignleton.ExcuteCommand(query, entity);
+
+            // also deactivate related tasks
+            string query2 = @"UPDATE Tareas SET estado = 0 WHERE id_proyecto = @Id;";
+            _connectionSignleton.ExcuteCommand(query2, entity);
+        }
+
+        public void DeactivateByProjectId(int idProyecto)
+        {
+            // Deactivate project and its tasks
+            string query = @"UPDATE Proyecto SET Estado = 0 WHERE id_proyecto = @IdProyecto;";
+            _connectionSignleton.ExcuteCommand<dynamic>(query, new { IdProyecto = idProyecto });
+
+            string query2 = @"UPDATE Tareas SET estado = 0 WHERE id_proyecto = @IdProyecto;";
+            _connectionSignleton.ExcuteCommand<dynamic>(query2, new { IdProyecto = idProyecto });
         }
 
 
@@ -104,10 +122,7 @@
             return proyectos.FirstOrDefault();
         }
 
-        public void DeactivateByProjectId(int idProyecto)
-        {
 
-        }
 
     }
 }
