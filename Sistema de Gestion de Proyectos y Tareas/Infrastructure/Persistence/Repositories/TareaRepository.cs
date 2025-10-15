@@ -2,14 +2,14 @@
 using Dapper;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
-using System.Collections.Generic;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories
 {
 
-    public class TareaRepository : ITareaRepository
+    public class TareaRepository : IDB<Tarea>
     {
         private readonly MySqlConnectionSingleton _connectionSignleton;
 
