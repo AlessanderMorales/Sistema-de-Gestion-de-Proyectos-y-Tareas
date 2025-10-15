@@ -1,23 +1,49 @@
-﻿
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data; 
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
+﻿// Archivo: Program.cs (Versión Actualizada con Políticas)
 
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorPages();
+builder.Services.AddAuthentication("MyCookieAuth")
+    .AddCookie("MyCookieAuth", options =>
+    {
+        options.Cookie.Name = "Sgpt.AuthCookie";
+        options.LoginPath = "/Login/Login";
+        options.AccessDeniedPath = "/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    });
+
+
+builder.Services.AddAuthorization(options =>
+{
+
+    options.AddPolicy("SoloAdmin", policy =>
+        policy.RequireRole(Roles.SuperAdmin));
+
+});
 
 builder.Services.AddSingleton<MySqlConnectionSingleton>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Proyecto>, ProyectoryRepositoryCreator>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Usuario>, UsuarioRepositoryCreator>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Tarea>, TareaRepositoryCreator>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Comentario>, ComentarioRepositoryCreator>();
+
 builder.Services.AddScoped<ProyectoService>();
 builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComentarioService>();
+
+builder.Services.AddRazorPages(options =>
+{
+
+    options.Conventions.AuthorizeFolder("/Usuarios", "SoloAdmin");
+});
+
 
 var app = builder.Build();
 
@@ -30,6 +56,11 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapRazorPages();
+
 app.Run();

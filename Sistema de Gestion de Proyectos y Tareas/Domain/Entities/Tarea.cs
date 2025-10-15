@@ -85,5 +85,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 yield return new ValidationResult("No se permiten palabras clave ni caracteres peligrosos en los campos de texto.", new[] { nameof(Titulo), nameof(Descripcion), nameof(Prioridad) });
             }
         }
+        public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
     }
 }

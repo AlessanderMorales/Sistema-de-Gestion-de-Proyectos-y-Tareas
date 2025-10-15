@@ -7,8 +7,8 @@
         public DateTime Fecha { get; set; }
         public int Estado { get; set; }
 
-        // Relaciones
         public int IdTarea { get; set; }
         public int IdUsuario { get; set; }
+        public Usuario Usuario { get; set; }
     }
 }

@@ -1,6 +1,10 @@
 ﻿
+
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
 {
@@ -12,7 +16,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         {
             _usuarioFactory = usuarioFactory;
         }
-
 
         public IEnumerable<Usuario> ObtenerTodosLosUsuarios()
         {
@@ -42,6 +45,18 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         {
             var repo = _usuarioFactory.CreateRepository();
             repo.DeleteAsync(id);
+        }
+
+        public Usuario ValidarUsuario(string email, string password)
+        {
+            var repo = _usuarioFactory.CreateRepository();
+            var usuario = repo.GetAllAsync().FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+            if (usuario != null && usuario.Contraseña == password)
+            {
+                return usuario;
+            }
+            return null;
         }
     }
 }

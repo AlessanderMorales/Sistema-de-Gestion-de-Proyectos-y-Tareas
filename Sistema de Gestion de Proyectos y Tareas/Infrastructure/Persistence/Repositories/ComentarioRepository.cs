@@ -74,5 +74,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
         {
 
         }
+
+        public IEnumerable<Comentario> GetAllWhere(string whereClause, object parameters = null)
+        {
+
+            string query = $"SELECT * FROM Comentario WHERE {whereClause};";
+            using var connection = _connectionSingleton.CreateConnection();
+            return connection.Query<Comentario>(query, parameters);
+        }
     }
 }

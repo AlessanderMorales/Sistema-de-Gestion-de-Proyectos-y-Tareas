@@ -23,7 +23,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [StringLength(15, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 15 caracteres.")]
         [DataType(DataType.Password)]
         public string Contraseña { get; set; } = string.Empty;
-
+        [Required(ErrorMessage = "El email es obligatorio.")] 
+        [EmailAddress(ErrorMessage = "Formato de email no válido.")]
+        public string Email { get; set; } = string.Empty;
         public string Rol { get; set; } = "Usuario"; 
 
         public int Estado { get; set; } = 1;

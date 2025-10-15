@@ -1,16 +1,16 @@
-﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories
-{
-    using Dapper;
-    using System.Data;
-    using System.Collections.Generic;
-    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-    using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
+﻿
+using Dapper;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
 
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories
+{
     public class UsuarioRepository : IDB<Usuario>
     {
-        private readonly IDbConnectionSingleton _connectionFactory;
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        public UsuarioRepository(IDbConnectionSingleton connectionFactory)
+        public UsuarioRepository(IDbConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
         }
@@ -20,10 +20,8 @@
             using var connection = _connectionFactory.CreateConnection();
             return connection.Query<Usuario>(
                 @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, 
-                         apellidos, contraseña, rol AS Rol, estado AS Estado 
-                  FROM Usuario 
-                  WHERE estado = 1 
-                  ORDER BY apellidos");
+                         apellidos, contraseña, email, rol AS Rol, estado AS Estado 
+                  FROM Usuario WHERE estado = 1 ORDER BY apellidos");
         }
 
         public Usuario GetByIdAsync(int id)
@@ -31,9 +29,8 @@
             using var connection = _connectionFactory.CreateConnection();
             return connection.QueryFirstOrDefault<Usuario>(
                 @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, 
-                         apellidos, contraseña, rol AS Rol, estado AS Estado 
-                  FROM Usuario 
-                  WHERE id_usuario = @Id AND estado = 1;",
+                         apellidos, contraseña, email, rol AS Rol, estado AS Estado 
+                  FROM Usuario WHERE id_usuario = @Id AND estado = 1;",
                 new { Id = id });
         }
 
@@ -41,8 +38,8 @@
         {
             using var connection = _connectionFactory.CreateConnection();
             connection.Execute(
-                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, rol, estado) 
-                  VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, @Rol, @Estado);",
+                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, email, rol, estado) 
+                  VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, @Email, @Rol, @Estado);",
                 entity);
         }
 
@@ -51,11 +48,8 @@
             using var connection = _connectionFactory.CreateConnection();
             connection.Execute(
                 @"UPDATE Usuario 
-                  SET primer_nombre = @PrimerNombre, 
-                      segundo_nombre = @SegundoNombre, 
-                      apellidos = @Apellidos, 
-                      contraseña = @Contraseña, 
-                      rol = @Rol
+                  SET primer_nombre = @PrimerNombre, segundo_nombre = @SegundoNombre, apellidos = @Apellidos, 
+                      contraseña = @Contraseña, email = @Email, rol = @Rol
                   WHERE id_usuario = @Id;",
                 entity);
         }
@@ -75,7 +69,6 @@
 
         public void DeactivateByProjectId(int idProyecto)
         {
-
         }
     }
 }

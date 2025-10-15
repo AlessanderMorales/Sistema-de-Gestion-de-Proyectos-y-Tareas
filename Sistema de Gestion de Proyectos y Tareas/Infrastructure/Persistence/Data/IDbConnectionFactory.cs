@@ -1,6 +1,9 @@
 ﻿using System.Data;
 
-public interface IDbConnectionSingleton
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data
 {
-    IDbConnection CreateConnection();
-} 
+    public interface IDbConnectionFactory
+    {
+        IDbConnection CreateConnection();
+    }
+}
