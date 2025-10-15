@@ -1,0 +1,23 @@
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
+{
+    public class MostrarModel : PageModel
+    {
+        private readonly ComentarioService _comentarioService;
+
+        public Comentario Comentario { get; set; }
+
+        public MostrarModel(ComentarioService comentarioService)
+        {
+            _comentarioService = comentarioService;
+        }
+
+        public void OnGet(int id)
+        {
+            Comentario = _comentarioService.GetById(id);
+        }
+    }
+}
