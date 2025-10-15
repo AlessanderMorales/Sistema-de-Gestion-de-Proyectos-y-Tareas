@@ -8,9 +8,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
     public class ProyectoService
     {
         private readonly MySqlRepositoryFactory<Proyecto> _proyectoFactory;
-        public ProyectoService(MySqlRepositoryFactory<Proyecto> proyectoFactory)
+        private readonly MySqlRepositoryFactory<Tarea> _tareaFactory;
+        public ProyectoService(MySqlRepositoryFactory<Proyecto> proyectoFactory, MySqlRepositoryFactory<Tarea> tareaFactory)
         {
             _proyectoFactory = proyectoFactory;
+            _tareaFactory = tareaFactory;
         }
         public IEnumerable<Proyecto> ObtenerTodosLosProyectos()
         {
@@ -48,6 +50,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
                 return repoConcreto.GetByIdConTareas(idProyecto);
             }
             return null;
+        }
+
+        public void EliminarProyectoPorId(int id)
+        {
+            var tareaRepo = _tareaFactory.CreateRepository();
+            tareaRepo.DeactivateByProjectId(id);
+            var proyectoRepo = _proyectoFactory.CreateRepository();
+            proyectoRepo.DeleteAsync(id);
         }
 
 

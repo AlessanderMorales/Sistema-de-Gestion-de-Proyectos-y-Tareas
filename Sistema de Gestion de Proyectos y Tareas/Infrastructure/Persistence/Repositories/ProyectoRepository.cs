@@ -104,7 +104,10 @@
             return proyectos.FirstOrDefault();
         }
 
+        public void DeactivateByProjectId(int idProyecto)
+        {
 
+        }
 
     }
 }

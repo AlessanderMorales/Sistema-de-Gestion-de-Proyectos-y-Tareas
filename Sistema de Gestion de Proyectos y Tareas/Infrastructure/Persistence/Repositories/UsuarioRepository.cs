@@ -72,5 +72,10 @@
         {
             DeleteAsync(entity.Id);
         }
+
+        public void DeactivateByProjectId(int idProyecto)
+        {
+
+        }
     }
 }

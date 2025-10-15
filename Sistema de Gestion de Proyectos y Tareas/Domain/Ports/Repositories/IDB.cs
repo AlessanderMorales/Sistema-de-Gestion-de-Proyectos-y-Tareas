@@ -8,5 +8,7 @@
         void UpdateAsync(T entity);
         void DeleteAsync(int id);
         void DeleteAsync(T entity);
+
+        void DeactivateByProjectId(int idProyecto);
     }
 }

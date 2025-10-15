@@ -27,8 +27,11 @@
                 <td>
                     <a class="btn btn-sm btn-success" asp-page="./Mostrar" asp-route-id="@item.Id">Ver Tareas</a>
                     <a class="btn btn-sm btn-info" asp-page="./Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
+                    <form method="post" asp-route-id="@item.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            Eliminar
+                        </button>
+
                     </form>
                 </td>
             </tr>

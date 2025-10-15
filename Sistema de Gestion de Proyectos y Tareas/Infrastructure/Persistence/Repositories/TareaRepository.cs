@@ -105,5 +105,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
                              WHERE id_tarea = @Id;";
             _connectionSignleton.ExcuteCommand(query, entity);
         }
+
+        public void DeactivateByProjectId(int idProyecto)
+        {
+            string query = @"UPDATE Tareas SET estado = 0 WHERE id_proyecto = @IdProyecto;";
+
+            using var connection = _connectionSignleton.CreateConnection();
+            connection.Execute(query, new { IdProyecto = idProyecto });
+        }
     }
 }
