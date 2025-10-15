@@ -27,7 +27,13 @@
                 <td>
                     <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-info btn-sm">Ver</a>
                     <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Deseas desactivar este comentario?');">
+                            Eliminar
+                        </button>
+                    </form>
                 </td>
+
             </tr>
         }
     </tbody>
