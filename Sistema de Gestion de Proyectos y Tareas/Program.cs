@@ -15,9 +15,11 @@ builder.Services.AddSingleton<MySqlConnectionSingleton>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Proyecto>, ProyectoryRepositoryCreator>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Usuario>, UsuarioRepositoryCreator>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Tarea>, TareaRepositoryCreator>();
+builder.Services.AddScoped<MySqlRepositoryFactory<Comentario>, ComentarioRepositoryCreator>();
 builder.Services.AddScoped<ProyectoService>();
 builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ComentarioService>();
 
 // App runtime singleton to detect restarts
 builder.Services.AddSingleton<AppRuntime>();

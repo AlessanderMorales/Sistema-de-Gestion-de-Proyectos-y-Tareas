@@ -1,0 +1,14 @@
+﻿@page "{id:int}"
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios.EditModel
+
+<h2>Editar Comentario</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="Comentario.Id" />
+    <div class="form-group">
+        <label>Contenido</label>
+        <textarea asp-for="Comentario.Contenido" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Actualizar</button>
+    <a asp-page="Index" class="btn btn-secondary mt-3">Cancelar</a>
+</form>

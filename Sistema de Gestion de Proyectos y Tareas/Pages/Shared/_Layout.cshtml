@@ -30,6 +30,7 @@
                 <div class="fs-4 fw-bold text-primary">Gestión</div>
             </div>
             <div class="list-group list-group-flush">
+<<<<<<< HEAD
                 @if (isAuthenticated)
                 {
                     <a asp-page="/Index" class="list-group-item list-group-item-action bg-white">Home</a>
@@ -45,6 +46,14 @@
                         <a asp-page="/Usuarios/Index" class="list-group-item list-group-item-action bg-white">Usuarios</a>
                     }
                 }
+=======
+                <a asp-page="/Index" class="list-group-item list-group-item-action bg-white">Home</a>
+                <a asp-page="/proyectos/Create" class="list-group-item list-group-item-action bg-white">Crear Proyectos</a>
+                <a asp-page="/proyectos/Index" class="list-group-item list-group-item-action bg-white">Mostrar proyectos</a>
+                <a asp-page="/Tareas/Index" class="list-group-item list-group-item-action bg-white">Tareas</a>
+                <a asp-page="/Usuarios/Index" class="list-group-item list-group-item-action bg-white">Usuarios</a>
+                <a asp-page="/Comentarios/Index" class="list-group-item list-group-item-action bg-white">Comentarios</a>
+>>>>>>> main
             </div>
         </div>
         <div id="page-content-wrapper" class="w-100">
