@@ -9,11 +9,12 @@ using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
-    [Authorize]
+    // Refuerzo de seguridad: sólo JefeDeProyecto puede crear tareas
+    [Authorize(Policy = "OnlyJefe")]
     public class CreateModel : PageModel
     {
         private readonly TareaService _tareaService;
-        private readonly ProyectoService _proyectoService; 
+        private readonly ProyectoService _proyectoService;
 
         [BindProperty]
         public Tarea Tarea { get; set; } = new();

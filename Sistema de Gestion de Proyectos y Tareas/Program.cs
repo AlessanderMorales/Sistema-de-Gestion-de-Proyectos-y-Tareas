@@ -42,14 +42,17 @@ builder.Services.AddScoped<ComentarioService>();
 
 builder.Services.AddRazorPages(options =>
 {
-
     options.Conventions.AuthorizeFolder("/Usuarios", "SoloAdmin");
     options.Conventions.AuthorizeFolder("/proyectos", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Tareas", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Comentarios", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizePage("/Index", "OnlyJefeOrEmpleado");
-});
 
+    // Bloqueo explícito: solo JefeDeProyecto puede acceder a las páginas de creación
+    options.Conventions.AuthorizePage("/proyectos/Create", "OnlyJefe");
+    options.Conventions.AuthorizePage("/Tareas/Create", "OnlyJefe");
+});
+ 
 
 var app = builder.Build();
 

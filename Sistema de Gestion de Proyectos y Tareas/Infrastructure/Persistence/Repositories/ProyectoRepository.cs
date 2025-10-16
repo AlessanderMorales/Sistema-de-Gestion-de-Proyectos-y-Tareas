@@ -126,15 +126,15 @@
                              INNER JOIN Tareas t ON p.id_proyecto = t.id_proyecto
                              WHERE p.estado = 1 AND t.estado = 1 AND t.id_usuario_asignado = @UsuarioId
                              ORDER BY p.nombre";
-            return _connectionSignleton.ExcuteCommandWithDataReturn<Proyecto>(query).Where(p => p != null && p.Id != 0).Select(p => p);
+            return _connectionSignleton
+                .ExcuteCommandWithDataReturn<Proyecto>(query, new { UsuarioId = idUsuario })
+                .Where(p => p != null && p.Id != 0)
+                .Select(p => p);
         }
 
         public void DeactivateByProjectId(int idProyecto)
         {
 
         }
-
-
-
     }
 }
