@@ -1,18 +1,78 @@
 ﻿@page "{id:int}"
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios.MostrarModel
+@{
+    ViewData["Title"] = "Detalle del Comentario";
+}
 
-<h2>Detalle del Comentario</h2>
+<style>
+    :root {
+        --accent-red: #D32F2F;
+        --accent-orange: #FF5722;
+        --accent-gold: #FFD700;
+    }
 
-<div class="card mt-3">
-    <div class="card-body">
-        <p><strong>Contenido:</strong> @Model.Comentario.Contenido</p>
-        <p><strong>Fecha:</strong> @Model.Comentario.Fecha</p>
-        @if (Model.Comentario.Usuario != null)
-        {
-            <p><strong>Usuario:</strong> @Model.Comentario.Usuario.PrimerNombre</p>
-        }
-        @* Si necesitas mostrar la tarea asociada como nombre, añade esa propiedad en el modelo o servicio. *@
+    .title-volcanic {
+        background: linear-gradient(45deg, var(--accent-gold), var(--accent-orange));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .details-list dt {
+        color: var(--accent-gold);
+        font-weight: 600;
+    }
+    .details-list dd {
+        color: #e0e0e0;
+        margin-left: 0;
+    }
+
+    .btn-volcanic-secondary {
+        background-color: transparent;
+        border: 2px solid #6c757d;
+        color: #ced4da;
+        font-weight: bold;
+        padding: 8px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-volcanic-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+</style>
+
+<h2 class="title-volcanic">@ViewData["Title"]</h2>
+
+@if (Model.Comentario != null)
+{
+    <div>
+        <dl class="row details-list">
+            <dt class="col-sm-3 col-md-2">Contenido</dt>
+            <dd class="col-sm-9 col-md-10">@Model.Comentario.Contenido</dd>
+
+            <dt class="col-sm-3 col-md-2">Fecha de Creación</dt>
+            <dd class="col-sm-9 col-md-10">@Model.Comentario.Fecha.ToString("F")</dd>
+
+            @if (Model.Comentario.Usuario != null)
+            {
+                <dt class="col-sm-3 col-md-2">Autor</dt>
+                <dd class="col-sm-9 col-md-10">@($"{Model.Comentario.Usuario.PrimerNombre} {Model.Comentario.Usuario.Apellidos}")</dd>
+            }
+        </dl>
     </div>
-</div>
 
-<a asp-page="Index" class="btn btn-secondary mt-3">Volver</a>
+    <div class="mt-4">
+        <a asp-page="Index" class="btn btn-volcanic-secondary">Volver a la Lista</a>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Comentario no encontrado</h4>
+        <p>El comentario que buscas no existe o fue eliminado.</p>
+    </div>
+}

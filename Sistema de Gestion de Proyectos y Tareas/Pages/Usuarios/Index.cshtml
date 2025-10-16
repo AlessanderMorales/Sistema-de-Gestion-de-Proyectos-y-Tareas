@@ -48,12 +48,7 @@
         letter-spacing: 1px;
         border-bottom: 2px solid var(--accent-orange);
     }
-    .table-volcanic tbody tr {
-        transition: background-color 0.2s ease-in-out;
-    }
-    .table-volcanic tbody tr:hover {
-        background-color: #4a4a50;
-    }
+    .table-volcanic tbody tr:hover { background-color: #4a4a50; }
 
     .btn-action { border-radius: 6px; font-weight: 500; padding: 5px 12px; transition: all 0.2s ease; }
     .btn-action:hover { transform: translateY(-1px); }
@@ -66,10 +61,13 @@
         color: white; font-weight: bold; padding: 10px 20px; border-radius: 8px;
         transition: all 0.3s ease;
     }
-    .btn-volcanic-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
-    }
+    .btn-volcanic-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4); }
+
+    .modal-content.volcanic-modal { background-color: #2c2c31; color: #f5f5f7; border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; }
+    .volcanic-modal .modal-header { border-bottom: 1px solid var(--accent-orange); }
+    .volcanic-modal .modal-footer { border-top: 1px solid rgba(255,255,255,0.1); }
+    .btn-volcanic-delete { background-color: var(--accent-red); border: none; color: white; font-weight: bold; padding: 10px 20px; border-radius: 8px; }
+    .btn-volcanic-secondary-modal { background-color: #4a4a50; border: none; color: white; font-weight: bold; padding: 10px 20px; border-radius: 8px; }
 </style>
 
 <div class="header-actions">
@@ -97,11 +95,55 @@
                 <td>@item.Rol</td>
                 <td class="text-center">
                     <a class="btn btn-sm btn-action btn-edit" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" style="display:inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
-                        <button type="submit" class="btn btn-sm btn-action btn-delete">Eliminar</button>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" style="display:inline" id="deleteForm-@item.Id">
+                        <button type="button" class="btn btn-sm btn-action btn-delete" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-item-id="@item.Id">
+                            Eliminar
+                        </button>
                     </form>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content volcanic-modal">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar a este usuario?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-volcanic-secondary-modal" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-volcanic-delete" id="confirmDeleteButton">Sí, Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            var confirmDeleteButton = document.getElementById('confirmDeleteButton');
+            var itemIdToDelete;
+
+            confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                itemIdToDelete = button.getAttribute('data-item-id');
+            });
+
+            confirmDeleteButton.addEventListener('click', function () {
+                if (itemIdToDelete) {
+                    var form = document.getElementById('deleteForm-' + itemIdToDelete);
+                    if (form) {
+                        form.submit();
+                    }
+                }
+            });
+        });
+    </script>
+}
