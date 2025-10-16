@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
 {
+    [Authorize]
     public class MostrarModel : PageModel
     {
         private readonly ComentarioService _comentarioService;

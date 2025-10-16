@@ -1,12 +1,14 @@
-// Archivo: Pages/Proyectos/Edit.cshtml.cs (Versión Corregida)
 
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 {
+    [Authorize]
     public class EditModel : PageModel
     {
         private readonly ProyectoService _proyectoService;
