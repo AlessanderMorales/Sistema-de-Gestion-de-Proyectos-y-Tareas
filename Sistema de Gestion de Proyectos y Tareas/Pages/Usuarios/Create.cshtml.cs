@@ -22,6 +22,12 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 
         public async Task<IActionResult> OnPostAsync()
         {
+
+            if (_usuarioService.EmailYaExiste(Usuario.Email))
+            {
+
+                ModelState.AddModelError("Usuario.Email", "Este correo electrónico ya está registrado.");
+            }
             if (!ModelState.IsValid)
             {
                 return Page();

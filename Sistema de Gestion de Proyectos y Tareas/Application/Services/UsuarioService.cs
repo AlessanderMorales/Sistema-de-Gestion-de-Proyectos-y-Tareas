@@ -128,5 +128,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
                 return false;
             }
         }
+
+
+        public bool EmailYaExiste(string email)
+        {
+            var repo = _usuarioFactory.CreateRepository();
+            var usuarioExistente = repo.GetAllAsync()
+                                    .FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            return usuarioExistente != null;
+        }
     }
 }

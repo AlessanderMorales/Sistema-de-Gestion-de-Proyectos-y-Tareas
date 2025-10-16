@@ -70,5 +70,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
         public void DeactivateByProjectId(int idProyecto)
         {
         }
+
+
     }
 }
