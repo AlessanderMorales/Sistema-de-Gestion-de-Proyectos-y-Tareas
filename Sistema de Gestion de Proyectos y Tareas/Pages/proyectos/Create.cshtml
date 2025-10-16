@@ -1,62 +1,159 @@
 ﻿@page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos.CreateModel
-@{ ViewData["Title"] = "Crear Proyecto"; }
-<h1>@ViewData["Title"]</h1><hr />
-<div class="row"><div class="col-md-6">
-    <form method="post">
-        <div class="mb-3">
-            <label asp-for="Proyecto.Nombre" class="form-label"></label>
-            <input asp-for="Proyecto.Nombre" class="form-control" />
-            <span asp-validation-for="Proyecto.Nombre" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Proyecto.Descripcion" class="form-label"></label>
-            <textarea asp-for="Proyecto.Descripcion" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Proyecto.Descripcion" class="text-danger"></span> 
-        </div>
-        <div class="mb-3">
-            <label asp-for="Proyecto.FechaInicio" class="form-label"></label>
-            <input asp-for="Proyecto.FechaInicio" class="form-control" type="date" />
-            <span asp-validation-for="Proyecto.FechaInicio" class="text-danger"></span> 
-        </div>
-        <div class="mb-3">
-            <label asp-for="Proyecto.FechaFin" class="form-label"></label>
-            <input asp-for="Proyecto.FechaFin" class="form-control" type="date" />
-            <span asp-validation-for="Proyecto.FechaFin" class="text-danger"></span>
-        </div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-    </form>
-</div></div>
+@{
+    ViewData["Title"] = "Crear Proyecto";
+}
+
+<style>
+    /* Estilos Volcánicos para Formularios */
+    :root {
+        --accent-red: #D32F2F;
+        --accent-orange: #FF5722;
+        --accent-gold: #FFD700;
+        --text-primary: #f5f5f7;
+    }
+
+    /* Título con gradiente */
+    .title-volcanic {
+        background: linear-gradient(45deg, var(--accent-gold), var(--accent-orange));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Estilos para campos de formulario */
+    .form-control, .form-select {
+        background-color: #3a3a40;
+        color: var(--text-primary);
+        border: 1px solid #555;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: #4a4a50;
+        color: var(--text-primary);
+        border-color: var(--accent-orange);
+        box-shadow: 0 0 0 0.25rem rgba(255, 87, 34, 0.3);
+    }
+    .form-control::placeholder {
+        color: #888;
+    }
+
+    /* Estilo para las etiquetas */
+    .form-label {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    /* Mensajes de validación */
+    .text-danger {
+        color: #ff5252 !important;
+        font-weight: 500;
+    }
+    
+    /* Contenedor del formulario */
+    .form-container {
+        max-width: 700px;
+    }
+
+    /* --- Estilos de Botones Volcánicos --- */
+    .btn-volcanic-primary {
+        background: linear-gradient(45deg, var(--accent-red), var(--accent-orange));
+        border: none;
+        color: white;
+        font-weight: bold;
+        padding: 12px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-volcanic-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+    }
+
+    .btn-volcanic-secondary {
+        background-color: transparent;
+        border: 2px solid #6c757d;
+        color: #ced4da;
+        font-weight: bold;
+        padding: 10px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-volcanic-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+        border-color: #6c757d;
+    }
+
+</style>
+
+<h1 class="title-volcanic">@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-8 form-container">
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Proyecto.Nombre" class="form-label"></label>
+                <input asp-for="Proyecto.Nombre" class="form-control" placeholder="Ej: Desarrollo de App Móvil" />
+                <span asp-validation-for="Proyecto.Nombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Proyecto.Descripcion" class="form-label"></label>
+                <textarea asp-for="Proyecto.Descripcion" class="form-control" rows="4" placeholder="Describe los objetivos y el alcance del proyecto..."></textarea>
+                <span asp-validation-for="Proyecto.Descripcion" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Proyecto.FechaInicio" class="form-label"></label>
+                    <input asp-for="Proyecto.FechaInicio" class="form-control" type="date" />
+                    <span asp-validation-for="Proyecto.FechaInicio" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Proyecto.FechaFin" class="form-label"></label>
+                    <input asp-for="Proyecto.FechaFin" class="form-control" type="date" />
+                    <span asp-validation-for="Proyecto.FechaFin" class="text-danger"></span>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-volcanic-primary">Guardar Proyecto</button>
+                <a asp-page="Index" class="btn btn-volcanic-secondary ms-2">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const fechaInicio = document.querySelector('#Proyecto_FechaInicio');
-            const fechaFin = document.querySelector('#Proyecto_FechaFin');
-            const form = document.querySelector('form');
+document.addEventListener('DOMContentLoaded', function () {
+    const fechaInicio = document.querySelector('#Proyecto_FechaInicio');
+    const fechaFin = document.querySelector('#Proyecto_FechaFin');
+    const form = document.querySelector('form');
 
-            form.addEventListener('submit', function (event) {
-                const inicio = new Date(fechaInicio.value);
-                const fin = new Date(fechaFin.value);
-                const errorSpan = fechaFin.parentElement.querySelector('.text-danger');
+    form.addEventListener('submit', function (event) {
+        const inicio = new Date(fechaInicio.value);
+        const fin = new Date(fechaFin.value);
+        const errorSpan = fechaFin.parentElement.querySelector('.text-danger');
 
-                if (errorSpan) errorSpan.textContent = '';
+        if (errorSpan) errorSpan.textContent = '';
 
-                if (fechaInicio.value && fechaFin.value) {
-                    if (fin < inicio) {
-                        event.preventDefault();
-                        errorSpan.textContent = 'La fecha de finalización no puede ser anterior a la fecha de inicio.';
-                    } else if (fin.getTime() === inicio.getTime()) {
-                        event.preventDefault();
-                        errorSpan.textContent = 'La fecha de finalización no puede ser igual a la fecha de inicio.';
-                    }
-                }
-            });
-        });
-    </script>
+        if (fechaInicio.value && fechaFin.value) {
+            if (fin < inicio) {
+                event.preventDefault();
+                errorSpan.textContent = 'La fecha de finalización no puede ser anterior a la fecha de inicio.';
+            } else if (fin.getTime() === inicio.getTime()) {
+                event.preventDefault();
+                errorSpan.textContent = 'La fecha de finalización no puede ser igual a la fecha de inicio.';
+            }
+        }
+    });
+});    </script>
 }
