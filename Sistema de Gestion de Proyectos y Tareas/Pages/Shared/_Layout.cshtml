@@ -169,12 +169,33 @@
                 <div class="fs-4">Gestión Pro</div>
             </div>
             <div class="list-group list-group-flush">
-                <a asp-page="/Index" class="list-group-item list-group-item-action">Home</a>
-                <a asp-page="/proyectos/Create" class="list-group-item list-group-item-action">Crear Proyectos</a>
-                <a asp-page="/proyectos/Index" class="list-group-item list-group-item-action">Mostrar proyectos</a>
-                <a asp-page="/Tareas/Index" class="list-group-item list-group-item-action">Tareas</a>
-                <a asp-page="/Usuarios/Index" class="list-group-item list-group-item-action">Usuarios</a>
-                <a asp-page="/Comentarios/Index" class="list-group-item list-group-item-action">Comentarios</a>
+                @* Sidebar links rendered based on role *@
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <a asp-page="/Login/Login" class="list-group-item list-group-item-action">Iniciar Sesión</a>
+                }
+                else if (User.IsInRole("SuperAdmin"))
+                {
+                    // SuperAdmin: only user management pages
+                    <a asp-page="/Usuarios/Index" class="list-group-item list-group-item-action">Usuarios</a>
+                    <a asp-page="/Usuarios/Create" class="list-group-item list-group-item-action">Crear Usuario</a>
+                }
+                else if (User.IsInRole("JefeDeProyecto"))
+                {
+                    // JefeDeProyecto: full app except user creation/edit/delete
+                    <a asp-page="/Index" class="list-group-item list-group-item-action">Home</a>
+                    <a asp-page="/proyectos/Create" class="list-group-item list-group-item-action">Crear Proyectos</a>
+                    <a asp-page="/proyectos/Index" class="list-group-item list-group-item-action">Mostrar proyectos</a>
+                    <a asp-page="/Tareas/Index" class="list-group-item list-group-item-action">Tareas</a>
+                    <a asp-page="/Comentarios/Index" class="list-group-item list-group-item-action">Comentarios</a>
+                }
+                else if (User.IsInRole("Empleado"))
+                {
+                    // Empleado: can only see assigned items - show only Tareas and maybe a personal view
+                    <a asp-page="/Index" class="list-group-item list-group-item-action">Home</a>
+                    <a asp-page="/Tareas/Index" class="list-group-item list-group-item-action">Mis Tareas</a>
+                    <a asp-page="/proyectos/Index" class="list-group-item list-group-item-action">Mis Proyectos</a>
+                }
             </div>
         </div>
 

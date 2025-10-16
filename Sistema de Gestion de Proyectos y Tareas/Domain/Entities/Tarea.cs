@@ -1,4 +1,3 @@
-
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
@@ -22,8 +21,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [Required(ErrorMessage = "La prioridad es obligatoria.")]
         [Display(Name = "Prioridad")]
         public string? Prioridad { get; set; }
+
         public int id_proyecto { get; set; }
         public Proyecto? Proyecto { get; set; }
+
+        // Nuevo: usuario asignado y status
+        public int? IdUsuarioAsignado { get; set; }
+        public string Status { get; set; } = "SinIniciar";
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             string pattern = @"^(?! )[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+)*$";

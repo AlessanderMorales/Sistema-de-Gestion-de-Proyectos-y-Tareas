@@ -1,7 +1,7 @@
 @page
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios.CreateModel
 @{
-    ViewData["Title"] = "Crear Usuario";
+    ViewData["Title"] = "Crear Nuevo Usuario";
 }
 
 <style>
@@ -94,23 +94,29 @@
 <div class="row">
     <div class="col-md-8 form-container">
         <form method="post">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Usuario.PrimerNombre" class="form-label"></label>
-                    <input asp-for="Usuario.PrimerNombre" class="form-control" />
-                    <span asp-validation-for="Usuario.PrimerNombre" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Usuario.SegundoNombre" class="form-label"></label>
-                    <input asp-for="Usuario.SegundoNombre" class="form-control" />
-                    <span asp-validation-for="Usuario.SegundoNombre" class="text-danger"></span>
-                </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Usuario.PrimerNombre" class="form-label"></label>
+                <input asp-for="Usuario.PrimerNombre" class="form-control" />
+                <span asp-validation-for="Usuario.PrimerNombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Usuario.SegundoNombre" class="form-label"></label>
+                <input asp-for="Usuario.SegundoNombre" class="form-control" />
+                <span asp-validation-for="Usuario.SegundoNombre" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Usuario.Apellidos" class="form-label"></label>
                 <input asp-for="Usuario.Apellidos" class="form-control" />
                 <span asp-validation-for="Usuario.Apellidos" class="text-danger"></span>
             </div>
+            <div class="mb-3">
+                <label asp-for="Usuario.Email" class="form-label"></label>
+                <input asp-for="Usuario.Email" class="form-control" type="email" />
+                <span asp-validation-for="Usuario.Email" class="text-danger"></span>
+            </div>
+
             <div class="mb-3">
                 <label asp-for="Usuario.Contraseña" class="form-label"></label>
                 <div class="input-group">
@@ -121,22 +127,25 @@
             </div>
             <div class="mb-3">
                 <label asp-for="Usuario.Rol" class="form-label"></label>
-                <select asp-for="Usuario.Rol" class="form-select">
-                    <option value="empleado">Empleado</option>
-                    <option value="jefe de proyecto">Jefe de Proyecto</option>
+                <select asp-for="Usuario.Rol" class="form-control">
+                    <option value="">-- Seleccione un Rol --</option>
+                    <option value="SuperAdmin">Super Administrador</option>
+                    <option value="JefeDeProyecto">Jefe de Proyecto</option>
+                    <option value="Empleado">Empleado</option>
                 </select>
                 <span asp-validation-for="Usuario.Rol" class="text-danger"></span>
             </div>
-            <div class="mt-4">
-                <button type="submit" class="btn btn-volcanic-primary">Guardar Usuario</button>
-                <a asp-page="Index" class="btn btn-volcanic-secondary ms-2">Cancelar</a>
-            </div>
+
+            <button type="submit" class="btn btn-primary">Crear Usuario</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
         document.getElementById('togglePassword').addEventListener('click', function () {
             const input = document.getElementById('contraseñaInput');

@@ -92,14 +92,14 @@
         {
             <tr>
                 <td>@c.Contenido</td>
-                <td>@c.Fecha.ToString("g")</td>
-                <td>@c.IdTarea</td>
-                <td>@c.IdUsuario</td>
-                <td class="text-center">
-                    <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-sm btn-action btn-view">Ver</a>
-                    <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-action btn-edit">Editar</a>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" style="display:inline;" id="deleteForm-@c.Id">
-                        <button type="button" class="btn btn-sm btn-action btn-delete" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-item-id="@c.Id">
+                <td>@c.Fecha</td>
+                <td>@(c.Tarea != null ? c.Tarea.Titulo : "-")</td>
+                <td>@(c.Usuario != null ? $"{c.Usuario.PrimerNombre} {c.Usuario.Apellidos}" : "-")</td>
+                <td>
+                    <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-info btn-sm">Ver</a>
+                    <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Deseas desactivar este comentario?');">
                             Eliminar
                         </button>
                     </form>

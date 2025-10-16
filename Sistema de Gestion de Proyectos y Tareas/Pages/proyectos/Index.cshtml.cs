@@ -1,9 +1,9 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 {
@@ -20,6 +20,16 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 
         public void OnGet()
         {
+            if (User.IsInRole("Empleado"))
+            {
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(idClaim, out var usuarioId))
+                {
+                    Proyectos = _proyectoService.ObtenerProyectosPorUsuarioAsignado(usuarioId);
+                    return;
+                }
+            }
+
             Proyectos = _proyectoService.ObtenerTodosLosProyectos();
         }
 

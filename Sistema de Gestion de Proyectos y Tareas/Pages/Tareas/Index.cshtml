@@ -111,13 +111,27 @@
                         <span class="text-muted">No asignado</span>
                     }
                 </td>
-                <td class="text-center">
-                    <a class="btn btn-sm btn-action btn-edit" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline" id="deleteForm-@item.Id">
-                        <button type="button" class="btn btn-sm btn-action btn-delete" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-item-id="@item.Id">
-                            Eliminar
-                        </button>
-                    </form>
+
+                <td>
+                    @if (User.IsInRole("JefeDeProyecto"))
+                    {
+                        <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                        <a class="btn btn-sm btn-warning" asp-page="Asignar" asp-route-id="@item.Id">Asignar</a>
+                        <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
+                        </form>
+                    }
+                    else if (User.IsInRole("Empleado"))
+                    {
+                        <span class="text-muted">Solo lectura</span>
+                    }
+                    else
+                    {
+                        <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                        <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
+                        </form>
+                    }
                 </td>
             </tr>
         }

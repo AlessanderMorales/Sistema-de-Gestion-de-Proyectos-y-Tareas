@@ -1,9 +1,9 @@
-﻿
-using Dapper;
+﻿using Dapper;
 using MySql.Data.MySqlClient; 
 using System.Collections.Generic;
 using System.Data; 
 using Microsoft.Extensions.Configuration;
+using System.Linq;
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data
 {
     public class MySqlConnectionSingleton : IDbConnectionFactory
@@ -13,11 +13,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Da
    
     public MySqlConnectionSingleton()
     {
-        _connectionString = "Server=localhost;Database=proyectos_tareas_db;User=root;Password=your_password;";
+        // Default fallback; prefer configuration-based constructor
+        _connectionString = "Server=localhost;Port=3306;Database=gestion_proyectos;Uid=root;Pwd=your_password;";
     }
     public MySqlConnectionSingleton(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("MySqlConecction")!;
+        // Use corrected key MySqlConnection
+        _connectionString = configuration.GetConnectionString("MySqlConnection")!;
     }
 
     public IDbConnection CreateConnection()
@@ -37,7 +39,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Da
     {
         using (var connection = CreateConnection())
         {
-            return connection.Query<Q>(query);
+            // Materialize results into a list while connection is open to avoid deferred execution after disposal
+            var result = connection.Query<Q>(query);
+            return result.ToList();
         }
     }
 

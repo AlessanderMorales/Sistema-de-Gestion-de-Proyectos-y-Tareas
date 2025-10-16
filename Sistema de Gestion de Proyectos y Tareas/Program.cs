@@ -19,10 +19,14 @@ builder.Services.AddAuthentication("MyCookieAuth")
 
 builder.Services.AddAuthorization(options =>
 {
-
     options.AddPolicy("SoloAdmin", policy =>
         policy.RequireRole(Roles.SuperAdmin));
 
+    options.AddPolicy("OnlyJefeOrEmpleado", policy =>
+        policy.RequireAssertion(ctx => ctx.User.IsInRole(Roles.JefeDeProyecto) || ctx.User.IsInRole(Roles.Empleado)));
+
+    options.AddPolicy("OnlyJefe", policy =>
+        policy.RequireRole(Roles.JefeDeProyecto));
 });
 
 builder.Services.AddSingleton<MySqlConnectionSingleton>();
@@ -40,6 +44,10 @@ builder.Services.AddRazorPages(options =>
 {
 
     options.Conventions.AuthorizeFolder("/Usuarios", "SoloAdmin");
+    options.Conventions.AuthorizeFolder("/proyectos", "OnlyJefeOrEmpleado");
+    options.Conventions.AuthorizeFolder("/Tareas", "OnlyJefeOrEmpleado");
+    options.Conventions.AuthorizeFolder("/Comentarios", "OnlyJefeOrEmpleado");
+    options.Conventions.AuthorizePage("/Index", "OnlyJefeOrEmpleado");
 });
 
 

@@ -1,6 +1,4 @@
-﻿
-
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+﻿using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
@@ -18,6 +16,17 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         {
             var repo = _tareaFactory.CreateRepository();
             return repo.GetAllAsync();
+        }
+
+        public IEnumerable<Tarea> ObtenerTareasPorUsuarioAsignado(int idUsuario)
+        {
+            var repo = _tareaFactory.CreateRepository();
+            // the concrete repository exposes GetByAssignedUserId
+            if (repo is Infrastructure.Persistence.Repositories.TareaRepository tareaRepo)
+            {
+                return tareaRepo.GetByAssignedUserId(idUsuario);
+            }
+            return Enumerable.Empty<Tarea>();
         }
 
         public Tarea ObtenerTareaPorId(int id)
@@ -42,6 +51,17 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         {
             var repo = _tareaFactory.CreateRepository();
             repo.DeleteAsync(tarea);
+        }
+
+        public void AsignarTareaAUsuario(int idTarea, int idUsuario)
+        {
+            var repo = _tareaFactory.CreateRepository();
+            var tarea = repo.GetByIdAsync(idTarea);
+            if (tarea != null)
+            {
+                tarea.IdUsuarioAsignado = idUsuario;
+                repo.UpdateAsync(tarea);
+            }
         }
     }
 }

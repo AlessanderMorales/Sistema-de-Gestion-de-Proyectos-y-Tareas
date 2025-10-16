@@ -1,5 +1,4 @@
-﻿
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+﻿using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories; 
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories;
 
@@ -18,6 +17,16 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         {
             var repo = _proyectoFactory.CreateRepository();
             return repo.GetAllAsync();
+        }
+
+        public IEnumerable<Proyecto> ObtenerProyectosPorUsuarioAsignado(int idUsuario)
+        {
+            var repo = _proyectoFactory.CreateRepository();
+            if (repo is ProyectoRepository pr)
+            {
+                return pr.GetProjectsByAssignedUserId(idUsuario);
+            }
+            return Enumerable.Empty<Proyecto>();
         }
 
         public Proyecto ObtenerProyectoPorId(int id)
