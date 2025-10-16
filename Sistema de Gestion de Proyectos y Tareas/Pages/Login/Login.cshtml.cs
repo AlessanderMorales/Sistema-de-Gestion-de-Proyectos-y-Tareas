@@ -45,20 +45,17 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 
             if (ModelState.IsValid)
             {
-                // --- LÓGICA DE VALIDACIÓN ---
-                // ¡Necesitaremos añadir un método en UsuarioService para esto!
+                
                 var usuario = _usuarioService.ValidarUsuario(Input.Email, Input.Password);
 
                 if (usuario != null)
                 {
-                    // --- CREACIÓN DE LA COOKIE DE AUTENTICACIÓN ---
 
-                    // 1. Crear la lista de "claims". Los claims son datos sobre el usuario.
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, usuario.Email), // Guardamos el email del usuario
-                        new Claim("FullName", $"{usuario.PrimerNombre} {usuario.Apellidos}"), // Guardamos su nombre completo
-                        new Claim(ClaimTypes.Role, usuario.Rol) // ¡MUY IMPORTANTE! Guardamos su rol.
+                        new Claim(ClaimTypes.Name, usuario.Email), 
+                        new Claim("FullName", $"{usuario.PrimerNombre} {usuario.Apellidos}"), 
+                        new Claim(ClaimTypes.Role, usuario.Rol) 
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");

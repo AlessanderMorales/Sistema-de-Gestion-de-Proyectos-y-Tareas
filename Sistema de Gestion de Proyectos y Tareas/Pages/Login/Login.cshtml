@@ -10,10 +10,29 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Mi Aplicación</title>
+    <title>@ViewData["Title"] - Plataforma Corporativa</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
+        /* Definición de las animaciones (Keyframes) */
+        @@keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes moltenGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Estilos Generales */
         html, body {
             height: 100%;
         }
@@ -22,41 +41,106 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            /* Fondo con un gradiente oscuro y un toque rojizo */
+            background: linear-gradient(270deg, #1D2B3C, #1a1a1d, #432020);
+            background-size: 200% 200%;
+            animation: moltenGradient 15s ease infinite;
         }
 
+        /* Contenedor del Login con animación de carga */
         .login-container {
             width: 100%;
-            max-width: 400px;
-            padding: 15px;
-            margin: auto;
+            max-width: 420px;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.95); /* Un poco más opaco para legibilidad */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInSlideUp 0.8s ease-out forwards;
         }
+
+        /* Título con un gradiente dorado y naranja para un look premium */
+        .login-container h1 {
+            background: linear-gradient(45deg, #FFD700, #FF8C00); /* De dorado a naranja oscuro */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            font-weight: 800; /* Aún más peso para mayor impacto */
+            text-align: center;
+        }
+        
+        .form-label {
+            color: #555;
+        }
+
+        .form-control {
+            background-color: rgba(233, 236, 239, 0.6);
+            border: 1px solid #ced4da;
+            color: #000;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        /* El foco ahora resalta en un color naranja vibrante */
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: #FF8C00; 
+            box-shadow: 0 0 0 0.25rem rgba(255, 140, 0, 0.3);
+        }
+
+        /* Botón de Iniciar Sesión con un gradiente "volcánico" */
+        #login-submit {
+            background: linear-gradient(45deg, #D32F2F, #FF5722); /* De rojo intenso a naranja ardiente */
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffffff;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-size 0.4s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background-size: 100% 100%;
+            cursor: pointer;
+        }
+
+        /* Efecto "lava al rojo vivo" en hover */
+        #login-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 87, 34, 0.5); /* Sombra anaranjada para un "glow" intenso */
+            background: linear-gradient(45deg, #FF5722, #FF7043); /* Gradiente más brillante */
+            background-size: 150% 150%; /* Sutil zoom en el gradiente */
+        }
+
     </style>
 </head>
 <body>
     <main class="login-container">
-        <h1 class="text-center">@ViewData["Title"]</h1>
+        <h1>@ViewData["Title"]</h1>
         <div class="row">
             <div class="col-md-12">
                 <section>
                     <form id="account" method="post">
-                        <hr />
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
-                            <label asp-for="Input.Email" class="form-label">Email</label>
+                            <label asp-for="Input.Email" class="form-label">Correo Electrónico</label>
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
 
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-4">
                             <input asp-for="Input.Password" type="password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="contraseña" />
                             <label asp-for="Input.Password" class="form-label">Contraseña</label>
                             <span asp-validation-for="Input.Password" class="text-danger"></span>
                         </div>
 
-                        <div>
-                            <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Iniciar Sesión</button>
+                        <div class="mt-4">
+                            <button id="login-submit" type="submit" class="w-100 btn btn-lg">Iniciar Sesión</button>
                         </div>
                     </form>
                 </section>
