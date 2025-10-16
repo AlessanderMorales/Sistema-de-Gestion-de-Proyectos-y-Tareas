@@ -65,7 +65,6 @@
             _connectionSignleton.ExcuteCommand(query, entity);
         }
 
-
         public Proyecto GetByIdConTareas(int idProyecto)
         {
             using var connection = _connectionSignleton.CreateConnection();
@@ -117,6 +116,17 @@
             ).Distinct().ToList();
 
             return proyectos.FirstOrDefault();
+        }
+
+        public IEnumerable<Proyecto> GetProjectsByAssignedUserId(int idUsuario)
+        {
+            // Devuelve proyectos distintos que tienen al menos una tarea asignada al usuario
+            string query = @"SELECT DISTINCT p.id_proyecto AS Id, p.nombre, p.descripcion, p.fecha_inicio AS FechaInicio, p.fecha_fin AS FechaFin, p.estado
+                             FROM Proyecto p
+                             INNER JOIN Tareas t ON p.id_proyecto = t.id_proyecto
+                             WHERE p.estado = 1 AND t.estado = 1 AND t.id_usuario_asignado = @UsuarioId
+                             ORDER BY p.nombre";
+            return _connectionSignleton.ExcuteCommandWithDataReturn<Proyecto>(query).Where(p => p != null && p.Id != 0).Select(p => p);
         }
 
         public void DeactivateByProjectId(int idProyecto)

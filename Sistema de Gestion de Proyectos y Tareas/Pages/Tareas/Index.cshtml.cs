@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using System.Security.Claims;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
@@ -19,6 +20,17 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 
         public void OnGet()
         {
+            if (User.IsInRole("Empleado"))
+            {
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(idClaim, out var usuarioId))
+                {
+                    Tareas = _tareaService.ObtenerTareasPorUsuarioAsignado(usuarioId);
+                    return;
+                }
+            }
+
+            // JefeDeProyecto (and others allowed) see all
             Tareas = _tareaService.ObtenerTodasLasTareas();
         }
 

@@ -6,7 +6,7 @@ using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {
-    [Authorize]
+    [Authorize(Policy = "SoloAdmin")]
     public class IndexModel : PageModel
     {
         private readonly UsuarioService _usuarioService;

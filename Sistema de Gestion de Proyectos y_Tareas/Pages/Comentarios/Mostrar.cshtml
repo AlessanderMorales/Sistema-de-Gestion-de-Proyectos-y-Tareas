@@ -1,0 +1,21 @@
+@page "{id:int}"
+@model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios.MostrarModel
+
+<h2>Detalle del Comentario</h2>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <p><strong>Contenido:</strong> @Model.Comentario.Contenido</p>
+        <p><strong>Fecha:</strong> @Model.Comentario.Fecha</p>
+        @if (Model.Comentario.Usuario != null)
+        {
+            <p><strong>Usuario:</strong> @Model.Comentario.Usuario.PrimerNombre @Model.Comentario.Usuario.Apellidos</p>
+        }
+        @if (Model.Comentario.Tarea != null)
+        {
+            <p><strong>Tarea:</strong> @Model.Comentario.Tarea.Titulo</p>
+        }
+    </div>
+</div>
+
+<a asp-page="Index" class="btn btn-secondary mt-3">Volver</a>

@@ -14,5 +14,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 
         [ValidateNever]
         public Usuario Usuario { get; set; }
+
+        [ValidateNever]
+        public Tarea Tarea { get; set; }
     }
 }

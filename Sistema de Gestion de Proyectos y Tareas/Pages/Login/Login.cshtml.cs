@@ -1,11 +1,10 @@
-
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 {
@@ -45,17 +44,26 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 
             if (ModelState.IsValid)
             {
-                
                 var usuario = _usuarioService.ValidarUsuario(Input.Email, Input.Password);
 
                 if (usuario != null)
                 {
+                    // Normalize role to the constants in Common/Roles
+                    string normalizedRole = Roles.Empleado;
+                    if (!string.IsNullOrEmpty(usuario.Rol))
+                    {
+                        var r = usuario.Rol.Trim().ToLowerInvariant();
+                        if (r.Contains("super")) normalizedRole = Roles.SuperAdmin;
+                        else if (r.Contains("jefe") || r.Contains("jefe de proyecto") || r.Contains("jefedeproyecto")) normalizedRole = Roles.JefeDeProyecto;
+                        else normalizedRole = Roles.Empleado;
+                    }
 
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, usuario.Email), 
-                        new Claim("FullName", $"{usuario.PrimerNombre} {usuario.Apellidos}"), 
-                        new Claim(ClaimTypes.Role, usuario.Rol) 
+                        new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()), // user id
+                        new Claim(ClaimTypes.Name, usuario.Email),
+                        new Claim("FullName", $"{usuario.PrimerNombre} {usuario.Apellidos}"),
+                        new Claim(ClaimTypes.Role, normalizedRole)
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");

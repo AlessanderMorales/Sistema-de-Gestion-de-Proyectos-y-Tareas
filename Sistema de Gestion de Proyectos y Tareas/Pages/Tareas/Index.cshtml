@@ -5,7 +5,13 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-<p><a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a></p>
+@{
+    var isEmpleado = User.IsInRole("Empleado");
+}
+@if(!isEmpleado)
+{
+    <p><a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a></p>
+}
 
 
 <table class="table table-bordered table-striped">
@@ -39,10 +45,25 @@
                 </td>
 
                 <td>
-                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
-                    </form>
+                    @if (User.IsInRole("JefeDeProyecto"))
+                    {
+                        <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                        <a class="btn btn-sm btn-warning" asp-page="Asignar" asp-route-id="@item.Id">Asignar</a>
+                        <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
+                        </form>
+                    }
+                    else if (User.IsInRole("Empleado"))
+                    {
+                        <span class="text-muted">Solo lectura</span>
+                    }
+                    else
+                    {
+                        <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                        <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
+                        </form>
+                    }
                 </td>
             </tr>
         }
