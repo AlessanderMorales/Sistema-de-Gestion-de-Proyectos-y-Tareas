@@ -1,5 +1,4 @@
-﻿
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Common
+﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Common
 {
     public static class Roles
     {

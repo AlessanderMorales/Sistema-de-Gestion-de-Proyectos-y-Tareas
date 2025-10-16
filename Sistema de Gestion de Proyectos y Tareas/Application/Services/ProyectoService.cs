@@ -2,7 +2,7 @@
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Repositories;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Common.Services
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
 {
     public class ProyectoService
     {
