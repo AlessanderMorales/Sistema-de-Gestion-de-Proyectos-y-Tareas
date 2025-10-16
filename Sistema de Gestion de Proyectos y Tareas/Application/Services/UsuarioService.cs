@@ -32,10 +32,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         public void CrearNuevoUsuario(Usuario usuario)
         {
             var repo = _usuarioFactory.CreateRepository();
-            // Normalize role before insert
             if (!string.IsNullOrEmpty(usuario.Rol)) usuario.Rol = usuario.Rol.Trim();
-
-            // Hash password before storing
             usuario.Contraseña = HashPassword(usuario.Contraseña);
 
             repo.AddAsync(usuario);
@@ -45,8 +42,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         {
             var repo = _usuarioFactory.CreateRepository();
             if (!string.IsNullOrEmpty(usuario.Rol)) usuario.Rol = usuario.Rol.Trim();
-
-            // If password appears changed (not starting with PBKDF2:), hash it
             if (!string.IsNullOrEmpty(usuario.Contraseña) && !usuario.Contraseña.StartsWith("PBKDF2:", StringComparison.Ordinal))
             {
                 usuario.Contraseña = HashPassword(usuario.Contraseña);
@@ -68,10 +63,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
 
             if (usuario == null) return null;
 
-            // Trim role
             if (!string.IsNullOrEmpty(usuario.Rol)) usuario.Rol = usuario.Rol.Trim();
-
-            // If stored password is hashed (starts with PBKDF2:), verify accordingly
             if (!string.IsNullOrEmpty(usuario.Contraseña) && usuario.Contraseña.StartsWith("PBKDF2:", StringComparison.Ordinal))
             {
                 if (VerifyHashedPassword(usuario.Contraseña, password))
@@ -81,7 +73,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
                 return null;
             }
 
-            // Legacy plaintext comparison - if matches, migrate to hashed value
             if (usuario.Contraseña == password)
             {
                 usuario.Contraseña = HashPassword(password);
@@ -92,10 +83,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
             return null;
         }
 
-        // PBKDF2 helpers
         private string HashPassword(string password)
         {
-            // PBKDF2 with HMACSHA256
             using var rng = RandomNumberGenerator.Create();
             byte[] salt = new byte[16];
             rng.GetBytes(salt);
@@ -103,7 +92,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
             using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100_000, HashAlgorithmName.SHA256);
             byte[] hash = pbkdf2.GetBytes(32);
 
-            // store as PBKDF2:{iterations}:{saltBase64}:{hashBase64}
             return $"PBKDF2:100000:{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
         }
 

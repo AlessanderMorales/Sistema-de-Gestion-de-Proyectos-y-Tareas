@@ -23,10 +23,12 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [StringLength(15, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 15 caracteres.")]
         [DataType(DataType.Password)]
         public string Contraseña { get; set; } = string.Empty;
-        [Required(ErrorMessage = "El email es obligatorio.")] 
+
+        [Required(ErrorMessage = "El email es obligatorio.")]
         [EmailAddress(ErrorMessage = "Formato de email no válido.")]
         public string Email { get; set; } = string.Empty;
-        public string Rol { get; set; } = "Usuario"; 
+
+        public string Rol { get; set; } = "Usuario";
 
         public int Estado { get; set; } = 1;
 
@@ -49,10 +51,10 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 
             if (string.IsNullOrWhiteSpace(Contraseña) ||
                 Contraseña.Length < 8 || Contraseña.Length > 15 ||
-                !Regex.IsMatch(Contraseña, @"[A-Z]") ||       
-                !Regex.IsMatch(Contraseña, @"[a-z]") ||        
-                !Regex.IsMatch(Contraseña, @"\d") ||           
-                !Regex.IsMatch(Contraseña, @"[\W_]"))          
+                !Regex.IsMatch(Contraseña, @"[A-Z]") ||
+                !Regex.IsMatch(Contraseña, @"[a-z]") ||
+                !Regex.IsMatch(Contraseña, @"\d") ||
+                !Regex.IsMatch(Contraseña, @"[\W_]"))
             {
                 yield return new ValidationResult("La contraseña debe tener entre 8 y 15 caracteres, incluir al menos una mayúscula, una minúscula, un número y un carácter especial.", new[] { nameof(Contraseña) });
             }
@@ -65,9 +67,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 yield return new ValidationResult("El apellido no debe empezar ni terminar con espacios.", new[] { nameof(Apellidos) });
 
             string[] sqlKeywords = { "SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "UNION", "ALTER", "CREATE", "EXEC", "TRUNCATE", "MERGE", "CALL", "GRANT", "REVOKE", "WHERE", "FROM" };
-            string[] sqlOperators = { "--", ";--", ";", "/*", "*/", "@@", "@", "char", "nchar", "varchar", "nvarchar", "alter", "begin", "cast", "create", "cursor", "declare", "end", "exec", "execute", "fetch", "kill", "open", "sys", "sysobjects", "syscolumns", "table", "update", "or", "and", "=", "%", "'", "\"", "(", ")" };
+            string[] sqlOperators = { "--", ";--", ";", "/*", "*/", "@@", "@", "char", "nchar", "varchar", "nvarchar", "alter", "begin", "cast", "create", "cursor", "declare", "end", "exec", "execute", "fetch", "kill", "open", "sys", "sysobjects", "syscolumns", "table", "update", "or", "and", "=", "%", "'", "\"", "(", ")", "<script>", "</script>", "javascript:", "data:text/html" };
 
-            bool ContainsSqlInjection(string input)
+            bool ContainsInjection(string input)
             {
                 if (string.IsNullOrEmpty(input)) return false;
                 string lowerInput = input.ToLowerInvariant();
@@ -83,17 +85,23 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     }
                     else
                     {
-                        if (lowerInput.Contains(op)) return true;
+                        if (lowerInput.Contains(op.ToLowerInvariant())) return true;
                     }
                 }
+                if (Regex.IsMatch(lowerInput, @"<a\s+href\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
+                if (Regex.IsMatch(lowerInput, @"<img\s+src\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
+                if (Regex.IsMatch(lowerInput, @"<iframe\s+src\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
+                if (Regex.IsMatch(lowerInput, @"<\s*script\b[^>]*>(.*?)</\s*script\s*>", RegexOptions.IgnoreCase | RegexOptions.Singleline)) return true;
+
                 return false;
             }
 
-            if (ContainsSqlInjection(PrimerNombre) ||
-                !string.IsNullOrEmpty(SegundoNombre) && ContainsSqlInjection(SegundoNombre) ||
-                !string.IsNullOrEmpty(Apellidos) && ContainsSqlInjection(Apellidos))
+            if (ContainsInjection(PrimerNombre) ||
+                !string.IsNullOrEmpty(SegundoNombre) && ContainsInjection(SegundoNombre) ||
+                !string.IsNullOrEmpty(Apellidos) && ContainsInjection(Apellidos) ||
+                ContainsInjection(Email))
             {
-                yield return new ValidationResult("No se permiten palabras clave ni caracteres peligrosos en los nombres o apellidos.", new[] { nameof(PrimerNombre), nameof(SegundoNombre), nameof(Apellidos) });
+                yield return new ValidationResult("No se permiten palabras clave ni caracteres peligrosos en los nombres, apellidos o email.", new[] { nameof(PrimerNombre), nameof(SegundoNombre), nameof(Apellidos), nameof(Email) });
             }
 
             var rolesValidos = new[] { "empleado", "jefe de proyecto" };

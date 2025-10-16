@@ -15,13 +15,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Da
    
         public MySqlConnectionSingleton()
         {
-            // Default fallback; prefer configuration-based constructor
             _connectionString = "Server=localhost;Port=3306;Database=gestion_proyectos;Uid=root;Pwd=your_password;";
         }
 
         public MySqlConnectionSingleton(IConfiguration configuration)
         {
-            // Use corrected key MySqlConnection
             var cs = configuration?.GetConnectionString("MySqlConnection");
             if (string.IsNullOrWhiteSpace(cs))
                 throw new InvalidOperationException("La cadena de conexión 'MySqlConnection' no está configurada.");
@@ -45,7 +43,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Da
         {
             using (var connection = CreateConnection())
             {
-                // Materialize results into a list while connection is open to avoid deferred execution after disposal
                 var result = connection.Query<Q>(query, parameters);
                 return result.ToList();
             }

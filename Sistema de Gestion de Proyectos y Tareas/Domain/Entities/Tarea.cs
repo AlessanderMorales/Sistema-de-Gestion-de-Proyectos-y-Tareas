@@ -28,7 +28,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 
         public Proyecto? Proyecto { get; set; }
 
-        // Nuevo: usuario asignado y status
         public int? IdUsuarioAsignado { get; set; }
         public string Status { get; set; } = "SinIniciar";
 
@@ -62,9 +61,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
             }
 
             string[] sqlKeywords = { "SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "UNION", "ALTER", "CREATE", "EXEC", "TRUNCATE", "MERGE", "CALL", "GRANT", "REVOKE", "WHERE", "FROM" };
-            string[] sqlOperators = { "--", ";--", ";", "/*", "*/", "@@", "@", "char", "nchar", "varchar", "nvarchar", "alter", "begin", "cast", "create", "cursor", "declare", "end", "exec", "execute", "fetch", "kill", "open", "sys", "sysobjects", "syscolumns", "table", "update", "or", "and", "=", "%", "'", "\"", "(", ")" };
+            string[] sqlOperators = { "--", ";--", ";", "/*", "*/", "@@", "@", "char", "nchar", "varchar", "nvarchar", "alter", "begin", "cast", "create", "cursor", "declare", "end", "exec", "execute", "fetch", "kill", "open", "sys", "sysobjects", "syscolumns", "table", "update", "or", "and", "=", "%", "'", "\"", "(", ")", "<script>", "</script>", "javascript:", "data:text/html" };
 
-            bool ContainsSqlInjection(string input)
+            bool ContainsInjection(string input)
             {
                 if (string.IsNullOrEmpty(input)) return false;
                 string lowerInput = input.ToLowerInvariant();
@@ -80,15 +79,20 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     }
                     else
                     {
-                        if (lowerInput.Contains(op)) return true;
+                        if (lowerInput.Contains(op.ToLowerInvariant())) return true;
                     }
                 }
+                if (Regex.IsMatch(lowerInput, @"<a\s+href\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
+                if (Regex.IsMatch(lowerInput, @"<img\s+src\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
+                if (Regex.IsMatch(lowerInput, @"<iframe\s+src\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
+                if (Regex.IsMatch(lowerInput, @"<\s*script\b[^>]*>(.*?)</\s*script\s*>", RegexOptions.IgnoreCase | RegexOptions.Singleline)) return true;
+
                 return false;
             }
 
-            if (ContainsSqlInjection(Titulo) ||
-                !string.IsNullOrEmpty(Descripcion) && ContainsSqlInjection(Descripcion) ||
-                !string.IsNullOrEmpty(Prioridad) && ContainsSqlInjection(Prioridad))
+            if (ContainsInjection(Titulo) ||
+                !string.IsNullOrEmpty(Descripcion) && ContainsInjection(Descripcion) ||
+                !string.IsNullOrEmpty(Prioridad) && ContainsInjection(Prioridad))
             {
                 yield return new ValidationResult("No se permiten palabras clave ni caracteres peligrosos en los campos de texto.", new[] { nameof(Titulo), nameof(Descripcion), nameof(Prioridad) });
             }

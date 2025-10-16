@@ -2,7 +2,7 @@
 @model Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.LoginModel
 @{
     ViewData["Title"] = "Iniciar Sesión";
-    Layout = null; // Anulamos el layout principal
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
-        /* Definición de las animaciones (Keyframes) */
         @@keyframes fadeInSlideUp {
             from {
                 opacity: 0;
@@ -32,7 +31,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Estilos Generales */
         html, body {
             height: 100%;
         }
@@ -42,18 +40,16 @@
             align-items: center;
             justify-content: center;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            /* Fondo con un gradiente oscuro y un toque rojizo */
             background: linear-gradient(270deg, #1D2B3C, #1a1a1d, #432020);
             background-size: 200% 200%;
             animation: moltenGradient 15s ease infinite;
         }
 
-        /* Contenedor del Login con animación de carga */
         .login-container {
             width: 100%;
             max-width: 420px;
             padding: 40px;
-            background-color: rgba(255, 255, 255, 0.95); /* Un poco más opaco para legibilidad */
+            background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border-radius: 20px;
@@ -62,14 +58,13 @@
             animation: fadeInSlideUp 0.8s ease-out forwards;
         }
 
-        /* Título con un gradiente dorado y naranja para un look premium */
         .login-container h1 {
-            background: linear-gradient(45deg, #FFD700, #FF8C00); /* De dorado a naranja oscuro */
+            background: linear-gradient(45deg, #FFD700, #FF8C00);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 2rem;
-            font-weight: 800; /* Aún más peso para mayor impacto */
+            font-weight: 800; 
             text-align: center;
         }
         
@@ -86,16 +81,14 @@
             border-radius: 8px;
         }
 
-        /* El foco ahora resalta en un color naranja vibrante */
         .form-control:focus {
             background-color: #ffffff;
             border-color: #FF8C00; 
             box-shadow: 0 0 0 0.25rem rgba(255, 140, 0, 0.3);
         }
 
-        /* Botón de Iniciar Sesión con un gradiente "volcánico" */
         #login-submit {
-            background: linear-gradient(45deg, #D32F2F, #FF5722); /* De rojo intenso a naranja ardiente */
+            background: linear-gradient(45deg, #D32F2F, #FF5722); 
             border: none;
             padding: 14px;
             font-size: 1.1rem;
@@ -108,12 +101,11 @@
             cursor: pointer;
         }
 
-        /* Efecto "lava al rojo vivo" en hover */
         #login-submit:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 87, 34, 0.5); /* Sombra anaranjada para un "glow" intenso */
-            background: linear-gradient(45deg, #FF5722, #FF7043); /* Gradiente más brillante */
-            background-size: 150% 150%; /* Sutil zoom en el gradiente */
+            box-shadow: 0 8px 25px rgba(255, 87, 34, 0.5); 
+            background: linear-gradient(45deg, #FF5722, #FF7043); 
+            background-size: 150% 150%; 
         }
 
     </style>

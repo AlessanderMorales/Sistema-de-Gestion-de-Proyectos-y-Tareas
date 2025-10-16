@@ -48,7 +48,6 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Comentarios", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizePage("/Index", "OnlyJefeOrEmpleado");
 
-    // Bloqueo explícito: solo JefeDeProyecto puede acceder a las páginas de creación
     options.Conventions.AuthorizePage("/proyectos/Create", "OnlyJefe");
     options.Conventions.AuthorizePage("/Tareas/Create", "OnlyJefe");
 });

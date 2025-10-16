@@ -21,7 +21,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         public IEnumerable<Tarea> ObtenerTareasPorUsuarioAsignado(int idUsuario)
         {
             var repo = _tareaFactory.CreateRepository();
-            // the concrete repository exposes GetByAssignedUserId
             if (repo is Infrastructure.Persistence.Repositories.TareaRepository tareaRepo)
             {
                 return tareaRepo.GetByAssignedUserId(idUsuario);
