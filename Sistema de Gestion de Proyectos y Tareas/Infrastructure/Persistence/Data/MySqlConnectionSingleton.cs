@@ -14,7 +14,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Da
     public MySqlConnectionSingleton()
     {
         // Default fallback; prefer configuration-based constructor
-        _connectionString = "Server=localhost;Port=3306;Database=gestion_proyectos;Uid=root;Pwd=admin;";
+        _connectionString = "Server=localhost;Port=3306;Database=gestion_proyectos;Uid=root;Pwd=your_password;";
     }
     public MySqlConnectionSingleton(IConfiguration configuration)
     {
