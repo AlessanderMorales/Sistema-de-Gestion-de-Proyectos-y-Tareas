@@ -1,4 +1,4 @@
-ï»¿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     var tokens = Antiforgery.GetAndStoreTokens(ViewContext.HttpContext);
     var successMessage = TempData["SuccessMessage"] as string;
@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Sistema de GestiÃ³n</title>
+    <title>@ViewData["Title"] - Sistema de Gestión</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <meta name="request-verification-token" content="@tokens.RequestToken" />
@@ -18,7 +18,7 @@
             --bg-dark-primary: #1a1a1d;
             --bg-dark-secondary: #2c2c31;
             --bg-content-area: #212124;
-            --text-primary: #f5f5f7;
+            --text-primary: #f5f5f7;  
             --text-secondary: #a0a0a5;
             --accent-red: #D32F2F;
             --accent-orange: #FF5722;
@@ -26,17 +26,9 @@
         }
 
         @@keyframes moltenGradient {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         body {
@@ -46,7 +38,7 @@
             animation: moltenGradient 20s ease infinite;
             overflow-x: hidden;
         }
-
+        
         #wrapper {
             display: flex;
             transition: all 0.4s ease;
@@ -60,11 +52,11 @@
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             transition: margin-left 0.4s ease;
         }
-
+        
         #wrapper.toggled #sidebar-wrapper {
             margin-left: -250px;
         }
-
+        
         #page-content-wrapper {
             flex-grow: 1;
             width: 100%;
@@ -78,12 +70,12 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-            .sidebar-heading .fs-4 {
-                background: linear-gradient(45deg, var(--accent-gold), var(--accent-orange));
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                font-weight: 800;
-            }
+        .sidebar-heading .fs-4 {
+            background: linear-gradient(45deg, var(--accent-gold), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
 
         .list-group-item {
             background-color: transparent;
@@ -100,10 +92,10 @@
         }
 
         .list-group-item.active {
-            color: var(--accent-orange);
-            font-weight: bold;
-            background-color: transparent;
-            border-left: 4px solid var(--accent-orange);
+             color: var(--accent-orange);
+             font-weight: bold;
+             background-color: transparent;
+             border-left: 4px solid var(--accent-orange);
         }
 
         #page-content-wrapper .navbar {
@@ -114,9 +106,7 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
 
-        .navbar-text {
-            color: var(--text-primary);
-        }
+        .navbar-text { color: var(--text-primary); }
 
         #sidebarToggle {
             background: linear-gradient(45deg, var(--accent-red), var(--accent-orange));
@@ -126,10 +116,10 @@
             transition: all 0.3s ease;
         }
 
-            #sidebarToggle:hover {
-                transform: scale(1.05);
-                box-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
-            }
+        #sidebarToggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
+        }
 
         .btn-outline-secondary {
             color: var(--accent-orange);
@@ -138,12 +128,12 @@
             transition: all 0.3s ease;
         }
 
-            .btn-outline-secondary:hover {
-                color: white;
-                background-color: var(--accent-orange);
-                border-color: var(--accent-orange);
-                box-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
-            }
+        .btn-outline-secondary:hover {
+            color: white;
+            background-color: var(--accent-orange);
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
+        }
 
         .content-container {
             flex-grow: 1;
@@ -161,29 +151,29 @@
         footer.border-top {
             border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
             background-color: transparent;
-            color: var(--text-primary); /* <<< LÃNEA CORREGIDA */
+            color: var(--text-primary); /* <<< LÍNEA CORREGIDA */
             padding: 1rem 0;
             margin-top: auto;
         }
-
-        footer a {
-            color: var(--accent-orange);
-            text-decoration: none;
-        }
+        
+         footer a {
+             color: var(--accent-orange);
+             text-decoration: none;
+         }
     </style>
 </head>
 <body>
     <div class="d-flex" id="wrapper">
         <div class="border-end" id="sidebar-wrapper">
             <div class="sidebar-heading text-center">
-                <img src="~/Image/Logo.png" alt="Logo de GestiÃ³n" style="height:40px; margin-bottom:10px;" />
-                <div class="fs-4">GestiÃ³n Pro</div>
+                <img src="~/Image/Logo.png" alt="Logo de Gestión" style="height:40px; margin-bottom:10px;" />
+                <div class="fs-4">Gestión Pro</div>
             </div>
             <div class="list-group list-group-flush">
                 @* Sidebar links rendered based on role *@
                 @if (!User.Identity.IsAuthenticated)
                 {
-                    <a asp-page="/Login/Login" class="list-group-item list-group-item-action">Iniciar SesiÃ³n</a>
+                    <a asp-page="/Login/Login" class="list-group-item list-group-item-action">Iniciar Sesión</a>
                 }
                 else if (User.IsInRole("SuperAdmin"))
                 {
@@ -213,18 +203,18 @@
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg border-bottom">
                 <div class="container-fluid">
-                    <button class="btn" id="sidebarToggle">â˜°</button>
+                    <button class="btn" id="sidebarToggle">?</button>
                     <div class="ms-auto">
                         <ul class="navbar-nav align-items-center">
                             @if (User.Identity.IsAuthenticated)
                             {
                                 <li class="nav-item">
-                                    <span class="navbar-text me-3">Â¡Hola, @User.Identity.Name!</span>
+                                    <span class="navbar-text me-3">¡Hola, @User.Identity.Name!</span>
                                 </li>
                                 <li class="nav-item">
-                                    <!-- BotÃ³n abre modal de logout -->
+                                    <!-- Botón abre modal de logout -->
                                     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#logoutModal">
-                                        Cerrar SesiÃ³n
+                                        Cerrar Sesión
                                     </button>
 
                                     <!-- Form oculto para enviar POST de logout con token antiforgery -->
@@ -236,7 +226,7 @@
                             else
                             {
                                 <li class="nav-item">
-                                    <a class="btn btn-primary" asp-page="/Login/Login">Iniciar SesiÃ³n</a>
+                                    <a class="btn btn-primary" asp-page="/Login/Login">Iniciar Sesión</a>
                                 </li>
                             }
                         </ul>
@@ -244,73 +234,73 @@
                 </div>
             </nav>
 
-            <!-- Modales globales (Ã©xito / error) -->
+            <!-- Modales globales (éxito / error) -->
             @if (!string.IsNullOrEmpty(successMessage))
             {
                 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header bg-success text-white">
-                                <h5 class="modal-title" id="successModalLabel">OperaciÃ³n completada</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                            </div>
-                            <div class="modal-body">
-                                @successMessage
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                            </div>
-                        </div>
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="successModalLabel">Operación completada</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                      </div>
+                      <div class="modal-body">
+                        @successMessage
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                      </div>
                     </div>
+                  </div>
                 </div>
             }
             @if (!string.IsNullOrEmpty(errorMessage))
             {
                 <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title" id="errorModalLabel">Error</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                            </div>
-                            <div class="modal-body">
-                                @errorMessage
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                            </div>
-                        </div>
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                      </div>
+                      <div class="modal-body">
+                        @errorMessage
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                      </div>
                     </div>
+                  </div>
                 </div>
             }
 
-            <!-- Modal de confirmaciÃ³n de logout -->
+            <!-- Modal de confirmación de logout -->
             <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="logoutModalLabel">Confirmar cierre de sesiÃ³n</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                        </div>
-                        <div class="modal-body">
-                            Â¿EstÃ¡s seguro de que deseas cerrar sesiÃ³n?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" id="confirmLogoutButton" class="btn btn-danger">SÃ­, salir</button>
-                        </div>
-                    </div>
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirmar cierre de sesión</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    ¿Estás seguro de que deseas cerrar sesión?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="confirmLogoutButton" class="btn btn-danger">Sí, salir</button>
+                  </div>
                 </div>
+              </div>
             </div>
 
             <div class="content-container">
                 <main role="main" class="main-content-card">
-                    @RenderBody()
+                     @RenderBody()
                 </main>
             </div>
 
             <footer class="border-top text-muted text-center">
-                &copy; 2025 - Sistema de GestiÃ³n - <a asp-page="/Privacy">Privacy</a>
+                &copy; 2025 - Sistema de Gestión - <a asp-page="/Privacy">Privacy</a>
             </footer>
         </div>
     </div>
@@ -330,7 +320,7 @@
                 });
             }
 
-            // Mostrar modal de Ã©xito/error si existen mensajes (Server-side inyecta los modales)
+            // Mostrar modal de éxito/error si existen mensajes (Server-side inyecta los modales)
             const successModalEl = document.getElementById('successModal');
             if (successModalEl) {
                 var modal = new bootstrap.Modal(successModalEl);

@@ -1,5 +1,3 @@
-
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -44,6 +42,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             }
             _proyectoService.ActualizarProyecto(Proyecto);
 
+            TempData["SuccessMessage"] = "Proyecto actualizado correctamente.";
             return RedirectToPage("./Index");
         }
     }

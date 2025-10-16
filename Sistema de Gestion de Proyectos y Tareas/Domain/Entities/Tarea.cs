@@ -22,7 +22,10 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [Display(Name = "Prioridad")]
         public string? Prioridad { get; set; }
 
+        [Required(ErrorMessage = "El proyecto es obligatorio.")]
+        [Display(Name = "Proyecto")]
         public int id_proyecto { get; set; }
+
         public Proyecto? Proyecto { get; set; }
 
         // Nuevo: usuario asignado y status

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common;
+using System;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {
@@ -30,6 +32,15 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
             {
                 return NotFound();
             }
+
+            // No permitir editar a otro SuperAdmin
+            if (!string.IsNullOrWhiteSpace(usuario.Rol) &&
+                usuario.Rol.Equals(Roles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["ErrorMessage"] = "No puedes modificar a otro administrador.";
+                return RedirectToPage("./Index");
+            }
+
             Usuario = usuario;
             return Page();
         }
@@ -40,8 +51,27 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
             {
                 return Page();
             }
+
+            // Recuperar usuario actual a actualizar (por si el rol se envía mal)
+            var existing = _usuarioService.ObtenerUsuarioPorId(Usuario.Id);
+            if (existing == null)
+            {
+                TempData["ErrorMessage"] = "Usuario no encontrado.";
+                return RedirectToPage("./Index");
+            }
+
+            if (!string.IsNullOrWhiteSpace(existing.Rol) &&
+                existing.Rol.Equals(Roles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["ErrorMessage"] = "No puedes modificar a otro administrador.";
+                return RedirectToPage("./Index");
+            }
+
+            // Normal update
             _usuarioService.ActualizarUsuario(Usuario);
 
+            // Mensaje de éxito — será mostrado como modal por el layout
+            TempData["SuccessMessage"] = "Usuario actualizado correctamente.";
             return RedirectToPage("./Index");
         }
     }
