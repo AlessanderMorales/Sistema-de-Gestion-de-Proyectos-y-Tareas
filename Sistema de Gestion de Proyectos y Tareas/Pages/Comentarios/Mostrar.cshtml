@@ -5,12 +5,13 @@
 
 <div class="card mt-3">
     <div class="card-body">
-        <p><strong>ID:</strong> @Model.Comentario.Id</p>
         <p><strong>Contenido:</strong> @Model.Comentario.Contenido</p>
         <p><strong>Fecha:</strong> @Model.Comentario.Fecha</p>
-        <p><strong>ID Tarea:</strong> @Model.Comentario.IdTarea</p>
-        <p><strong>ID Usuario:</strong> @Model.Comentario.IdUsuario</p>
-        <p><strong>Estado:</strong> @(Model.Comentario.Estado == 1 ? "Activo" : "Inactivo")</p>
+        @if (Model.Comentario.Usuario != null)
+        {
+            <p><strong>Usuario:</strong> @Model.Comentario.Usuario.PrimerNombre</p>
+        }
+        @* Si necesitas mostrar la tarea asociada como nombre, añade esa propiedad en el modelo o servicio. *@
     </div>
 </div>
 

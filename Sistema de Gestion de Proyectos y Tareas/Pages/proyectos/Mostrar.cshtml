@@ -11,9 +11,6 @@
     <div>
         <h4>Información del Proyecto</h4>
         <dl class="row">
-            <dt class="col-sm-2">ID</dt>
-            <dd class="col-sm-10">@Model.Proyecto.Id</dd>
-
             <dt class="col-sm-2">Descripción</dt>
             <dd class="col-sm-10">@Model.Proyecto.Descripcion</dd>
 
@@ -32,7 +29,6 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>ID Tarea</th>
                         <th>Título</th>
                         <th>Descripción</th>
                         <th>Prioridad</th>
@@ -43,7 +39,6 @@
                     @foreach (var tarea in Model.Proyecto.Tareas)
                     {
                         <tr>
-                            <td>@tarea.Id</td>
                             <td>@tarea.Titulo</td>
                             <td>@tarea.Descripcion</td>
                             <td>@tarea.Prioridad</td>
