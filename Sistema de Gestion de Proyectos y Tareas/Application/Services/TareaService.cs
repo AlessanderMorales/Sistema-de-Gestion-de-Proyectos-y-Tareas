@@ -1,4 +1,6 @@
-﻿using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
@@ -21,11 +23,16 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         public IEnumerable<Tarea> ObtenerTareasPorUsuarioAsignado(int idUsuario)
         {
             var repo = _tareaFactory.CreateRepository();
+
+            // Si el repositorio concreto proporciona un método optimizado por consulta, úsalo.
             if (repo is Infrastructure.Persistence.Repositories.TareaRepository tareaRepo)
             {
                 return tareaRepo.GetByAssignedUserId(idUsuario);
             }
-            return Enumerable.Empty<Tarea>();
+
+            // Recurso de respaldo: filtrar en memoria
+            return repo.GetAllAsync()
+                       .Where(t => t.IdUsuarioAsignado.HasValue && t.IdUsuarioAsignado.Value == idUsuario);
         }
 
         public Tarea ObtenerTareaPorId(int id)
