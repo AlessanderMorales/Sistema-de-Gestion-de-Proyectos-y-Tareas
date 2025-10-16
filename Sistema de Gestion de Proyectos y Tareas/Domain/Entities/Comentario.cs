@@ -1,4 +1,6 @@
-﻿namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 {
     public class Comentario
     {
@@ -9,6 +11,8 @@
 
         public int IdTarea { get; set; }
         public int IdUsuario { get; set; }
+
+        [ValidateNever]
         public Usuario Usuario { get; set; }
     }
 }

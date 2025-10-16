@@ -35,8 +35,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
 
         public void AddAsync(Comentario entity)
         {
-            string query = @"INSERT INTO Comentario (contenido, id_tarea, id_usuario, estado)
-                             VALUES (@Contenido, @IdTarea, @IdUsuario, @Estado);";
+            string query = @"INSERT INTO Comentario (contenido, fecha, id_tarea, id_usuario, estado)
+                     VALUES (@Contenido, @Fecha, @IdTarea, @IdUsuario, @Estado);";
+
             _connectionSingleton.ExcuteCommand(query, entity);
         }
 
