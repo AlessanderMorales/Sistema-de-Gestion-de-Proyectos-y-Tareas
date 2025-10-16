@@ -3,16 +3,88 @@
 @{
     ViewData["Title"] = "Lista de Usuarios";
 }
-<h1>@ViewData["Title"]</h1>
-<p><a asp-page="Create" class="btn btn-primary">Crear Nuevo Usuario</a></p>
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
+
+<style>
+    :root {
+        --accent-red: #D32F2F;
+        --accent-orange: #FF5722;
+        --accent-gold: #FFD700;
+        --accent-edit: #ffc107;
+    }
+
+    .title-volcanic {
+        background: linear-gradient(45deg, var(--accent-gold), var(--accent-orange));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+        padding-bottom: 1rem;
+    }
+
+    .table-volcanic {
+        background-color: transparent;
+        color: #e0e0e0;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+    .table-volcanic > :not(caption) > * > * {
+        background-color: #3a3a40;
+        padding: 1.25rem;
+        border-width: 0;
+        vertical-align: middle;
+    }
+    .table-volcanic thead th {
+        background-color: transparent;
+        color: var(--accent-gold);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid var(--accent-orange);
+    }
+    .table-volcanic tbody tr {
+        transition: background-color 0.2s ease-in-out;
+    }
+    .table-volcanic tbody tr:hover {
+        background-color: #4a4a50;
+    }
+
+    .btn-action { border-radius: 6px; font-weight: 500; padding: 5px 12px; transition: all 0.2s ease; }
+    .btn-action:hover { transform: translateY(-1px); }
+    .btn-edit { background-color: var(--accent-edit); border-color: var(--accent-edit); color: #212529; }
+    .btn-delete { background-color: var(--accent-red); border-color: var(--accent-red); color: white; }
+
+    .btn-volcanic-primary {
+        background: linear-gradient(45deg, var(--accent-red), var(--accent-orange));
+        border: none;
+        color: white; font-weight: bold; padding: 10px 20px; border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-volcanic-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+    }
+</style>
+
+<div class="header-actions">
+    <h1 class="title-volcanic m-0">@ViewData["Title"]</h1>
+    <a asp-page="Create" class="btn btn-volcanic-primary">Crear Nuevo Usuario</a>
+</div>
+
+<table class="table table-volcanic">
+    <thead>
         <tr>
             <th>Primer Nombre</th>
             <th>Segundo Nombre</th>
             <th>Apellidos</th>
-            <th>Contraseña</th>
-            <th>Acciones</th>
+            <th>Rol</th>
+            <th class="text-center">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -22,11 +94,11 @@
                 <td>@item.PrimerNombre</td>
                 <td>@item.SegundoNombre</td>
                 <td>@item.Apellidos</td>
-                <td>****</td>
-                <td>
-                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                <td>@item.Rol</td>
+                <td class="text-center">
+                    <a class="btn btn-sm btn-action btn-edit" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@item.Id" style="display:inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
+                        <button type="submit" class="btn btn-sm btn-action btn-delete">Eliminar</button>
                     </form>
                 </td>
             </tr>
