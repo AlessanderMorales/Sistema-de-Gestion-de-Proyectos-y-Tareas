@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common;
 using System;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 {

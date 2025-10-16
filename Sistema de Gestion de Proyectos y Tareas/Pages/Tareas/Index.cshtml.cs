@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common.Services;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using System.Security.Claims;
 
@@ -36,6 +36,12 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 
         public IActionResult OnPost(int id)
         {
+            // Prevent Empleado role from deleting tasks
+            if (User.IsInRole("Empleado"))
+            {
+                TempData["ErrorMessage"] = "No estás autorizado para eliminar tareas.";
+                return RedirectToPage("./Index");
+            }
 
             var tarea = _tareaService.ObtenerTareaPorId(id);
             if (tarea != null)

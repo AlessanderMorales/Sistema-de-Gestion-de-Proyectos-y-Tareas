@@ -9,13 +9,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "El t√≠tulo de la tarea es obligatorio.")]
-        [StringLength(100, ErrorMessage = "El t√≠tulo no puede exceder los 100 caracteres.")]
-        [Display(Name = "T√≠tulo")]
+        [Required(ErrorMessage = "El tÌtulo de la tarea es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El tÌtulo no puede exceder los 100 caracteres.")]
+        [Display(Name = "TÌtulo")]
         public string Titulo { get; set; } = string.Empty;
 
-        [StringLength(500, ErrorMessage = "La descripci√≥n no puede exceder los 500 caracteres.")]
-        [Display(Name = "Descripci√≥n")]
+        [StringLength(500, ErrorMessage = "La descripciÛn no puede exceder los 500 caracteres.")]
+        [Display(Name = "DescripciÛn")]
         public string? Descripcion { get; set; }
 
         [Required(ErrorMessage = "La prioridad es obligatoria.")]
@@ -33,28 +33,28 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            string pattern = @"^(?! )[A-Za-z√Å√â√ç√ì√ö√°√©√≠√≥√∫√ë√±0-9]+(?: [A-Za-z√Å√â√ç√ì√ö√°√©√≠√≥√∫√ë√±0-9]+)*$";
+            string pattern = @"^(?! )[A-Za-z¡…Õ”⁄·ÈÌÛ˙—Ò0-9]+(?: [A-Za-z¡…Õ”⁄·ÈÌÛ˙—Ò0-9]+)*$";
             string multipleSpaces = @" {2,}";
 
             if (string.IsNullOrWhiteSpace(Titulo) || !Regex.IsMatch(Titulo.TrimEnd(), pattern) || Regex.IsMatch(Titulo, multipleSpaces))
-                yield return new ValidationResult("El t√≠tulo solo puede contener letras, n√∫meros y un espacio entre palabras, sin espacios al inicio/final ni m√∫ltiples espacios.", new[] { nameof(Titulo) });
+                yield return new ValidationResult("El tÌtulo solo puede contener letras, n˙meros y un espacio entre palabras, sin espacios al inicio/final ni m˙ltiples espacios.", new[] { nameof(Titulo) });
 
             if (Titulo != Titulo.TrimStart())
-                yield return new ValidationResult("El t√≠tulo no debe empezar con espacios.", new[] { nameof(Titulo) });
+                yield return new ValidationResult("El tÌtulo no debe empezar con espacios.", new[] { nameof(Titulo) });
 
             if (!string.IsNullOrWhiteSpace(Descripcion))
             {
                 if (!Regex.IsMatch(Descripcion.TrimEnd(), pattern) || Regex.IsMatch(Descripcion, multipleSpaces))
-                    yield return new ValidationResult("La descripci√≥n solo puede contener letras, n√∫meros y un espacio entre palabras, sin espacios al inicio/final ni m√∫ltiples espacios.", new[] { nameof(Descripcion) });
+                    yield return new ValidationResult("La descripciÛn solo puede contener letras, n˙meros y un espacio entre palabras, sin espacios al inicio/final ni m˙ltiples espacios.", new[] { nameof(Descripcion) });
 
                 if (Descripcion != Descripcion.TrimStart())
-                    yield return new ValidationResult("La descripci√≥n no debe empezar con espacios.", new[] { nameof(Descripcion) });
+                    yield return new ValidationResult("La descripciÛn no debe empezar con espacios.", new[] { nameof(Descripcion) });
             }
 
             if (!string.IsNullOrWhiteSpace(Prioridad))
             {
                 if (!Regex.IsMatch(Prioridad.TrimEnd(), pattern) || Regex.IsMatch(Prioridad, multipleSpaces))
-                    yield return new ValidationResult("La prioridad solo puede contener letras, n√∫meros y un espacio entre palabras, sin espacios al inicio/final ni m√∫ltiples espacios.", new[] { nameof(Prioridad) });
+                    yield return new ValidationResult("La prioridad solo puede contener letras, n˙meros y un espacio entre palabras, sin espacios al inicio/final ni m˙ltiples espacios.", new[] { nameof(Prioridad) });
 
                 if (Prioridad != Prioridad.TrimStart())
                     yield return new ValidationResult("La prioridad no debe empezar con espacios.", new[] { nameof(Prioridad) });
@@ -65,7 +65,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 if (string.IsNullOrEmpty(input)) return false;
                 string lowerInput = input.ToLowerInvariant();
 
-                var sqlPatterns = new[]
+                string[] explicitSqlPatterns = new[]
                 {
                     @"(--|;--)",
                     @"\bunion\s+select\b",
@@ -79,18 +79,18 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     @"\bor\s+1\s*=\s*1\b"
                 };
 
-                foreach (var p in sqlPatterns)
+                foreach (var p in explicitSqlPatterns)
                 {
                     if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
                         return true;
                 }
 
-                var xssPatterns = new[]
+                string[] xssPatterns = new[]
                 {
                     @"<\s*script\b",
                     @"<\s*iframe\b",
                     @"javascript\s*:",
-                    @"on\w+\s*="
+                    @"on\w+\s*=",
                 };
 
                 foreach (var p in xssPatterns)
@@ -102,14 +102,12 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 return false;
             }
 
-            if (ContainsInjection(Titulo))
-                yield return new ValidationResult("El t√≠tulo contiene intentos expl√≠citos de inyecci√≥n SQL o contenido HTML/JS peligroso.", new[] { nameof(Titulo) });
-
-            if (!string.IsNullOrEmpty(Descripcion) && ContainsInjection(Descripcion))
-                yield return new ValidationResult("La descripci√≥n contiene intentos expl√≠citos de inyecci√≥n SQL o contenido HTML/JS peligroso.", new[] { nameof(Descripcion) });
-
-            if (!string.IsNullOrEmpty(Prioridad) && ContainsInjection(Prioridad))
-                yield return new ValidationResult("La prioridad contiene intentos expl√≠citos de inyecci√≥n SQL o contenido HTML/JS peligroso.", new[] { nameof(Prioridad) });
+            if (ContainsInjection(Titulo) ||
+                !string.IsNullOrEmpty(Descripcion) && ContainsInjection(Descripcion) ||
+                !string.IsNullOrEmpty(Prioridad) && ContainsInjection(Prioridad))
+            {
+                yield return new ValidationResult("No se permiten intentos explÌcitos de inyecciÛn SQL o contenido HTML/JS peligroso.", new[] { nameof(Titulo), nameof(Descripcion), nameof(Prioridad) });
+            }
         }
         public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
     }

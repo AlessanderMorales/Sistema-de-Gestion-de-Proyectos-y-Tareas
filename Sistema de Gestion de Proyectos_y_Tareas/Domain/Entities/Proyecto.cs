@@ -1,4 +1,4 @@
-锘縰sing System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
@@ -15,8 +15,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [Display(Name = "Nombre del Proyecto")]
         public string Nombre { get; set; } = string.Empty;
 
-        [StringLength(30, ErrorMessage = "La descripci贸n no puede exceder los 30 caracteres.")]
-        [Display(Name = "Descripci贸n")]
+        [StringLength(30, ErrorMessage = "La descripci髇 no puede exceder los 30 caracteres.")]
+        [Display(Name = "Descripci髇")]
         public string? Descripcion { get; set; }
 
         [Required(ErrorMessage = "La fecha de inicio es obligatoria.")]
@@ -24,9 +24,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [Display(Name = "Fecha de Inicio")]
         public DateTime FechaInicio { get; set; }
 
-        [Required(ErrorMessage = "La fecha de finalizaci贸n es obligatoria.")]
+        [Required(ErrorMessage = "La fecha de finalizaci髇 es obligatoria.")]
         [DataType(DataType.Date)]
-        [Display(Name = "Fecha de Finalizaci贸n")]
+        [Display(Name = "Fecha de Finalizaci髇")]
         public DateTime FechaFin { get; set; }
 
         [Display(Name = "Estado")]
@@ -37,14 +37,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
             if (FechaFin < FechaInicio)
             {
                 yield return new ValidationResult(
-                    "La fecha de finalizaci贸n no puede ser anterior a la fecha de inicio.",
+                    "La fecha de finalizaci髇 no puede ser anterior a la fecha de inicio.",
                     new[] { nameof(FechaFin) });
             }
 
             if (FechaFin == FechaInicio)
             {
                 yield return new ValidationResult(
-                    "La fecha de finalizaci贸n no puede ser igual a la fecha de inicio.",
+                    "La fecha de finalizaci髇 no puede ser igual a la fecha de inicio.",
                     new[] { nameof(FechaFin) });
             }
 
@@ -53,7 +53,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 if (string.IsNullOrEmpty(input)) return false;
                 string lowerInput = input.ToLowerInvariant();
 
-                var sqlPatterns = new[]
+                string[] explicitSqlPatterns = new[]
                 {
                     @"(--|;--)",
                     @"\bunion\s+select\b",
@@ -67,18 +67,18 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     @"\bor\s+1\s*=\s*1\b"
                 };
 
-                foreach (var p in sqlPatterns)
+                foreach (var p in explicitSqlPatterns)
                 {
                     if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
                         return true;
                 }
 
-                var xssPatterns = new[]
+                string[] xssPatterns = new[]
                 {
                     @"<\s*script\b",
                     @"<\s*iframe\b",
                     @"javascript\s*:",
-                    @"on\w+\s*="
+                    @"on\w+\s*=",
                 };
 
                 foreach (var p in xssPatterns)
@@ -90,14 +90,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 return false;
             }
 
-            if (ContainsInjection(Nombre))
+            if (ContainsInjection(Nombre) || (!string.IsNullOrEmpty(Descripcion) && ContainsInjection(Descripcion)))
             {
-                yield return new ValidationResult("El nombre contiene intentos expl铆citos de inyecci贸n SQL o contenido HTML/JS peligroso.", new[] { nameof(Nombre) });
-            }
-
-            if (!string.IsNullOrEmpty(Descripcion) && ContainsInjection(Descripcion))
-            {
-                yield return new ValidationResult("La descripci贸n contiene intentos expl铆citos de inyecci贸n SQL o contenido HTML/JS peligroso.", new[] { nameof(Descripcion) });
+                yield return new ValidationResult("Los campos de texto contienen intentos expl韈itos de inyecci髇 SQL o contenido HTML/JS peligroso.", new[] { nameof(Nombre), nameof(Descripcion) });
             }
         }
 

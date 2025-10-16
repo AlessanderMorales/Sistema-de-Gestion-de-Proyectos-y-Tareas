@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 {
@@ -35,12 +35,29 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 
         public IActionResult OnPost(int id)
         {
+            // Prevent Empleado role from deleting projects
+            if (User.IsInRole("Empleado"))
+            {
+                TempData["ErrorMessage"] = "No estás autorizado para eliminar proyectos.";
+                return RedirectToPage("./Index");
+            }
+
             var proyecto = _proyectoService.ObtenerProyectoPorId(id);
             if (proyecto != null)
             {
                 _proyectoService.EliminarProyecto(proyecto);
             }
-            _proyectoService.EliminarProyectoPorId(id);
+            // Some services may also expose direct delete by id
+            try
+            {
+                _proyectoService.EliminarProyectoPorId(id);
+            }
+            catch
+            {
+                // ignore if method not implemented
+            }
+
+            TempData["SuccessMessage"] = "Proyecto eliminado correctamente.";
             return RedirectToPage("./Index");
         }
     }

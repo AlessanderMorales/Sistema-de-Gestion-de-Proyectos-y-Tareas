@@ -1,8 +1,8 @@
-﻿using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+﻿using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);

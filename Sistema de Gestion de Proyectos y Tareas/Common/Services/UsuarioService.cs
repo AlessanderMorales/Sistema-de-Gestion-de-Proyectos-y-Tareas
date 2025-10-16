@@ -6,7 +6,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Common.Services
 {
     public class UsuarioService
     {

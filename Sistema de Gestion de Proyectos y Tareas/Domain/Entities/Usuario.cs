@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 {
@@ -28,7 +29,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [EmailAddress(ErrorMessage = "Formato de email no válido.")]
         public string Email { get; set; } = string.Empty;
 
-        public string Rol { get; set; } = "Usuario";
+        [Required(ErrorMessage = "Por favor, seleccione un rol (empleado o jefe de proyecto).")]
+        public string Rol { get; set; } = string.Empty;
 
         public int Estado { get; set; } = 1;
 
@@ -66,49 +68,65 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
             if (!string.IsNullOrEmpty(Apellidos) && Apellidos != Apellidos.Trim())
                 yield return new ValidationResult("El apellido no debe empezar ni terminar con espacios.", new[] { nameof(Apellidos) });
 
-            string[] sqlKeywords = { "SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "UNION", "ALTER", "CREATE", "EXEC", "TRUNCATE", "MERGE", "CALL", "GRANT", "REVOKE", "WHERE", "FROM" };
-            string[] sqlOperators = { "--", ";--", ";", "/*", "*/", "@@", "@", "char", "nchar", "varchar", "nvarchar", "alter", "begin", "cast", "create", "cursor", "declare", "end", "exec", "execute", "fetch", "kill", "open", "sys", "sysobjects", "syscolumns", "table", "update", "or", "and", "=", "%", "'", "\"", "(", ")", "<script>", "</script>", "javascript:", "data:text/html" };
-
             bool ContainsInjection(string input)
             {
                 if (string.IsNullOrEmpty(input)) return false;
                 string lowerInput = input.ToLowerInvariant();
-                foreach (var keyword in sqlKeywords)
+
+                var sqlPatterns = new[]
                 {
-                    if (Regex.IsMatch(lowerInput, $@"\b{keyword.ToLowerInvariant()}\b")) return true;
-                }
-                foreach (var op in sqlOperators)
+                    @"(--|;--)",                        
+                    @"\bunion\s+select\b",              
+                    @"\bdrop\s+table\b",                
+                    @"\binsert\s+into\b",               
+                    @"\btruncate\s+table\b",            
+                    @"\bdelete\s+from\b",               
+                    @"\bupdate\s+\w+\s+set\b",          
+                    @"\bexec\s*\(",                     
+                    @"\bxp_cmdshell\b",                 
+                    @"\bbenchmark\s*\(",                
+                    @"\bwaitfor\s+delay\b",            
+                    @"(['""]\s*or\s+['""]?1['""]?\s*=\s*['""]?1['""]?)", 
+                    @"\bor\s+1\s*=\s*1\b"             
+                };
+
+                foreach (var p in sqlPatterns)
                 {
-                    if (Regex.IsMatch(op, @"^[a-zA-Z]+$"))
-                    {
-                        if (Regex.IsMatch(lowerInput, $@"\b{op.ToLowerInvariant()}\b")) return true;
-                    }
-                    else
-                    {
-                        if (lowerInput.Contains(op.ToLowerInvariant())) return true;
-                    }
+                    if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
+                        return true;
                 }
-                if (Regex.IsMatch(lowerInput, @"<a\s+href\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
-                if (Regex.IsMatch(lowerInput, @"<img\s+src\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
-                if (Regex.IsMatch(lowerInput, @"<iframe\s+src\s*=\s*(['""]?)\s*javascript:", RegexOptions.IgnoreCase)) return true;
-                if (Regex.IsMatch(lowerInput, @"<\s*script\b[^>]*>(.*?)</\s*script\s*>", RegexOptions.IgnoreCase | RegexOptions.Singleline)) return true;
+
+                var xssPatterns = new[]
+                {
+                    @"<\s*script\b",    
+                    @"<\s*iframe\b",    
+                    @"javascript\s*:",  
+                    @"on\w+\s*="        
+                };
+
+                foreach (var p in xssPatterns)
+                {
+                    if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
+                        return true;
+                }
 
                 return false;
             }
 
-            if (ContainsInjection(PrimerNombre) ||
-                !string.IsNullOrEmpty(SegundoNombre) && ContainsInjection(SegundoNombre) ||
-                !string.IsNullOrEmpty(Apellidos) && ContainsInjection(Apellidos) ||
-                ContainsInjection(Email))
-            {
-                yield return new ValidationResult("No se permiten palabras clave ni caracteres peligrosos en los nombres, apellidos o email.", new[] { nameof(PrimerNombre), nameof(SegundoNombre), nameof(Apellidos), nameof(Email) });
-            }
+            if (ContainsInjection(PrimerNombre))
+                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en el primer nombre.", new[] { nameof(PrimerNombre) });
+
+            if (!string.IsNullOrWhiteSpace(SegundoNombre) && ContainsInjection(SegundoNombre))
+                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en el segundo nombre.", new[] { nameof(SegundoNombre) });
+
+            if (!string.IsNullOrWhiteSpace(Apellidos) && ContainsInjection(Apellidos))
+                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en los apellidos.", new[] { nameof(Apellidos) });
 
             var rolesValidos = new[] { "empleado", "jefe de proyecto" };
-            if (!rolesValidos.Contains(Rol.ToLowerInvariant()))
+            if (string.IsNullOrWhiteSpace(Rol) || !rolesValidos.Contains(Rol.Trim().ToLowerInvariant()))
             {
                 yield return new ValidationResult(
-                    "El rol solo puede ser 'empleado' o 'jefe de proyecto'.",
+                    "Seleccione un rol válido: 'empleado' o 'jefe de proyecto'.",
                     new[] { nameof(Rol) });
             }
         }

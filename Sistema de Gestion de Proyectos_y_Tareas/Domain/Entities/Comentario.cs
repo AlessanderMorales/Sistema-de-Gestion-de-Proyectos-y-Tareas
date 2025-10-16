@@ -1,5 +1,4 @@
-Ôªøusing Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
@@ -28,11 +27,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            string pattern = @"^(?! )[A-Za-z√Å√â√ç√ì√ö√°√©√≠√≥√∫√ë√±0-9.,?!;:'""()\s-]+(?: [A-Za-z√Å√â√ç√ì√ö√°√©√≠√≥√∫√ë√±0-9.,?!;:'""()\s-]+)*$";
+            string pattern = @"^(?! )[A-Za-z¡…Õ”⁄·ÈÌÛ˙—Ò0-9.,?!;:'""()\s-]+(?: [A-Za-z¡…Õ”⁄·ÈÌÛ˙—Ò0-9.,?!;:'""()\s-]+)*$"; // Permite m·s caracteres para comentarios
             string multipleSpaces = @" {2,}";
 
             if (string.IsNullOrWhiteSpace(Contenido) || !Regex.IsMatch(Contenido.TrimEnd(), pattern) || Regex.IsMatch(Contenido, multipleSpaces))
-                yield return new ValidationResult("El contenido del comentario solo puede contener letras, n√∫meros, signos de puntuaci√≥n y un espacio entre palabras, sin espacios al inicio/final ni m√∫ltiples espacios.", new[] { nameof(Contenido) });
+                yield return new ValidationResult("El contenido del comentario solo puede contener letras, n˙meros, signos de puntuaciÛn y un espacio entre palabras, sin espacios al inicio/final ni m˙ltiples espacios.", new[] { nameof(Contenido) });
 
             if (Contenido != Contenido.TrimStart())
                 yield return new ValidationResult("El contenido del comentario no debe empezar con espacios.", new[] { nameof(Contenido) });
@@ -42,7 +41,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 if (string.IsNullOrEmpty(input)) return false;
                 string lowerInput = input.ToLowerInvariant();
 
-                var sqlPatterns = new[]
+                string[] explicitSqlPatterns = new[]
                 {
                     @"(--|;--)",
                     @"\bunion\s+select\b",
@@ -52,25 +51,22 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     @"\bdelete\s+from\b",
                     @"\bupdate\s+\w+\s+set\b",
                     @"\bexec\s*\(",
-                    @"\bxp_cmdshell\b",
-                    @"\bbenchmark\s*\(",
-                    @"\bwaitfor\s+delay\b",
                     @"(['""]\s*or\s+['""]?1['""]?\s*=\s*['""]?1['""]?)",
                     @"\bor\s+1\s*=\s*1\b"
                 };
 
-                foreach (var p in sqlPatterns)
+                foreach (var p in explicitSqlPatterns)
                 {
                     if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
                         return true;
                 }
 
-                var xssPatterns = new[]
+                string[] xssPatterns = new[]
                 {
                     @"<\s*script\b",
                     @"<\s*iframe\b",
                     @"javascript\s*:",
-                    @"on\w+\s*="
+                    @"on\w+\s*=",
                 };
 
                 foreach (var p in xssPatterns)
@@ -84,7 +80,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 
             if (ContainsInjection(Contenido))
             {
-                yield return new ValidationResult("El contenido del comentario contiene intentos expl√≠citos de inyecci√≥n SQL o contenido HTML/JS peligroso.", new[] { nameof(Contenido) });
+                yield return new ValidationResult("El contenido del comentario contiene intentos explÌcitos de inyecciÛn SQL o contenido HTML/JS peligroso.", new[] { nameof(Contenido) });
             }
         }
     }

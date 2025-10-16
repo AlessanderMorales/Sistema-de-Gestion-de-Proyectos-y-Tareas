@@ -3,7 +3,7 @@ using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
 using System.Collections.Generic;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
+namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Common.Services
 {
     public class ComentarioService
     {

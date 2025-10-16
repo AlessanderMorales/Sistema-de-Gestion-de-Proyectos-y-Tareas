@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Common.Services;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using System.Collections.Generic;
+using System;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
 {
@@ -36,7 +37,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
+            {
+                Tareas = _tareaService.ObtenerTodasLasTareas();
+                Usuarios = _usuarioService.ObtenerTodosLosUsuarios();
                 return Page();
+            }
 
             Comentario.Estado = 1;
             Comentario.Fecha = DateTime.Now;
