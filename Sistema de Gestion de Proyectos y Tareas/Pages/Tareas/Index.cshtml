@@ -4,19 +4,105 @@
     ViewData["Title"] = "Lista de Tareas";
 }
 
-<h1>@ViewData["Title"]</h1>
-<p><a asp-page="Create" class="btn btn-primary">Crear Nueva Tarea</a></p>
+<style>
+    :root {
+        --accent-red: #D32F2F;
+        --accent-orange: #FF5722;
+        --accent-gold: #FFD700;
+        --accent-edit: #ffc107;
+    }
 
+    .title-volcanic {
+        background: linear-gradient(45deg, var(--accent-gold), var(--accent-orange));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+    }
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+        padding-bottom: 1rem;
+    }
+
+    .table-volcanic {
+        background-color: transparent;
+        color: #e0e0e0;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+    .table-volcanic > :not(caption) > * > * {
+        background-color: #3a3a40;
+        padding: 1.25rem;
+        border-width: 0;
+        vertical-align: middle;
+    }
+    .table-volcanic thead th {
+        background-color: transparent;
+        color: var(--accent-gold);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid var(--accent-orange);
+    }
+    .table-volcanic tbody tr {
+        transition: background-color 0.2s ease-in-out;
+    }
+    .table-volcanic tbody tr:hover {
+        background-color: #4a4a50;
+    }
+
+    .priority-badge {
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-weight: bold;
+        color: #212529;
+        font-size: 0.85rem;
+    }
+    .priority-alta { background-color: #dc3545; color: white; }
+    .priority-media { background-color: #ffc107; }
+    .priority-baja { background-color: #28a745; color: white; }
+
+    .project-link {
+        color: var(--accent-orange);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .project-link:hover { color: var(--accent-gold); }
+
+    .btn-action { border-radius: 6px; font-weight: 500; padding: 5px 12px; transition: all 0.2s ease; }
+    .btn-action:hover { transform: translateY(-1px); }
+    .btn-edit { background-color: var(--accent-edit); border-color: var(--accent-edit); color: #212529; }
+    .btn-delete { background-color: #6c757d; border-color: #6c757d; color: white; }
+
+    .btn-volcanic-primary {
+        background: linear-gradient(45deg, var(--accent-red), var(--accent-orange));
+        border: none;
+        color: white; font-weight: bold; padding: 10px 20px; border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-volcanic-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+    }
+</style>
+
+<div class="header-actions">
+    <h1 class="title-volcanic m-0">@ViewData["Title"]</h1>
+    <a asp-page="Create" class="btn btn-volcanic-primary">Crear Nueva Tarea</a>
+</div>
+
+<table class="table table-volcanic">
+    <thead>
         <tr>
             <th>Título</th>
             <th>Descripción</th>
-            <th>Prioridad</th>
+            <th class="text-center">Prioridad</th>
             <th>Proyecto Asignado</th>
-
-            <th>Acciones</th>
+            <th class="text-center">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -25,23 +111,23 @@
             <tr>
                 <td>@item.Titulo</td>
                 <td>@item.Descripcion</td>
-                <td>@item.Prioridad</td>
-
+                <td class="text-center">
+                    <span class="priority-badge priority-@(item.Prioridad.ToLower())">@item.Prioridad</span>
+                </td>
                 <td>
                     @if (item.Proyecto != null)
                     {
-                        <a asp-page="/Proyectos/Mostrar" asp-route-id="@item.Proyecto.Id">@item.Proyecto.Nombre</a>
+                        <a class="project-link" asp-page="/Proyectos/Mostrar" asp-route-id="@item.Proyecto.Id">@item.Proyecto.Nombre</a>
                     }
                     else
                     {
                         <span class="text-muted">No asignado</span>
                     }
                 </td>
-
-                <td>
-                    <a class="btn btn-sm btn-info" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
-                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-secondary">Eliminar</button>
+                <td class="text-center">
+                    <a class="btn btn-sm btn-action btn-edit" asp-page="Edit" asp-route-id="@item.Id">Editar</a>
+                    <form method="post" asp-page="Index" asp-route-id="@item.Id" style="display:inline" onsubmit="return confirm('¿Confirmas la eliminación de esta tarea?');">
+                        <button type="submit" class="btn btn-sm btn-action btn-delete">Eliminar</button>
                     </form>
                 </td>
             </tr>
