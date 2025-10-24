@@ -20,7 +20,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         [StringLength(100)]
         public string? Apellidos { get; set; }
 
-        [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [StringLength(15, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 15 caracteres.")]
         [DataType(DataType.Password)]
         public string Contraseña { get; set; } = string.Empty;
@@ -51,14 +50,17 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
             if (string.IsNullOrWhiteSpace(Apellidos) || !Regex.IsMatch(Apellidos.Trim(), nombrePattern) || Regex.IsMatch(Apellidos, sinEspaciosMultiples))
                 yield return new ValidationResult("El apellido solo puede contener letras y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(Apellidos) });
 
-            if (string.IsNullOrWhiteSpace(Contraseña) ||
-                Contraseña.Length < 8 || Contraseña.Length > 15 ||
-                !Regex.IsMatch(Contraseña, @"[A-Z]") ||
-                !Regex.IsMatch(Contraseña, @"[a-z]") ||
-                !Regex.IsMatch(Contraseña, @"\d") ||
-                !Regex.IsMatch(Contraseña, @"[\W_]"))
+            // Validar contraseña solo si se proporciona (para actualizaciones o creaciones manuales)
+            if (!string.IsNullOrWhiteSpace(Contraseña) && !Contraseña.StartsWith("PBKDF2:"))
             {
-                yield return new ValidationResult("La contraseña debe tener entre 8 y 15 caracteres, incluir al menos una mayúscula, una minúscula, un número y un carácter especial.", new[] { nameof(Contraseña) });
+                if (Contraseña.Length < 8 || Contraseña.Length > 15 ||
+                    !Regex.IsMatch(Contraseña, @"[A-Z]") ||
+                    !Regex.IsMatch(Contraseña, @"[a-z]") ||
+                    !Regex.IsMatch(Contraseña, @"\d") ||
+                    !Regex.IsMatch(Contraseña, @"[\W_]"))
+                {
+                    yield return new ValidationResult("La contraseña debe tener entre 8 y 15 caracteres, incluir al menos una mayúscula, una minúscula, un número y un carácter especial.", new[] { nameof(Contraseña) });
+                }
             }
 
             if (PrimerNombre != PrimerNombre.Trim())
@@ -122,7 +124,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
             if (!string.IsNullOrWhiteSpace(Apellidos) && ContainsInjection(Apellidos))
                 yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en los apellidos.", new[] { nameof(Apellidos) });
 
-            var rolesValidos = new[] { "empleado", "jefe de proyecto" };
+            var rolesValidos = new[] { "empleado", "jefe de proyecto", "superadmin", "jefedeproyecto" };
             if (string.IsNullOrWhiteSpace(Rol) || !rolesValidos.Contains(Rol.Trim().ToLowerInvariant()))
             {
                 yield return new ValidationResult(

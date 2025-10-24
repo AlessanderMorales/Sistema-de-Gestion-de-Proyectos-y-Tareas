@@ -39,6 +39,7 @@ builder.Services.AddScoped<ProyectoService>();
 builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComentarioService>();
+builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddRazorPages(options =>
 {

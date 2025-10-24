@@ -48,7 +48,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 
                 if (usuario != null)
                 {
-                    // Normalize role to the constants in Common/Roles
                     string normalizedRole = Roles.Empleado;
                     if (!string.IsNullOrEmpty(usuario.Rol))
                     {
@@ -60,7 +59,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()), // user id
+                        new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                         new Claim(ClaimTypes.Name, usuario.Email),
                         new Claim("FullName", $"{usuario.PrimerNombre} {usuario.Apellidos}"),
                         new Claim(ClaimTypes.Role, normalizedRole)

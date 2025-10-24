@@ -24,13 +24,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
         {
             var repo = _tareaFactory.CreateRepository();
 
-            // Si el repositorio concreto proporciona un método optimizado por consulta, úsalo.
             if (repo is Infrastructure.Persistence.Repositories.TareaRepository tareaRepo)
             {
                 return tareaRepo.GetByAssignedUserId(idUsuario);
             }
 
-            // Recurso de respaldo: filtrar en memoria
             return repo.GetAllAsync()
                        .Where(t => t.IdUsuarioAsignado.HasValue && t.IdUsuarioAsignado.Value == idUsuario);
         }

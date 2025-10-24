@@ -49,15 +49,6 @@
     .form-container {
         max-width: 700px;
     }
-    
-    .input-group .btn-outline-secondary {
-        background-color: #4a4a50;
-        border-color: #555;
-        color: var(--text-primary);
-    }
-     .input-group .btn-outline-secondary:hover {
-        background-color: #5a5a60;
-     }
 
     .btn-volcanic-primary {
         background: linear-gradient(45deg, var(--accent-red), var(--accent-orange));
@@ -87,13 +78,32 @@
         color: white;
         border-color: #6c757d;
     }
+    
+    .info-box {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        color: #0d47a1;
+    }
+    
+    .info-box strong {
+        display: block;
+        margin-bottom: 5px;
+    }
 </style>
 
 <h1 class="title-volcanic">@ViewData["Title"]</h1>
 
 <div class="row">
     <div class="col-md-8 form-container">
-        <form method="post">
+        <div class="info-box">
+            <strong>?? Generación Automática de Contraseña</strong>
+            La contraseña se generará automáticamente y se enviará al correo electrónico del usuario.
+        </div>
+        
+        <form method="post" id="createUserForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
@@ -118,14 +128,6 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="Usuario.Contraseña" class="form-label"></label>
-                <div class="input-group">
-                    <input asp-for="Usuario.Contraseña" class="form-control" type="password" id="contraseñaInput" />
-                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">Mostrar</button>
-                </div>
-                <span asp-validation-for="Usuario.Contraseña" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
                 <label asp-for="Usuario.Rol" class="form-label"></label>
                 <select asp-for="Usuario.Rol" class="form-control">
                     <option value="">-- Seleccione un Rol --</option>
@@ -136,8 +138,8 @@
                 <span asp-validation-for="Usuario.Rol" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-primary">Crear Usuario</button>
-            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-volcanic-primary" id="submitBtn">Crear Usuario</button>
+            <a asp-page="Index" class="btn btn-volcanic-secondary">Cancelar</a>
         </form>
     </div>
 </div>
@@ -146,16 +148,20 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    
     <script>
-        document.getElementById('togglePassword').addEventListener('click', function () {
-            const input = document.getElementById('contraseñaInput');
-            if (input.type === 'password') {
-                input.type = 'text';
-                this.textContent = 'Ocultar';
-            } else {
-                input.type = 'password';
-                this.textContent = 'Mostrar';
-            }
+        // Script de depuración para verificar que el formulario se envía correctamente
+        document.getElementById('createUserForm').addEventListener('submit', function(e) {
+            console.log('Formulario enviado');
+            console.log('Primer Nombre:', document.querySelector('[name="Usuario.PrimerNombre"]').value);
+            console.log('Apellidos:', document.querySelector('[name="Usuario.Apellidos"]').value);
+            console.log('Email:', document.querySelector('[name="Usuario.Email"]').value);
+            console.log('Rol:', document.querySelector('[name="Usuario.Rol"]').value);
+            
+            // Deshabilitar el botón para evitar múltiples envíos
+            var btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creando usuario...';
         });
     </script>
 }

@@ -68,7 +68,39 @@
     .volcanic-modal .modal-footer { border-top: 1px solid rgba(255,255,255,0.1); }
     .btn-volcanic-delete { background-color: var(--accent-red); border: none; color: white; font-weight: bold; padding: 10px 20px; border-radius: 8px; }
     .btn-volcanic-secondary-modal { background-color: #4a4a50; border: none; color: white; font-weight: bold; padding: 10px 20px; border-radius: 8px; }
+    
+    .alert-custom-success {
+        background-color: #d4edda;
+        border-left: 4px solid #28a745;
+        color: #155724;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .alert-custom-error {
+        background-color: #f8d7da;
+        border-left: 4px solid #dc3545;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
 </style>
+
+@if (!string.IsNullOrEmpty(TempData["MensajeExito"] as string))
+{
+    <div class="alert-custom-success">
+        <strong>? Éxito:</strong> @TempData["MensajeExito"]
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(TempData["MensajeError"] as string))
+{
+    <div class="alert-custom-error">
+        <strong>? Advertencia:</strong> @TempData["MensajeError"]
+    </div>
+}
 
 <div class="header-actions">
     <h1 class="title-volcanic m-0">@ViewData["Title"]</h1>
