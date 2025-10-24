@@ -110,9 +110,10 @@
 <table class="table table-volcanic">
     <thead>
         <tr>
-            <th>Primer Nombre</th>
-            <th>Segundo Nombre</th>
+            <th>Nombres</th>
             <th>Apellidos</th>
+            <th>Email</th>
+            <th>Usuario</th>
             <th>Rol</th>
             <th class="text-center">Acciones</th>
         </tr>
@@ -121,9 +122,10 @@
         @foreach (var item in Model.Usuarios)
         {
             <tr>
-                <td>@item.PrimerNombre</td>
-                <td>@item.SegundoNombre</td>
-                <td>@item.Apellidos</td>
+                <td>@item.Nombres</td>
+                <td>@(item.PrimerApellido + (!string.IsNullOrEmpty(item.SegundoApellido) ? " " + item.SegundoApellido : ""))</td>
+                <td>@item.Email</td>
+                <td>@item.NombreUsuario</td>
                 <td>@item.Rol</td>
                 <td class="text-center">
                     <a class="btn btn-sm btn-action btn-edit" asp-page="Edit" asp-route-id="@item.Id">Editar</a>

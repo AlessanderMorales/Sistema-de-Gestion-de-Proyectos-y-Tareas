@@ -33,6 +33,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
         {
             // Remover la validación de contraseña del ModelState ya que se generará automáticamente
             ModelState.Remove("Usuario.Contraseña");
+            ModelState.Remove("Usuario.NombreUsuario");
             
             if (_usuarioService.EmailYaExiste(Usuario.Email))
             {
@@ -46,24 +47,39 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 
             try
             {
-                // La contraseña se genera automáticamente en el servicio
+                // La contraseña y nombre de usuario se generan automáticamente en el servicio
                 string contraseñaGenerada = _usuarioService.CrearNuevoUsuario(Usuario);
 
-                // Enviar email con las credenciales
-                string nombreCompleto = $"{Usuario.PrimerNombre} {Usuario.Apellidos}";
-                bool emailEnviado = await _emailService.EnviarEmailContraseña(
-                    Usuario.Email, 
-                    nombreCompleto, 
-                    contraseñaGenerada
-                );
+                // Obtener el usuario recién creado para acceder a su nombre de usuario generado
+                var usuarioCreado = _usuarioService.ObtenerTodosLosUsuarios()
+                    .FirstOrDefault(u => u.Email.Equals(Usuario.Email, StringComparison.OrdinalIgnoreCase));
 
-                if (emailEnviado)
+                if (usuarioCreado != null)
                 {
-                    MensajeExito = $"Usuario creado exitosamente. Se ha enviado un correo a {Usuario.Email} con las credenciales de acceso.";
+                    // Enviar email con las credenciales
+                    string nombreCompleto = !string.IsNullOrEmpty(usuarioCreado.SegundoApellido)
+                        ? $"{usuarioCreado.Nombres} {usuarioCreado.PrimerApellido} {usuarioCreado.SegundoApellido}"
+                        : $"{usuarioCreado.Nombres} {usuarioCreado.PrimerApellido}";
+
+                    bool emailEnviado = await _emailService.EnviarEmailContraseña(
+                        usuarioCreado.Email, 
+                        nombreCompleto,
+                        usuarioCreado.NombreUsuario,  // Ahora se envía el nombre de usuario
+                        contraseñaGenerada
+                    );
+
+                    if (emailEnviado)
+                    {
+                        MensajeExito = $"Usuario creado exitosamente. Se ha enviado un correo a {usuarioCreado.Email} con las credenciales de acceso.";
+                    }
+                    else
+                    {
+                        MensajeError = $"Usuario creado, pero hubo un error al enviar el correo. Usuario: {usuarioCreado.NombreUsuario} | Contraseña: {contraseñaGenerada}";
+                    }
                 }
                 else
                 {
-                    MensajeError = $"Usuario creado, pero hubo un error al enviar el correo. Contraseña generada: {contraseñaGenerada}";
+                    MensajeError = "Usuario creado pero no se pudo recuperar la información para enviar el email.";
                 }
             }
             catch (Exception ex)

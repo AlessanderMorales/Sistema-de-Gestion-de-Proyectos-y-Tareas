@@ -1,5 +1,4 @@
-﻿
-using Dapper;
+﻿using Dapper;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Ports.Repositories;
 using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
@@ -19,27 +18,42 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
         {
             using var connection = _connectionFactory.CreateConnection();
             return connection.Query<Usuario>(
-                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, 
-                         apellidos, contraseña, email, rol AS Rol, estado AS Estado 
-                  FROM Usuario WHERE estado = 1 ORDER BY apellidos");
+                @"SELECT id_usuario AS Id, nombres AS Nombres, primer_apellido AS PrimerApellido, 
+                         segundo_apellido AS SegundoApellido, nombre_usuario AS NombreUsuario,
+                         contraseña, email, rol AS Rol, estado AS Estado 
+                  FROM Usuario WHERE estado = 1 ORDER BY primer_apellido");
         }
 
         public Usuario GetByIdAsync(int id)
         {
             using var connection = _connectionFactory.CreateConnection();
             return connection.QueryFirstOrDefault<Usuario>(
-                @"SELECT id_usuario AS Id, primer_nombre AS PrimerNombre, segundo_nombre AS SegundoNombre, 
-                         apellidos, contraseña, email, rol AS Rol, estado AS Estado 
+                @"SELECT id_usuario AS Id, nombres AS Nombres, primer_apellido AS PrimerApellido, 
+                         segundo_apellido AS SegundoApellido, nombre_usuario AS NombreUsuario,
+                         contraseña, email, rol AS Rol, estado AS Estado 
                   FROM Usuario WHERE id_usuario = @Id AND estado = 1;",
                 new { Id = id });
+        }
+
+        public Usuario GetByEmailOrUsername(string emailOrUsername)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            return connection.QueryFirstOrDefault<Usuario>(
+                @"SELECT id_usuario AS Id, nombres AS Nombres, primer_apellido AS PrimerApellido, 
+                         segundo_apellido AS SegundoApellido, nombre_usuario AS NombreUsuario,
+                         contraseña, email, rol AS Rol, estado AS Estado 
+                  FROM Usuario 
+                  WHERE (email = @EmailOrUsername OR nombre_usuario = @EmailOrUsername) 
+                  AND estado = 1;",
+                new { EmailOrUsername = emailOrUsername });
         }
 
         public void AddAsync(Usuario entity)
         {
             using var connection = _connectionFactory.CreateConnection();
             connection.Execute(
-                @"INSERT INTO Usuario (primer_nombre, segundo_nombre, apellidos, contraseña, email, rol, estado) 
-                  VALUES (@PrimerNombre, @SegundoNombre, @Apellidos, @Contraseña, @Email, @Rol, @Estado);",
+                @"INSERT INTO Usuario (nombres, primer_apellido, segundo_apellido, nombre_usuario, contraseña, email, rol, estado) 
+                  VALUES (@Nombres, @PrimerApellido, @SegundoApellido, @NombreUsuario, @Contraseña, @Email, @Rol, @Estado);",
                 entity);
         }
 
@@ -48,10 +62,18 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
             using var connection = _connectionFactory.CreateConnection();
             connection.Execute(
                 @"UPDATE Usuario 
-                  SET primer_nombre = @PrimerNombre, segundo_nombre = @SegundoNombre, apellidos = @Apellidos, 
-                      contraseña = @Contraseña, email = @Email, rol = @Rol
+                  SET nombres = @Nombres, primer_apellido = @PrimerApellido, segundo_apellido = @SegundoApellido,
+                      nombre_usuario = @NombreUsuario, contraseña = @Contraseña, email = @Email, rol = @Rol
                   WHERE id_usuario = @Id;",
                 entity);
+        }
+
+        public void UpdatePassword(int id, string newPasswordHash)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Execute(
+                @"UPDATE Usuario SET contraseña = @NewPasswordHash WHERE id_usuario = @Id;",
+                new { Id = id, NewPasswordHash = newPasswordHash });
         }
 
         public void DeleteAsync(int id)
@@ -70,7 +92,5 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Re
         public void DeactivateByProjectId(int idProyecto)
         {
         }
-
-
     }
 }

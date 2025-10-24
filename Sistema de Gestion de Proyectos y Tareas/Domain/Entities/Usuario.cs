@@ -9,16 +9,23 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "El primer nombre es obligatorio.")]
-        [StringLength(50)]
-        public string PrimerNombre { get; set; } = string.Empty;
-
-        [StringLength(50)]
-        public string? SegundoNombre { get; set; }
-
-        [Required(ErrorMessage = "Los apellidos son obligatorios.")]
+        [Required(ErrorMessage = "Los nombres son obligatorios.")]
         [StringLength(100)]
-        public string? Apellidos { get; set; }
+        [Display(Name = "Nombres")]
+        public string Nombres { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El primer apellido es obligatorio.")]
+        [StringLength(50)]
+        [Display(Name = "Primer Apellido")]
+        public string PrimerApellido { get; set; } = string.Empty;
+
+        [StringLength(50)]
+        [Display(Name = "Segundo Apellido")]
+        public string? SegundoApellido { get; set; }
+
+        [StringLength(50)]
+        [Display(Name = "Nombre de Usuario")]
+        public string NombreUsuario { get; set; } = string.Empty;
 
         [StringLength(15, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 15 caracteres.")]
         [DataType(DataType.Password)]
@@ -33,24 +40,42 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 
         public int Estado { get; set; } = 1;
 
+        [Obsolete("Use Nombres instead")]
+        public string PrimerNombre
+        {
+            get => Nombres?.Split(' ').FirstOrDefault() ?? string.Empty;
+            set => Nombres = value;
+        }
+
+        [Obsolete("Use PrimerApellido and SegundoApellido instead")]
+        public string Apellidos
+        {
+            get => $"{PrimerApellido} {SegundoApellido}".Trim();
+            set
+            {
+                var partes = value?.Split(' ', 2);
+                if (partes?.Length > 0) PrimerApellido = partes[0];
+                if (partes?.Length > 1) SegundoApellido = partes[1];
+            }
+        }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             string nombrePattern = @"^(?! )[A-Za-zÁÉÍÓÚáéíóúÑñ]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$";
             string sinEspaciosMultiples = @" {2,}";
 
-            if (string.IsNullOrWhiteSpace(PrimerNombre) || !Regex.IsMatch(PrimerNombre.Trim(), nombrePattern) || Regex.IsMatch(PrimerNombre, sinEspaciosMultiples))
-                yield return new ValidationResult("El primer nombre solo puede contener letras y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(PrimerNombre) });
+            if (string.IsNullOrWhiteSpace(Nombres) || !Regex.IsMatch(Nombres.Trim(), nombrePattern) || Regex.IsMatch(Nombres, sinEspaciosMultiples))
+                yield return new ValidationResult("Los nombres solo pueden contener letras y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(Nombres) });
 
-            if (!string.IsNullOrWhiteSpace(SegundoNombre))
+            if (string.IsNullOrWhiteSpace(PrimerApellido) || !Regex.IsMatch(PrimerApellido.Trim(), nombrePattern) || Regex.IsMatch(PrimerApellido, sinEspaciosMultiples))
+                yield return new ValidationResult("El primer apellido solo puede contener letras, sin espacios al inicio/final.", new[] { nameof(PrimerApellido) });
+
+            if (!string.IsNullOrWhiteSpace(SegundoApellido))
             {
-                if (!Regex.IsMatch(SegundoNombre.Trim(), nombrePattern) || Regex.IsMatch(SegundoNombre, sinEspaciosMultiples))
-                    yield return new ValidationResult("El segundo nombre solo puede contener letras y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(SegundoNombre) });
+                if (!Regex.IsMatch(SegundoApellido.Trim(), nombrePattern) || Regex.IsMatch(SegundoApellido, sinEspaciosMultiples))
+                    yield return new ValidationResult("El segundo apellido solo puede contener letras, sin espacios al inicio/final.", new[] { nameof(SegundoApellido) });
             }
 
-            if (string.IsNullOrWhiteSpace(Apellidos) || !Regex.IsMatch(Apellidos.Trim(), nombrePattern) || Regex.IsMatch(Apellidos, sinEspaciosMultiples))
-                yield return new ValidationResult("El apellido solo puede contener letras y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(Apellidos) });
-
-            // Validar contraseña solo si se proporciona (para actualizaciones o creaciones manuales)
             if (!string.IsNullOrWhiteSpace(Contraseña) && !Contraseña.StartsWith("PBKDF2:"))
             {
                 if (Contraseña.Length < 8 || Contraseña.Length > 15 ||
@@ -63,12 +88,12 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 }
             }
 
-            if (PrimerNombre != PrimerNombre.Trim())
-                yield return new ValidationResult("El primer nombre no debe empezar ni terminar con espacios.", new[] { nameof(PrimerNombre) });
-            if (!string.IsNullOrEmpty(SegundoNombre) && SegundoNombre != SegundoNombre.Trim())
-                yield return new ValidationResult("El segundo nombre no debe empezar ni terminar con espacios.", new[] { nameof(SegundoNombre) });
-            if (!string.IsNullOrEmpty(Apellidos) && Apellidos != Apellidos.Trim())
-                yield return new ValidationResult("El apellido no debe empezar ni terminar con espacios.", new[] { nameof(Apellidos) });
+            if (Nombres != Nombres?.Trim())
+                yield return new ValidationResult("Los nombres no deben empezar ni terminar con espacios.", new[] { nameof(Nombres) });
+            if (!string.IsNullOrEmpty(PrimerApellido) && PrimerApellido != PrimerApellido.Trim())
+                yield return new ValidationResult("El primer apellido no debe empezar ni terminar con espacios.", new[] { nameof(PrimerApellido) });
+            if (!string.IsNullOrEmpty(SegundoApellido) && SegundoApellido != SegundoApellido.Trim())
+                yield return new ValidationResult("El segundo apellido no debe empezar ni terminar con espacios.", new[] { nameof(SegundoApellido) });
 
             bool ContainsInjection(string input)
             {
@@ -115,14 +140,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                 return false;
             }
 
-            if (ContainsInjection(PrimerNombre))
-                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en el primer nombre.", new[] { nameof(PrimerNombre) });
+            if (ContainsInjection(Nombres))
+                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en los nombres.", new[] { nameof(Nombres) });
 
-            if (!string.IsNullOrWhiteSpace(SegundoNombre) && ContainsInjection(SegundoNombre))
-                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en el segundo nombre.", new[] { nameof(SegundoNombre) });
+            if (!string.IsNullOrWhiteSpace(PrimerApellido) && ContainsInjection(PrimerApellido))
+                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en el primer apellido.", new[] { nameof(PrimerApellido) });
 
-            if (!string.IsNullOrWhiteSpace(Apellidos) && ContainsInjection(Apellidos))
-                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en los apellidos.", new[] { nameof(Apellidos) });
+            if (!string.IsNullOrWhiteSpace(SegundoApellido) && ContainsInjection(SegundoApellido))
+                yield return new ValidationResult("No se permiten intentos explícitos de inyección SQL o contenido HTML/JS peligroso en el segundo apellido.", new[] { nameof(SegundoApellido) });
 
             var rolesValidos = new[] { "empleado", "jefe de proyecto", "superadmin", "jefedeproyecto" };
             if (string.IsNullOrWhiteSpace(Rol) || !rolesValidos.Contains(Rol.Trim().ToLowerInvariant()))

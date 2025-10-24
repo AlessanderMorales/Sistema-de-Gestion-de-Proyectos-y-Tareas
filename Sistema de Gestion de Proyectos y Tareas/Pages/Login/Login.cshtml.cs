@@ -24,9 +24,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 
         public class InputModel
         {
-            [Required(ErrorMessage = "El email es obligatorio.")]
-            [EmailAddress]
-            public string Email { get; set; }
+            [Required(ErrorMessage = "El email o nombre de usuario es obligatorio.")]
+            [Display(Name = "Email o Usuario")]
+            public string EmailOrUsername { get; set; }
 
             [Required(ErrorMessage = "La contraseña es obligatoria.")]
             [DataType(DataType.Password)]
@@ -44,7 +44,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 
             if (ModelState.IsValid)
             {
-                var usuario = _usuarioService.ValidarUsuario(Input.Email, Input.Password);
+                var usuario = _usuarioService.ValidarUsuario(Input.EmailOrUsername, Input.Password);
 
                 if (usuario != null)
                 {
@@ -57,11 +57,16 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
                         else normalizedRole = Roles.Empleado;
                     }
 
+                    string nombreCompleto = !string.IsNullOrEmpty(usuario.SegundoApellido)
+                        ? $"{usuario.Nombres} {usuario.PrimerApellido} {usuario.SegundoApellido}"
+                        : $"{usuario.Nombres} {usuario.PrimerApellido}";
+
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                         new Claim(ClaimTypes.Name, usuario.Email),
-                        new Claim("FullName", $"{usuario.PrimerNombre} {usuario.Apellidos}"),
+                        new Claim("Username", usuario.NombreUsuario ?? usuario.Email),
+                        new Claim("FullName", nombreCompleto),
                         new Claim(ClaimTypes.Role, normalizedRole)
                     };
 
@@ -73,7 +78,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Intento de inicio de sesión no válido.");
+                    ModelState.AddModelError(string.Empty, "Email/usuario o contraseña incorrectos.");
                     return Page();
                 }
             }

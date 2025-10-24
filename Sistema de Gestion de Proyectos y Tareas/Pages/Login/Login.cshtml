@@ -120,9 +120,9 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
-                            <label asp-for="Input.Email" class="form-label">Correo Electrónico</label>
-                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            <input asp-for="Input.EmailOrUsername" class="form-control" autocomplete="username" aria-required="true" placeholder="usuario o email" />
+                            <label asp-for="Input.EmailOrUsername" class="form-label">Usuario o Correo Electrónico</label>
+                            <span asp-validation-for="Input.EmailOrUsername" class="text-danger"></span>
                         </div>
 
                         <div class="form-floating mb-4">

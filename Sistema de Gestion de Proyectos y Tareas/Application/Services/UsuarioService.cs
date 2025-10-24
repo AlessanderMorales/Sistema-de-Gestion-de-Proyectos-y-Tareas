@@ -35,15 +35,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
             var repo = _usuarioFactory.CreateRepository();
             if (!string.IsNullOrEmpty(usuario.Rol)) usuario.Rol = usuario.Rol.Trim();
             
-            // Generar contraseña automática
-            string contraseñaGenerada = GenerarContraseñaAutomatica(usuario.PrimerNombre, usuario.Apellidos);
+            usuario.NombreUsuario = GenerarNombreUsuario(usuario.Email);
             
-            // Hashear la contraseña antes de guardarla
+            string contraseñaGenerada = GenerarContraseñaAutomatica(usuario.Nombres, usuario.PrimerApellido);
+            
             usuario.Contraseña = HashPassword(contraseñaGenerada);
 
             repo.AddAsync(usuario);
             
-            // Retornar la contraseña sin hashear para enviarla por email
             return contraseñaGenerada;
         }
 
@@ -59,16 +58,37 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
             repo.UpdateAsync(usuario);
         }
 
+        public bool CambiarContraseña(int usuarioId, string contraseñaActual, string nuevaContraseña)
+        {
+            var repo = _usuarioFactory.CreateRepository();
+            var usuario = repo.GetByIdAsync(usuarioId);
+
+            if (usuario == null) return false;
+
+            if (!VerifyHashedPassword(usuario.Contraseña, contraseñaActual))
+            {
+                return false;
+            }
+
+            string nuevaContraseñaHash = HashPassword(nuevaContraseña);
+            var usuarioRepo = repo as Infrastructure.Persistence.Repositories.UsuarioRepository;
+            usuarioRepo?.UpdatePassword(usuarioId, nuevaContraseñaHash);
+
+            return true;
+        }
+
         public void EliminarUsuario(int id)
         {
             var repo = _usuarioFactory.CreateRepository();
             repo.DeleteAsync(id);
         }
 
-        public Usuario ValidarUsuario(string email, string password)
+        public Usuario ValidarUsuario(string emailOrUsername, string password)
         {
             var repo = _usuarioFactory.CreateRepository();
-            var usuario = repo.GetAllAsync().FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            var usuarioRepo = repo as Infrastructure.Persistence.Repositories.UsuarioRepository;
+            
+            var usuario = usuarioRepo?.GetByEmailOrUsername(emailOrUsername);
 
             if (usuario == null) return null;
 
@@ -92,42 +112,47 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
             return null;
         }
 
-        private string GenerarContraseñaAutomatica(string primerNombre, string apellidos)
+        private string GenerarNombreUsuario(string email)
         {
-            // Limpiar y normalizar los nombres (remover acentos y espacios extras)
-            string nombreLimpio = LimpiarTexto(primerNombre);
-            string apellidoLimpio = LimpiarTexto(apellidos);
+            if (string.IsNullOrWhiteSpace(email)) return string.Empty;
 
-            // Tomar las 3 primeras letras del nombre (o menos si es más corto)
-            string partNombre = nombreLimpio.Length >= 3 
-                ? nombreLimpio.Substring(0, 3) 
-                : nombreLimpio.PadRight(3, 'x');
+            var parteLocal = email.Split('@')[0];
+            
+            var nombreUsuario = Regex.Replace(parteLocal, @"[^a-zA-Z0-9._-]", "").ToLowerInvariant();
 
-            // Tomar las 2 primeras letras del apellido (o menos si es más corto)
+            return nombreUsuario;
+        }
+
+        private string GenerarContraseñaAutomatica(string nombres, string primerApellido)
+        {
+            string nombreLimpio = LimpiarTexto(nombres);
+            string apellidoLimpio = LimpiarTexto(primerApellido);
+
+            var primerNombre = nombreLimpio.Split(' ').FirstOrDefault() ?? nombreLimpio;
+            string partNombre = primerNombre.Length >= 3 
+                ? primerNombre.Substring(0, 3) 
+                : primerNombre.PadRight(3, 'x');
+
             string partApellido = apellidoLimpio.Length >= 2 
                 ? apellidoLimpio.Substring(0, 2) 
                 : apellidoLimpio.PadRight(2, 'x');
 
-            // Crear la contraseña base: Primera letra mayúscula + resto minúsculas
             string contraseñaBase = char.ToUpper(partNombre[0]) + 
                                    partNombre.Substring(1).ToLower() + 
                                    partApellido.ToLower();
 
-            // Verificar si la contraseña ya existe y agregar números si es necesario
             string contraseñaFinal = contraseñaBase;
             int contador = 1;
             
             var repo = _usuarioFactory.CreateRepository();
             var todosUsuarios = repo.GetAllAsync().ToList();
 
-            // Buscar contraseñas similares para encontrar el siguiente número disponible
-            while (ContraseñaExiste(contraseñaFinal, todosUsuarios))
+            while (ContraseñaExiste(contraseñaFinal + "!", todosUsuarios))
             {
                 contraseñaFinal = contraseñaBase + contador;
                 contador++;
             }
 
-            // Agregar un carácter especial al final para cumplir con los requisitos
             contraseñaFinal += "!";
 
             return contraseñaFinal;
@@ -135,10 +160,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
 
         private bool ContraseñaExiste(string contraseñaPlana, List<Usuario> usuarios)
         {
-            // Verificar si algún usuario tiene esta contraseña
             foreach (var usuario in usuarios)
             {
-                // Si la contraseña está hasheada, verificarla
                 if (usuario.Contraseña.StartsWith("PBKDF2:", StringComparison.Ordinal))
                 {
                     if (VerifyHashedPassword(usuario.Contraseña, contraseñaPlana))
@@ -146,7 +169,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
                         return true;
                     }
                 }
-                // Si no está hasheada (legacy), comparar directamente
                 else if (usuario.Contraseña == contraseñaPlana)
                 {
                     return true;
@@ -160,7 +182,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
             if (string.IsNullOrWhiteSpace(texto))
                 return string.Empty;
 
-            // Remover acentos y caracteres especiales
             string normalizado = texto.Normalize(NormalizationForm.FormD);
             StringBuilder sb = new StringBuilder();
 

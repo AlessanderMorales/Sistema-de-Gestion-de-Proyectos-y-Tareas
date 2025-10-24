@@ -91,29 +91,39 @@
     <div class="col-md-8 form-container">
         <form method="post">
             <input type="hidden" asp-for="Usuario.Id" />
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Usuario.PrimerNombre" class="form-label"></label>
-                    <input asp-for="Usuario.PrimerNombre" class="form-control" />
-                    <span asp-validation-for="Usuario.PrimerNombre" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Usuario.SegundoNombre" class="form-label"></label>
-                    <input asp-for="Usuario.SegundoNombre" class="form-control" />
-                    <span asp-validation-for="Usuario.SegundoNombre" class="text-danger"></span>
-                </div>
+            
+            <div class="mb-3">
+                <label asp-for="Usuario.Nombres" class="form-label"></label>
+                <input asp-for="Usuario.Nombres" class="form-control" placeholder="Ej: Juan Carlos" />
+                <small class="text-muted">Puede incluir varios nombres separados por espacio</small>
+                <span asp-validation-for="Usuario.Nombres" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Usuario.Apellidos" class="form-label"></label>
-                <input asp-for="Usuario.Apellidos" class="form-control" />
-                <span asp-validation-for="Usuario.Apellidos" class="text-danger"></span>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Usuario.PrimerApellido" class="form-label"></label>
+                    <input asp-for="Usuario.PrimerApellido" class="form-control" />
+                    <span asp-validation-for="Usuario.PrimerApellido" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Usuario.SegundoApellido" class="form-label"></label>
+                    <input asp-for="Usuario.SegundoApellido" class="form-control" />
+                    <small class="text-muted">Opcional</small>
+                    <span asp-validation-for="Usuario.SegundoApellido" class="text-danger"></span>
+                </div>
             </div>
 
             <div class="mb-3">
                 <label asp-for="Usuario.Email" class="form-label"></label>
-                <input asp-for="Usuario.Email" class="form-control" placeholder="correo@ejemplo.com" />
+                <input asp-for="Usuario.Email" class="form-control" type="email" placeholder="correo@ejemplo.com" />
                 <span asp-validation-for="Usuario.Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Usuario.NombreUsuario" class="form-label"></label>
+                <input asp-for="Usuario.NombreUsuario" class="form-control" placeholder="usuario" readonly />
+                <small class="text-muted">El nombre de usuario se genera automáticamente del email</small>
+                <span asp-validation-for="Usuario.NombreUsuario" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
@@ -122,14 +132,17 @@
                 <div class="form-text">Rellena este campo solo si deseas establecer una nueva contraseña.</div>
                 <span asp-validation-for="Usuario.Contraseña" class="text-danger"></span>
             </div>
+
             <div class="mb-3">
                 <label asp-for="Usuario.Rol" class="form-label"></label>
                 <select asp-for="Usuario.Rol" class="form-select">
-                    <option value="empleado">Empleado</option>
-                    <option value="jefe de proyecto">Jefe de Proyecto</option>
+                    <option value="SuperAdmin">Super Administrador</option>
+                    <option value="JefeDeProyecto">Jefe de Proyecto</option>
+                    <option value="Empleado">Empleado</option>
                 </select>
                 <span asp-validation-for="Usuario.Rol" class="text-danger"></span>
             </div>
+
             <div class="mt-4">
                 <button type="submit" class="btn btn-volcanic-primary">Guardar Cambios</button>
                 <a asp-page="Index" class="btn btn-volcanic-secondary ms-2">Cancelar</a>

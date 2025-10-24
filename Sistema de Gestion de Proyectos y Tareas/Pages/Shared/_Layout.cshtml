@@ -188,6 +188,7 @@
                 {
                     <a asp-page="/Usuarios/Index" class="list-group-item list-group-item-action">Usuarios</a>
                     <a asp-page="/Usuarios/Create" class="list-group-item list-group-item-action">Crear Usuario</a>
+                    <a asp-page="/Configuracion/CambiarContraseña" class="list-group-item list-group-item-action">⚙️ Configuración</a>
                 }
                 else if (User.IsInRole("JefeDeProyecto"))
                 {
@@ -196,12 +197,14 @@
                     <a asp-page="/proyectos/Index" class="list-group-item list-group-item-action">Mostrar proyectos</a>
                     <a asp-page="/Tareas/Index" class="list-group-item list-group-item-action">Tareas</a>
                     <a asp-page="/Comentarios/Index" class="list-group-item list-group-item-action">Comentarios</a>
+                    <a asp-page="/Configuracion/CambiarContraseña" class="list-group-item list-group-item-action">⚙️ Configuración</a>
                 }
                 else if (User.IsInRole("Empleado"))
                 {
                     <a asp-page="/Index" class="list-group-item list-group-item-action">Home</a>
                     <a asp-page="/Tareas/Index" class="list-group-item list-group-item-action">Mis Tareas</a>
                     <a asp-page="/proyectos/Index" class="list-group-item list-group-item-action">Mis Proyectos</a>
+                    <a asp-page="/Configuracion/CambiarContraseña" class="list-group-item list-group-item-action">⚙️ Configuración</a>
                 }
             </div>
         </div>
