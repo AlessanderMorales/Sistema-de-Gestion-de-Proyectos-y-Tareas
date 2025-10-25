@@ -1,4 +1,4 @@
-﻿namespace ServiceTarea
+﻿namespace LibraryD
 {
     public class Class1
     {

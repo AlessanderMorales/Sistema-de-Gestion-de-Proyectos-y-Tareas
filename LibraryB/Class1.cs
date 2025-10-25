@@ -1,4 +1,4 @@
-﻿namespace ServiceUsuario
+﻿namespace LibraryB
 {
     public class Class1
     {

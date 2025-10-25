@@ -1,4 +1,4 @@
-﻿namespace ServiceProyecto
+﻿namespace LibraryC
 {
     public class Class1
     {

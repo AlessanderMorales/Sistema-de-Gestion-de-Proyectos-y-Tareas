@@ -1,4 +1,4 @@
-﻿namespace ServiceCommon
+﻿namespace LibraryA
 {
     public class Class1
     {
