@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using ServiceUsuario.Domain.Entities;
-using ServiceTarea.Domain.Entities;
 
 namespace ServiceComentario.Domain.Entities
 {
@@ -19,14 +18,16 @@ namespace ServiceComentario.Domain.Entities
         public DateTime Fecha { get; set; }
         public int Estado { get; set; }
 
+        // 🔹 Solo guardamos el ID de la tarea, no la referencia a la entidad Tarea
+        [Required]
         public int IdTarea { get; set; }
+
+        [Required]
         public int IdUsuario { get; set; }
 
+        // 🔹 Referencia de navegación solo al usuario (sin dependencia circular)
         [ValidateNever]
         public Usuario Usuario { get; set; }
-
-        [ValidateNever]
-        public Tarea Tarea { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

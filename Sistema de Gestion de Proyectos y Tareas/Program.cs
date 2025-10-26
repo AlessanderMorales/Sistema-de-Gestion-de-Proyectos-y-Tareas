@@ -1,12 +1,23 @@
-﻿using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Data;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Infrastructure.Persistence.Factories;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Common;
-
+﻿using ServiceComentario.Application.Service;
+using ServiceComentario.Domain.Entities;
+using ServiceComentario.Infrastructure.Persistence.Factories;
+using ServiceCommon.Application.Services;
+using ServiceCommon.Domain.Common;
+using ServiceCommon.Domain.Port;
+using ServiceCommon.Infrastructure.Persistence.Data;
+using ServiceProyecto.Application.Service;
+using ServiceProyecto.Domain.Entities;
+using ServiceProyecto.Infrastructure.Persistence.Factories;
+using ServiceTarea.Application.Service;
+using ServiceTarea.Domain.Entities;
+using ServiceTarea.Infrastructure.Persistence.Factories;
+using ServiceUsuario.Application.Service;
+using ServiceUsuario.Domain.Entities;
+using ServiceUsuario.Infrastructure.Persistence.Factories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ✅ Autenticación por cookies
 builder.Services.AddAuthentication("MyCookieAuth")
     .AddCookie("MyCookieAuth", options =>
     {
@@ -16,7 +27,7 @@ builder.Services.AddAuthentication("MyCookieAuth")
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     });
 
-
+// ✅ Políticas de autorización
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SoloAdmin", policy =>
@@ -34,27 +45,27 @@ builder.Services.AddScoped<MySqlRepositoryFactory<Proyecto>, ProyectoryRepositor
 builder.Services.AddScoped<MySqlRepositoryFactory<Usuario>, UsuarioRepositoryCreator>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Tarea>, TareaRepositoryCreator>();
 builder.Services.AddScoped<MySqlRepositoryFactory<Comentario>, ComentarioRepositoryCreator>();
-
+builder.Services.AddScoped<IComentarioManager, ComentarioService>();
 builder.Services.AddScoped<ProyectoService>();
 builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComentarioService>();
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<EmailService>(); 
 
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Usuarios", "SoloAdmin");
-    options.Conventions.AuthorizeFolder("/proyectos", "OnlyJefeOrEmpleado");
+    options.Conventions.AuthorizeFolder("/Proyectos", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Tareas", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Comentarios", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizePage("/Index", "OnlyJefeOrEmpleado");
 
-    options.Conventions.AuthorizePage("/proyectos/Create", "OnlyJefe");
+    options.Conventions.AuthorizePage("/Proyectos/Create", "OnlyJefe");
     options.Conventions.AuthorizePage("/Tareas/Create", "OnlyJefe");
 });
- 
 
 var app = builder.Build();
+
 
 if (!app.Environment.IsDevelopment())
 {
@@ -64,8 +75,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapRazorPages();
+
 app.Run();

@@ -93,7 +93,7 @@
             <tr>
                 <td>@c.Contenido</td>
                 <td>@c.Fecha</td>
-                <td>@(c.Tarea != null ? c.Tarea.Titulo : "-")</td>
+                <td>@c.IdTarea</td>
                 <td>@(c.Usuario != null ? $"{c.Usuario.PrimerNombre} {c.Usuario.Apellidos}" : "-")</td>
                 <td>
                     <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-info btn-sm">Ver</a>

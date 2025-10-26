@@ -105,9 +105,9 @@
                     <span class="priority-badge priority-@(item.Prioridad.ToLower())">@item.Prioridad</span>
                 </td>
                 <td>
-                    @if (item.Proyecto != null)
+                    @if (!string.IsNullOrEmpty(item.ProyectoNombre))
                     {
-                        <a class="project-link" asp-page="/Proyectos/Mostrar" asp-route-id="@item.Proyecto.Id">@item.Proyecto.Nombre</a>
+                        <a class="project-link" asp-page="/Proyectos/Mostrar" asp-route-id="@item.IdProyecto">@item.ProyectoNombre</a>
                     }
                     else
                     {

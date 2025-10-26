@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using ServiceTarea.Application.Service;
+using ServiceUsuario.Application.Service;
+using ServiceUsuario.Domain.Entities;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
+using ServiceProyecto.Application.Service;
+using ServiceProyecto.Domain.Entities;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 {

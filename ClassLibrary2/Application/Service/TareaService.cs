@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ServiceCommon.Domain.Port;
 using ServiceCommon.Infrastructure.Persistence.Data;
 using ServiceTarea.Domain.Entities;
 
@@ -8,10 +9,12 @@ namespace ServiceTarea.Application.Service
     public class TareaService
     {
         private readonly MySqlRepositoryFactory<Tarea> _tareaFactory;
+        private readonly IComentarioManager _comentarioManager;
 
-        public TareaService(MySqlRepositoryFactory<Tarea> tareaFactory)
+        public TareaService(MySqlRepositoryFactory<Tarea> tareaFactory, IComentarioManager comentarioManager)
         {
             _tareaFactory = tareaFactory;
+            _comentarioManager = comentarioManager;
         }
 
         public IEnumerable<Tarea> ObtenerTodasLasTareas()
@@ -55,6 +58,9 @@ namespace ServiceTarea.Application.Service
         {
             var repo = _tareaFactory.CreateRepository();
             repo.DeleteAsync(tarea);
+
+            // 🔹 Desactivar comentarios asociados a esta tarea
+            _comentarioManager.DesactivarPorTareaId(tarea.Id);
         }
 
         public void AsignarTareaAUsuario(int idTarea, int idUsuario)

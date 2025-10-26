@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Common;
+using ServiceUsuario.Application.Service;
+using ServiceCommon.Domain.Common;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 {

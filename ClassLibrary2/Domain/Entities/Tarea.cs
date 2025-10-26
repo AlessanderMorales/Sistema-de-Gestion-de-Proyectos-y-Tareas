@@ -31,11 +31,9 @@ namespace ServiceTarea.Domain.Entities
         public string Status { get; set; } = "SinIniciar";
 
         public int Estado { get; set; } = 1;
-
-        // 🔹 Lista de IDs de comentarios (no la entidad completa)
         public ICollection<int> IdComentarios { get; set; } = new List<int>();
 
-        // (Validaciones permanecen igual)
+        public string? ProyectoNombre { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             string pattern = @"^(?! )[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+)*$";

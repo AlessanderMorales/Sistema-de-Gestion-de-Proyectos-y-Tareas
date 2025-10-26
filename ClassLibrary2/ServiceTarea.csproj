@@ -8,7 +8,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ServiceCommon\ServiceCommon.csproj" />
-		<ProjectReference Include="..\ServicioA\ServiceComentario.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -111,11 +111,11 @@
                 <span asp-validation-for="Tarea.Prioridad" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label asp-for="Tarea.id_proyecto" class="form-label">Proyecto</label>
-                <select asp-for="Tarea.id_proyecto" class="form-select" asp-items="Model.ProyectosDisponibles">
+                <label asp-for="Tarea.IdProyecto" class="form-label">Proyecto</label>
+                <select asp-for="Tarea.IdProyecto" class="form-select" asp-items="Model.ProyectosDisponibles">
                     <option value="">-- Seleccione un Proyecto --</option>
                 </select>
-                <span asp-validation-for="Tarea.id_proyecto" class="text-danger"></span>
+                <span asp-validation-for="Tarea.IdProyecto" class="text-danger"></span>
             </div>
             <div class="mt-4">
                 <button type="submit" class="btn btn-volcanic-primary">Actualizar Tarea</button>

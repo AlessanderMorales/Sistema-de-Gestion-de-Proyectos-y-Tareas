@@ -8,13 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Factories\**" />
+    <Content Remove="Factories\**" />
+    <EmbeddedResource Remove="Factories\**" />
+    <None Remove="Factories\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="MySql.Data" Version="9.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Ports\Factories\" />
-    <Folder Include="Factories\" />
     <Folder Include="Pages\Usuarios\" />
     <Folder Include="wwwroot\Image\" />
   </ItemGroup>

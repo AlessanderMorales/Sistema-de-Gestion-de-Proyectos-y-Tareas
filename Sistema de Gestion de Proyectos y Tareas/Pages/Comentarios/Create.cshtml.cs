@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using ServiceComentario.Application.Service;
+using ServiceComentario.Domain.Entities;
+using ServiceTarea.Application.Service;
+using ServiceTarea.Domain.Entities;
+using ServiceUsuario.Application.Service;
+using ServiceUsuario.Domain.Entities;
 using System.Collections.Generic;
 using System;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
 {
