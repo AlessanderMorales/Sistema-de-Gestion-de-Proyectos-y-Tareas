@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServiceCommon.Domain.Port
 {
-    internal interface IComentarioManager
+    public interface IComentarioManager
     {
         void DesactivarPorTareaId(int idTarea);
 
