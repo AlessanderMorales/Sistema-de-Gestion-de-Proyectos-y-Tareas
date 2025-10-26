@@ -23,4 +23,12 @@
     <None Include="wwwroot\Image\Logo.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibrary1\ServiceProyecto.csproj" />
+    <ProjectReference Include="..\ClassLibrary2\ServiceTarea.csproj" />
+    <ProjectReference Include="..\ServiceCommon\ServiceCommon.csproj" />
+    <ProjectReference Include="..\ServiceUsuario\ServiceUsuario.csproj" />
+    <ProjectReference Include="..\ServicioA\ServiceComentario.csproj" />
+  </ItemGroup>
+
 </Project>

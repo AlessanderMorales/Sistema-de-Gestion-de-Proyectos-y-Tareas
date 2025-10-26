@@ -16,7 +16,6 @@ namespace ServiceTarea.Infrastructure.Persistence.Repositories
             _connectionSignleton = mySqlConnectionSingleton;
         }
 
-        // ✅ Clase interna local que representa solo lo que necesitamos del proyecto
         private class ProyectoLite
         {
             public int Id { get; set; }
