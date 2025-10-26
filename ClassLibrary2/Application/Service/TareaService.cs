@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ServiceCommon.Infrastructure.Persistence.Data;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using ServiceTarea.Domain.Entities;
 
-namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services
+namespace ServiceTarea.Application.Service
 {
     public class TareaService
     {

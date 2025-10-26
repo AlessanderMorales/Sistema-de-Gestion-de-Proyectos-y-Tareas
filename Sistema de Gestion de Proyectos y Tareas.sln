@@ -12,8 +12,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceComentario", "ServicioA\ServiceComentario.csproj", "{3973568D-4C19-4804-939B-0AC64F6ECFCC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceProyecto", "ClassLibrary1\ServiceProyecto.csproj", "{3B673D0F-EFD2-4E14-AC5D-6C86E6E11D36}"
+	ProjectSection(ProjectDependencies) = postProject
+		{74B5433C-E2BD-44EB-83D9-AF6505CB9D4D} = {74B5433C-E2BD-44EB-83D9-AF6505CB9D4D}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceTarea", "ClassLibrary2\ServiceTarea.csproj", "{9625F419-CE2B-4F6D-B92C-37D0FA52736A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{74B5433C-E2BD-44EB-83D9-AF6505CB9D4D} = {74B5433C-E2BD-44EB-83D9-AF6505CB9D4D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

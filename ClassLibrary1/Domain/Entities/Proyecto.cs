@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-
+using ServiceTarea.Domain.Entities;
 
 namespace ServiceProyecto.Domain.Entities
 {

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using ServiceUsuario.Domain.Entities;
+using ServiceTarea.Domain.Entities;
 
 namespace ServiceComentario.Domain.Entities
 {

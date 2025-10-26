@@ -5,7 +5,7 @@ using ServiceProyecto.Domain.Entities;
 using ServiceTarea.Domain.Entities;
 
 namespace ServiceProyecto.Infrastructure.Persistence.Repositories
-
+{ 
     public class ProyectoRepository : IDB<Proyecto>
     {
         private readonly MySqlConnectionSingleton _connectionSignleton;
