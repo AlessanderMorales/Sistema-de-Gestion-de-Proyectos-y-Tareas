@@ -59,7 +59,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Tareas", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Comentarios", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizePage("/Index", "OnlyJefeOrEmpleado");
-
+    options.Conventions.AuthorizePage("/Comentarios", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizePage("/Proyectos/Create", "OnlyJefe");
     options.Conventions.AuthorizePage("/Tareas/Create", "OnlyJefe");
 });
