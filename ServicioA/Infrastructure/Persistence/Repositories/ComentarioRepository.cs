@@ -28,8 +28,11 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                     c.id_tarea AS IdTarea, 
                     c.id_usuario AS IdUsuario,
                     u.id_usuario AS Usuario_Id, 
-                    u.primer_nombre AS Usuario_PrimerNombre, 
-                    u.apellidos AS Usuario_Apellidos
+                    u.nombres AS Usuario_Nombres, 
+                    u.primer_apellido AS Usuario_PrimerApellido,
+                    u.segundo_apellido AS Usuario_SegundoApellido,
+                    u.email AS Usuario_Email,
+                    u.rol AS Usuario_Rol
                 FROM Comentario c
                 LEFT JOIN Usuario u ON c.id_usuario = u.id_usuario
                 WHERE c.estado = 1;";
@@ -49,8 +52,11 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                     ? new Usuario
                     {
                         Id = r.Usuario_Id,
-                        PrimerNombre = r.Usuario_PrimerNombre,
-                        Apellidos = r.Usuario_Apellidos
+                        Nombres = r.Usuario_Nombres,
+                        PrimerApellido = r.Usuario_PrimerApellido,
+                        SegundoApellido = r.Usuario_SegundoApellido,
+                        Email = r.Usuario_Email,
+                        Rol = r.Usuario_Rol
                     }
                     : null
             }).ToList();
@@ -69,15 +75,17 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                     c.id_tarea AS IdTarea, 
                     c.id_usuario AS IdUsuario,
                     u.id_usuario AS Usuario_Id, 
-                    u.primer_nombre AS Usuario_PrimerNombre, 
-                    u.apellidos AS Usuario_Apellidos
+                    u.nombres AS Usuario_Nombres, 
+                    u.primer_apellido AS Usuario_PrimerApellido,
+                    u.segundo_apellido AS Usuario_SegundoApellido,
+                    u.email AS Usuario_Email,
+                    u.rol AS Usuario_Rol
                 FROM Comentario c
                 LEFT JOIN Usuario u ON c.id_usuario = u.id_usuario
                 WHERE c.id_comentario = @Id;";
 
-            var parameters = new { Id = id };
             using var connection = _connectionSingleton.CreateConnection();
-            var r = connection.QueryFirstOrDefault<dynamic>(query, parameters);
+            var r = connection.QueryFirstOrDefault<dynamic>(query, new { Id = id });
             if (r == null) return null;
 
             return new Comentario
@@ -92,8 +100,11 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                     ? new Usuario
                     {
                         Id = r.Usuario_Id,
-                        PrimerNombre = r.Usuario_PrimerNombre,
-                        Apellidos = r.Usuario_Apellidos
+                        Nombres = r.Usuario_Nombres,
+                        PrimerApellido = r.Usuario_PrimerApellido,
+                        SegundoApellido = r.Usuario_SegundoApellido,
+                        Email = r.Usuario_Email,
+                        Rol = r.Usuario_Rol
                     }
                     : null
             };
@@ -130,8 +141,8 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
 
         public void DeleteAsync(int id)
         {
-            string query = @"UPDATE Comentario SET Estado = 0 WHERE id_comentario = @Id;";
-            _connectionSingleton.ExcuteCommand<dynamic>(query, new { Id = id });
+            string query = @"UPDATE Comentario SET estado = 0 WHERE id_comentario = @Id;";
+            _connectionSingleton.ExcuteCommand(query, new { Id = id });
         }
 
         public void DeleteAsync(Comentario entity)
@@ -139,10 +150,9 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
             DeleteAsync(entity.Id);
         }
 
-        // 🔹 Métodos auxiliares
         public void DeactivateByProjectId(int idProyecto)
         {
-            // Método opcional — si quieres inactivar comentarios ligados a un proyecto.
+            // En este caso, los comentarios no se desactivan directamente por proyecto.
         }
 
         public IEnumerable<Comentario> GetAllWhere(string whereClause, object parameters = null)
