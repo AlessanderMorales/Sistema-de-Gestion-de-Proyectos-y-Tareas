@@ -1,10 +1,11 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Services;
-using Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities;
+using ServiceTarea.Application.Service;
+using ServiceTarea.Domain.Entities;
+using ServiceProyecto.Application.Service;
+using ServiceProyecto.Domain.Entities;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
@@ -39,7 +40,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
             }
             Tarea = tarea;
             var proyectos = _proyectoService.ObtenerTodosLosProyectos();
-            ProyectosDisponibles = new SelectList(proyectos, "Id", "Nombre", Tarea.id_proyecto);
+            ProyectosDisponibles = new SelectList(proyectos, "Id", "Nombre", Tarea.IdProyecto);
 
             return Page();
         }
@@ -49,7 +50,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
             if (!ModelState.IsValid)
             {
                 var proyectos = _proyectoService.ObtenerTodosLosProyectos();
-                ProyectosDisponibles = new SelectList(proyectos, "Id", "Nombre", Tarea.id_proyecto);
+                ProyectosDisponibles = new SelectList(proyectos, "Id", "Nombre", Tarea.IdProyecto);
                 return Page();
             }
 

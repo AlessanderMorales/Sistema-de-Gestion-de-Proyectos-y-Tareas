@@ -8,19 +8,32 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="MySql.Data" Version="9.4.0" />
+    <Compile Remove="Factories\**" />
+    <Content Remove="Factories\**" />
+    <EmbeddedResource Remove="Factories\**" />
+    <None Remove="Factories\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Ports\Factories\" />
-    <Folder Include="Factories\" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="MySql.Data" Version="9.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Pages\Usuarios\" />
     <Folder Include="wwwroot\Image\" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\Image\Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibrary1\ServiceProyecto.csproj" />
+    <ProjectReference Include="..\ClassLibrary2\ServiceTarea.csproj" />
+    <ProjectReference Include="..\ServiceCommon\ServiceCommon.csproj" />
+    <ProjectReference Include="..\ServiceUsuario\ServiceUsuario.csproj" />
+    <ProjectReference Include="..\ServicioA\ServiceComentario.csproj" />
   </ItemGroup>
 
 </Project>
