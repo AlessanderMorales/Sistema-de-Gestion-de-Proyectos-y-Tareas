@@ -82,7 +82,7 @@ namespace ServiceUsuario.Infrastructure.Persistence.Repositories
         {
             using var connection = _connectionFactory.CreateConnection();
             connection.Execute(
-                @"UPDATE Usuario SET estado = 0 WHERE id_usuario = @Id;",
+                @"DELETE FROM Usuario WHERE id_usuario = @Id;",
                 new { Id = id });
         }
 

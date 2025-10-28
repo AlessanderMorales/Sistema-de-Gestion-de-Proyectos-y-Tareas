@@ -17,17 +17,16 @@ using ServiceUsuario.Infrastructure.Persistence.Factories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Autenticación por cookies
 builder.Services.AddAuthentication("MyCookieAuth")
     .AddCookie("MyCookieAuth", options =>
     {
         options.Cookie.Name = "Sgpt.AuthCookie";
         options.LoginPath = "/Login/Login";
-        options.AccessDeniedPath = "/AccessDenied";
+     options.AccessDeniedPath = "/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+   options.SlidingExpiration = true;
     });
 
-// ✅ Políticas de autorización
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SoloAdmin", policy =>
@@ -38,6 +37,10 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("OnlyJefe", policy =>
         policy.RequireRole(Roles.JefeDeProyecto));
+
+    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+     .RequireAuthenticatedUser()
+        .Build();
 });
 
 builder.Services.AddSingleton<MySqlConnectionSingleton>();
@@ -50,7 +53,7 @@ builder.Services.AddScoped<ProyectoService>();
 builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComentarioService>();
-builder.Services.AddScoped<EmailService>(); 
+builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddRazorPages(options =>
 {
@@ -58,14 +61,19 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Proyectos", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Tareas", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Comentarios", "OnlyJefeOrEmpleado");
+    options.Conventions.AuthorizeFolder("/Configuracion");
     options.Conventions.AuthorizePage("/Index", "OnlyJefeOrEmpleado");
-    options.Conventions.AuthorizePage("/Comentarios", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizePage("/Proyectos/Create", "OnlyJefe");
     options.Conventions.AuthorizePage("/Tareas/Create", "OnlyJefe");
+    options.Conventions.AuthorizePage("/Tareas/Asignar", "OnlyJefe");
+    options.Conventions.AllowAnonymousToPage("/Login/Login");
+    options.Conventions.AllowAnonymousToPage("/AccessDenied");
+    options.Conventions.AllowAnonymousToPage("/Error");
+    options.Conventions.AllowAnonymousToPage("/Privacy");
+    options.Conventions.AllowAnonymousToPage("/Logout");
 });
 
 var app = builder.Build();
-
 
 if (!app.Environment.IsDevelopment())
 {
@@ -80,6 +88,15 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+  await next();
+    if (context.Response.StatusCode == 403)
+    {
+        context.Response.Redirect("/AccessDenied");
+    }
+});
 
 app.MapRazorPages();
 

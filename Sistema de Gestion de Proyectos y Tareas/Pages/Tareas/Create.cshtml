@@ -113,6 +113,14 @@
                 </select>
                 <span asp-validation-for="Tarea.IdProyecto" class="text-danger"></span>
             </div>
+      
+            <!-- Estado oculto, siempre "SinIniciar" -->
+          <input type="hidden" asp-for="Tarea.Status" value="SinIniciar" />
+            
+          <div class="alert alert-info">
+            <strong>Nota:</strong> La tarea se creara con estado "Sin Iniciar" por defecto.
+          </div>
+        
             <div class="mt-4">
                 <button type="submit" class="btn btn-volcanic-primary">Guardar Tarea</button>
                 <a asp-page="Index" class="btn btn-volcanic-secondary ms-2">Cancelar</a>

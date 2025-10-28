@@ -69,10 +69,8 @@ namespace ServiceProyecto.Infrastructure.Persistence.Repositories
         {
             using var connection = _connectionSignleton.CreateConnection();
 
-            // --- CONSULTA CORREGIDA Y EXPLÍCITA ---
             var sql = @"
         SELECT 
-            -- Seleccionamos explícitamente las columnas de Proyecto con alias
             p.id_proyecto AS Id, 
             p.nombre, 
             p.descripcion, 
@@ -80,7 +78,6 @@ namespace ServiceProyecto.Infrastructure.Persistence.Repositories
             p.fecha_fin AS FechaFin, 
             p.estado,
             
-            -- Seleccionamos explícitamente las columnas de Tarea con alias
             t.id_tarea AS Id, 
             t.titulo, 
             t.descripcion, 
@@ -120,7 +117,6 @@ namespace ServiceProyecto.Infrastructure.Persistence.Repositories
 
         public IEnumerable<Proyecto> GetProjectsByAssignedUserId(int idUsuario)
         {
-            // Devuelve proyectos distintos que tienen al menos una tarea asignada al usuario
             string query = @"SELECT DISTINCT p.id_proyecto AS Id, p.nombre, p.descripcion, p.fecha_inicio AS FechaInicio, p.fecha_fin AS FechaFin, p.estado
                              FROM Proyecto p
                              INNER JOIN Tareas t ON p.id_proyecto = t.id_proyecto

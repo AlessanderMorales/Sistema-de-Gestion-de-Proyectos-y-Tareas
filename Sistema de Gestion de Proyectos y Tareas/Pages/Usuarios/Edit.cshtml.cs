@@ -5,6 +5,8 @@ using ServiceUsuario.Application.Service;
 using ServiceUsuario.Domain.Entities;
 using ServiceCommon.Domain.Common;
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
@@ -16,64 +18,73 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 
         [BindProperty]
         public Usuario Usuario { get; set; } = default!;
+   
         public EditModel(UsuarioService usuarioService)
         {
-            _usuarioService = usuarioService;
+    _usuarioService = usuarioService;
         }
 
-        public IActionResult OnGet(int? id)
+  public IActionResult OnGet(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+     if (id == null)
+    {
+ return NotFound();
+         }
+          
             var usuario = _usuarioService.ObtenerUsuarioPorId(id.Value);
 
-            if (usuario == null)
-            {
-                return NotFound();
-            }
+          if (usuario == null)
+ {
+          return NotFound();
+   }
 
-            // No permitir editar a otro SuperAdmin
-            if (!string.IsNullOrWhiteSpace(usuario.Rol) &&
-                usuario.Rol.Equals(Roles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
-            {
-                TempData["ErrorMessage"] = "No puedes modificar a otro administrador.";
-                return RedirectToPage("./Index");
+      if (!string.IsNullOrWhiteSpace(usuario.Rol) &&
+    usuario.Rol.Equals(Roles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
+       {
+ TempData["ErrorMessage"] = "No puedes modificar a otro administrador.";
+           return RedirectToPage("./Index");
             }
 
             Usuario = usuario;
-            return Page();
+          return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+          var validationContext = new ValidationContext(Usuario, serviceProvider: null, items: null);
+      var validationResults = Usuario.Validate(validationContext).ToList();
+     
+            foreach (var validationResult in validationResults)
+    {
+       foreach (var memberName in validationResult.MemberNames)
+      {
+         ModelState.AddModelError($"Usuario.{memberName}", validationResult.ErrorMessage ?? "Error de validación");
+        }
+            }
+
             if (!ModelState.IsValid)
             {
-                return Page();
-            }
+    return Page();
+     }
 
-            // Recuperar usuario actual a actualizar (por si el rol se envía mal)
-            var existing = _usuarioService.ObtenerUsuarioPorId(Usuario.Id);
-            if (existing == null)
+    var existing = _usuarioService.ObtenerUsuarioPorId(Usuario.Id);
+     if (existing == null)
             {
-                TempData["ErrorMessage"] = "Usuario no encontrado.";
-                return RedirectToPage("./Index");
-            }
+     TempData["ErrorMessage"] = "Usuario no encontrado.";
+    return RedirectToPage("./Index");
+ }
 
             if (!string.IsNullOrWhiteSpace(existing.Rol) &&
-                existing.Rol.Equals(Roles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
-            {
-                TempData["ErrorMessage"] = "No puedes modificar a otro administrador.";
-                return RedirectToPage("./Index");
-            }
+          existing.Rol.Equals(Roles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
+     {
+           TempData["ErrorMessage"] = "No puedes modificar a otro administrador.";
+        return RedirectToPage("./Index");
+  }
 
-            // Normal update
-            _usuarioService.ActualizarUsuario(Usuario);
+      _usuarioService.ActualizarUsuario(Usuario);
 
-            // Mensaje de éxito — será mostrado como modal por el layout
-            TempData["SuccessMessage"] = "Usuario actualizado correctamente.";
-            return RedirectToPage("./Index");
+        TempData["SuccessMessage"] = "Usuario actualizado correctamente.";
+      return RedirectToPage("./Index");
         }
     }
 }

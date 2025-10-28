@@ -63,8 +63,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     @"\bdelete\s+from\b",
                     @"\bupdate\s+\w+\s+set\b",
                     @"\bexec\s*\(",
+                    @"\bxp_cmdshell\b",
+                    @"\bbenchmark\s*\(",
+                    @"\bwaitfor\s+delay\b",
                     @"(['""]\s*or\s+['""]?1['""]?\s*=\s*['""]?1['""]?)",
-                    @"\bor\s+1\s*=\s*1\b"
+                    @"\bor\s+1\s*=\s*1\b",
+                    @"\bselect\s+.*\s+from\b",
+                    @"\balter\s+table\b"
                 };
 
                 foreach (var p in sqlPatterns)
@@ -78,7 +83,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     @"<\s*script\b",
                     @"<\s*iframe\b",
                     @"javascript\s*:",
-                    @"on\w+\s*="
+                    @"on\w+\s*=",
+                    @"<\s*object\b",
+                    @"<\s*embed\b"
                 };
 
                 foreach (var p in xssPatterns)

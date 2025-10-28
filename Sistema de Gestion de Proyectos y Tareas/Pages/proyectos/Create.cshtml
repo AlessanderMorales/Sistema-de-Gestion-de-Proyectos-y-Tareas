@@ -91,7 +91,7 @@
         <form method="post">
             <div class="mb-3">
                 <label asp-for="Proyecto.Nombre" class="form-label"></label>
-                <input asp-for="Proyecto.Nombre" class="form-control" placeholder="Ej: Desarrollo de App Móvil" />
+                <input asp-for="Proyecto.Nombre" class="form-control" placeholder="Ej: Desarrollo de App Movil" />
                 <span asp-validation-for="Proyecto.Nombre" class="text-danger"></span>
             </div>
             <div class="mb-3">
@@ -141,10 +141,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (fechaInicio.value && fechaFin.value) {
             if (fin < inicio) {
                 event.preventDefault();
-                errorSpan.textContent = 'La fecha de finalización no puede ser anterior a la fecha de inicio.';
+                errorSpan.textContent = 'La fecha de finalizacion no puede ser anterior a la fecha de inicio.';
             } else if (fin.getTime() === inicio.getTime()) {
                 event.preventDefault();
-                errorSpan.textContent = 'La fecha de finalización no puede ser igual a la fecha de inicio.';
+                errorSpan.textContent = 'La fecha de finalizacion no puede ser igual a la fecha de inicio.';
             }
         }
     });

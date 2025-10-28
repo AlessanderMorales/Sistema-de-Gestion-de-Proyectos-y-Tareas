@@ -99,67 +99,66 @@
 <div class="row">
     <div class="col-md-8 form-container">
         <div class="info-box">
-            <strong>?? Generación Automática</strong>
+       <strong>Generación Automática</strong>
             El nombre de usuario y la contraseña se generarán automáticamente. El usuario recibirá sus credenciales por correo electrónico.
         </div>
         
         <form method="post" id="createUserForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="mb-3">
-                <label asp-for="Usuario.Nombres" class="form-label"></label>
-                <input asp-for="Usuario.Nombres" class="form-control" placeholder="Ej: Juan Carlos" />
-                <small class="text-muted">Puede incluir varios nombres separados por espacio</small>
-                <span asp-validation-for="Usuario.Nombres" class="text-danger"></span>
-            </div>
+          <div class="mb-3">
+      <label asp-for="Usuario.Nombres" class="form-label"></label>
+            <input asp-for="Usuario.Nombres" class="form-control" placeholder="Ej: Juan Carlos" />
+    <small class="text-muted">Puede incluir varios nombres separados por espacio</small>
+  <span asp-validation-for="Usuario.Nombres" class="text-danger"></span>
+   </div>
 
-            <div class="mb-3">
+ <div class="mb-3">
                 <label asp-for="Usuario.PrimerApellido" class="form-label"></label>
-                <input asp-for="Usuario.PrimerApellido" class="form-control" />
-                <span asp-validation-for="Usuario.PrimerApellido" class="text-danger"></span>
+         <input asp-for="Usuario.PrimerApellido" class="form-control" />
+          <span asp-validation-for="Usuario.PrimerApellido" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Usuario.SegundoApellido" class="form-label"></label>
-                <input asp-for="Usuario.SegundoApellido" class="form-control" />
-                <small class="text-muted">Opcional</small>
+     <div class="mb-3">
+   <label asp-for="Usuario.SegundoApellido" class="form-label"></label>
+    <input asp-for="Usuario.SegundoApellido" class="form-control" />
+     <small class="text-muted">Opcional</small>
                 <span asp-validation-for="Usuario.SegundoApellido" class="text-danger"></span>
-            </div>
+     </div>
 
-            <div class="mb-3">
-                <label asp-for="Usuario.Email" class="form-label"></label>
-                <input asp-for="Usuario.Email" class="form-control" type="email" placeholder="usuario@ejemplo.com" />
-                <small class="text-muted">El nombre de usuario se generará automáticamente desde el email</small>
-                <span asp-validation-for="Usuario.Email" class="text-danger"></span>
-            </div>
+      <div class="mb-3">
+             <label asp-for="Usuario.Email" class="form-label"></label>
+      <input asp-for="Usuario.Email" class="form-control" type="email" placeholder="usuario@ejemplo.com" />
+    <small class="text-muted">El nombre de usuario se generará automáticamente desde el email</small>
+       <span asp-validation-for="Usuario.Email" class="text-danger"></span>
+  </div>
 
-            <div class="mb-3">
-                <label asp-for="Usuario.Rol" class="form-label"></label>
-                <select asp-for="Usuario.Rol" class="form-control">
-                    <option value="">-- Seleccione un Rol --</option>
-                    <option value="SuperAdmin">Super Administrador</option>
-                    <option value="JefeDeProyecto">Jefe de Proyecto</option>
-                    <option value="Empleado">Empleado</option>
-                </select>
-                <span asp-validation-for="Usuario.Rol" class="text-danger"></span>
-            </div>
+      <div class="mb-3">
+     <label asp-for="Usuario.Rol" class="form-label"></label>
+           <select asp-for="Usuario.Rol" class="form-control">
+                    <option value="Empleado" selected>Empleado</option>
+<option value="JefeDeProyecto">Jefe de Proyecto</option>
+            <option value="SuperAdmin">Super Administrador</option>
+     </select>
+        <span asp-validation-for="Usuario.Rol" class="text-danger"></span>
+       </div>
 
-            <button type="submit" class="btn btn-volcanic-primary" id="submitBtn">Crear Usuario</button>
-            <a asp-page="Index" class="btn btn-volcanic-secondary">Cancelar</a>
+ <button type="submit" class="btn btn-volcanic-primary" id="submitBtn">Crear Usuario</button>
+      <a asp-page="Index" class="btn btn-volcanic-secondary">Cancelar</a>
         </form>
     </div>
 </div>
 
 @section Scripts {
     @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+ await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     
     <script>
         document.getElementById('createUserForm').addEventListener('submit', function(e) {
             var btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = 'Creando usuario...';
+  btn.disabled = true;
+        btn.textContent = 'Creando usuario...';
         });
     </script>
 }

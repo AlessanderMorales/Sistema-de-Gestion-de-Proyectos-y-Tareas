@@ -147,14 +147,14 @@ namespace ServiceCommon.Application.Services
                             </div>
 
                             <div class='info-box'>
-                                <strong>?? Nota:</strong><br/>
+                                <strong> Nota:</strong><br/>
                                 También puedes iniciar sesión usando tu email: <strong>{email}</strong>
                             </div>
 
                             <div class='warning'>
-                                <strong>?? Importante:</strong><br/>
+                                <strong> Importante:</strong><br/>
                                 • Por seguridad, te recomendamos cambiar tu contraseña después del primer inicio de sesión.<br/>
-                                • Ve a: <strong>?? Configuración ? Cambiar Contraseña</strong><br/>
+                                • Ve a: <strong>Configuración Cambiar Contraseña</strong><br/>
                                 • Nunca compartas tus credenciales con nadie.
                             </div>
 

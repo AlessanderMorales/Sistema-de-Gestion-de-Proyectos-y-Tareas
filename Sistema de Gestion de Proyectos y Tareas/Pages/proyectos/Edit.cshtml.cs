@@ -13,6 +13,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 
         [BindProperty]
         public Proyecto Proyecto { get; set; } = default!;
+        
         public EditModel(ProyectoService proyectoService)
         {
             _proyectoService = proyectoService;
@@ -24,15 +25,17 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             {
                 return NotFound();
             }
+            
             var proyecto = _proyectoService.ObtenerProyectoPorId(id.Value);
 
             if (proyecto == null)
             {
                 return NotFound();
             }
+            
             Proyecto = proyecto;
             return Page();
-        }
+         }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -40,6 +43,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             {
                 return Page();
             }
+            
             _proyectoService.ActualizarProyecto(Proyecto);
 
             TempData["SuccessMessage"] = "Proyecto actualizado correctamente.";

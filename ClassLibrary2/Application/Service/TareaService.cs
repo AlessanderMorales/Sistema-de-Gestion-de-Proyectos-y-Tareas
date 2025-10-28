@@ -3,6 +3,7 @@ using System.Linq;
 using ServiceCommon.Domain.Port;
 using ServiceCommon.Infrastructure.Persistence.Data;
 using ServiceTarea.Domain.Entities;
+using ServiceTarea.Infrastructure.Persistence.Repositories;
 
 namespace ServiceTarea.Application.Service
 {
@@ -10,11 +11,13 @@ namespace ServiceTarea.Application.Service
     {
         private readonly MySqlRepositoryFactory<Tarea> _tareaFactory;
         private readonly IComentarioManager _comentarioManager;
+        private readonly MySqlConnectionSingleton _connectionSingleton;
 
-        public TareaService(MySqlRepositoryFactory<Tarea> tareaFactory, IComentarioManager comentarioManager)
+        public TareaService(MySqlRepositoryFactory<Tarea> tareaFactory, IComentarioManager comentarioManager, MySqlConnectionSingleton connectionSingleton)
         {
             _tareaFactory = tareaFactory;
             _comentarioManager = comentarioManager;
+            _connectionSingleton = connectionSingleton;
         }
 
         public IEnumerable<Tarea> ObtenerTodasLasTareas()
@@ -59,7 +62,6 @@ namespace ServiceTarea.Application.Service
             var repo = _tareaFactory.CreateRepository();
             repo.DeleteAsync(tarea);
 
-            // 🔹 Desactivar comentarios asociados a esta tarea
             _comentarioManager.DesactivarPorTareaId(tarea.Id);
         }
 
@@ -71,7 +73,29 @@ namespace ServiceTarea.Application.Service
             {
                 tarea.IdUsuarioAsignado = idUsuario;
                 repo.UpdateAsync(tarea);
+
+                // También agregar a la tabla Tarea_Usuario
+                var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
+                tareaUsuarioRepo.AsignarUsuario(idTarea, idUsuario);
             }
+        }
+
+        /// <summary>
+        /// Asignar múltiples usuarios a una tarea
+        /// </summary>
+        public void AsignarMultiplesUsuarios(int idTarea, List<int> idsUsuarios)
+        {
+            var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
+            tareaUsuarioRepo.ReemplazarUsuarios(idTarea, idsUsuarios);
+        }
+
+        /// <summary>
+        /// Obtener IDs de usuarios asignados a una tarea
+        /// </summary>
+        public IEnumerable<int> ObtenerIdsUsuariosAsignados(int idTarea)
+        {
+            var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
+            return tareaUsuarioRepo.GetUsuariosIdsByTareaId(idTarea);
         }
     }
 }

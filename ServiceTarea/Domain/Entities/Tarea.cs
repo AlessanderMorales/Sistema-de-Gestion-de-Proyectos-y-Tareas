@@ -1,6 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
 {
@@ -31,6 +32,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
         public int? IdUsuarioAsignado { get; set; }
         public string Status { get; set; } = "SinIniciar";
 
+        public string? ProyectoNombre { get; set; }
+        public string? UsuarioAsignadoNombre { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             string pattern = @"^(?! )[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+)*$";
@@ -60,6 +64,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     yield return new ValidationResult("La prioridad no debe empezar con espacios.", new[] { nameof(Prioridad) });
             }
 
+            // ✅ Validación contra SQL Injection y XSS
             bool ContainsInjection(string input)
             {
                 if (string.IsNullOrEmpty(input)) return false;
@@ -75,8 +80,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     @"\bdelete\s+from\b",
                     @"\bupdate\s+\w+\s+set\b",
                     @"\bexec\s*\(",
+                    @"\bxp_cmdshell\b",
+                    @"\bbenchmark\s*\(",
+                    @"\bwaitfor\s+delay\b",
                     @"(['""]\s*or\s+['""]?1['""]?\s*=\s*['""]?1['""]?)",
-                    @"\bor\s+1\s*=\s*1\b"
+                    @"\bor\s+1\s*=\s*1\b",
+                    @"\bselect\s+.*\s+from\b",
+                    @"\balter\s+table\b"
                 };
 
                 foreach (var p in sqlPatterns)
@@ -90,7 +100,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Domain.Entities
                     @"<\s*script\b",
                     @"<\s*iframe\b",
                     @"javascript\s*:",
-                    @"on\w+\s*="
+                    @"on\w+\s*=",
+                    @"<\s*object\b",
+                    @"<\s*embed\b"
                 };
 
                 foreach (var p in xssPatterns)

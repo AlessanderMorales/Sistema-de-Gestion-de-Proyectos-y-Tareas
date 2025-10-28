@@ -3,6 +3,7 @@ using ServiceCommon.Domain.Port.Repositories;
 using ServiceCommon.Infrastructure.Persistence.Data;
 using ServiceComentario.Domain.Entities;
 using ServiceUsuario.Domain.Entities;
+using ServiceTarea.Domain.Entities;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,9 +33,13 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                     u.primer_apellido AS Usuario_PrimerApellido,
                     u.segundo_apellido AS Usuario_SegundoApellido,
                     u.email AS Usuario_Email,
-                    u.rol AS Usuario_Rol
+                    u.rol AS Usuario_Rol,
+                    t.id_tarea AS Tarea_Id,
+                    t.titulo AS Tarea_Titulo,
+                    t.id_proyecto AS Tarea_IdProyecto
                 FROM Comentario c
                 LEFT JOIN Usuario u ON c.id_usuario = u.id_usuario
+                LEFT JOIN Tareas t ON c.id_tarea = t.id_tarea
                 WHERE c.estado = 1;";
 
             using var connection = _connectionSingleton.CreateConnection();
@@ -58,6 +63,14 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                         Email = r.Usuario_Email,
                         Rol = r.Usuario_Rol
                     }
+                    : null,
+                Tarea = r.Tarea_Id != null
+                    ? new Tarea
+                    {
+                        Id = r.Tarea_Id,
+                        Titulo = r.Tarea_Titulo,
+                        IdProyecto = r.Tarea_IdProyecto
+                    }
                     : null
             }).ToList();
 
@@ -79,9 +92,13 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                     u.primer_apellido AS Usuario_PrimerApellido,
                     u.segundo_apellido AS Usuario_SegundoApellido,
                     u.email AS Usuario_Email,
-                    u.rol AS Usuario_Rol
+                    u.rol AS Usuario_Rol,
+                    t.id_tarea AS Tarea_Id,
+                    t.titulo AS Tarea_Titulo,
+                    t.id_proyecto AS Tarea_IdProyecto
                 FROM Comentario c
                 LEFT JOIN Usuario u ON c.id_usuario = u.id_usuario
+                LEFT JOIN Tareas t ON c.id_tarea = t.id_tarea
                 WHERE c.id_comentario = @Id;";
 
             using var connection = _connectionSingleton.CreateConnection();
@@ -105,6 +122,14 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                         SegundoApellido = r.Usuario_SegundoApellido,
                         Email = r.Usuario_Email,
                         Rol = r.Usuario_Rol
+                    }
+                    : null,
+                Tarea = r.Tarea_Id != null
+                    ? new Tarea
+                    {
+                        Id = r.Tarea_Id,
+                        Titulo = r.Tarea_Titulo,
+                        IdProyecto = r.Tarea_IdProyecto
                     }
                     : null
             };
@@ -152,14 +177,66 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
 
         public void DeactivateByProjectId(int idProyecto)
         {
-            // En este caso, los comentarios no se desactivan directamente por proyecto.
+
         }
 
-        public IEnumerable<Comentario> GetAllWhere(string whereClause, object parameters = null)
+        public IEnumerable<Comentario> GetByTareaId(int idTarea)
         {
-            string query = $"SELECT * FROM Comentario WHERE {whereClause};";
+            string query = @"
+                SELECT 
+                    c.id_comentario AS Id, 
+                    c.contenido AS Contenido, 
+                    c.fecha AS Fecha, 
+                    c.estado AS Estado, 
+                    c.id_tarea AS IdTarea, 
+                    c.id_usuario AS IdUsuario,
+                    u.id_usuario AS Usuario_Id, 
+                    u.nombres AS Usuario_Nombres, 
+                    u.primer_apellido AS Usuario_PrimerApellido,
+                    u.segundo_apellido AS Usuario_SegundoApellido,
+                    u.email AS Usuario_Email,
+                    u.rol AS Usuario_Rol,
+                    t.id_tarea AS Tarea_Id,
+                    t.titulo AS Tarea_Titulo,
+                    t.id_proyecto AS Tarea_IdProyecto
+                FROM Comentario c
+                LEFT JOIN Usuario u ON c.id_usuario = u.id_usuario
+                LEFT JOIN Tareas t ON c.id_tarea = t.id_tarea
+                WHERE c.id_tarea = @IdTarea AND c.estado = 1;";
+
             using var connection = _connectionSingleton.CreateConnection();
-            return connection.Query<Comentario>(query, parameters);
+            var rows = connection.Query<dynamic>(query, new { IdTarea = idTarea }).ToList();
+
+            var comentarios = rows.Select(r => new Comentario
+            {
+                Id = r.Id,
+                Contenido = r.Contenido,
+                Fecha = r.Fecha,
+                Estado = r.Estado,
+                IdTarea = r.IdTarea,
+                IdUsuario = r.IdUsuario,
+                Usuario = r.Usuario_Id != null
+                    ? new Usuario
+                    {
+                        Id = r.Usuario_Id,
+                        Nombres = r.Usuario_Nombres,
+                        PrimerApellido = r.Usuario_PrimerApellido,
+                        SegundoApellido = r.Usuario_SegundoApellido,
+                        Email = r.Usuario_Email,
+                        Rol = r.Usuario_Rol
+                    }
+                    : null,
+                Tarea = r.Tarea_Id != null
+                    ? new Tarea
+                    {
+                        Id = r.Tarea_Id,
+                        Titulo = r.Tarea_Titulo,
+                        IdProyecto = r.Tarea_IdProyecto
+                    }
+                    : null
+            }).ToList();
+
+            return comentarios;
         }
     }
 }

@@ -30,13 +30,14 @@ namespace ServiceTarea.Infrastructure.Persistence.Repositories
                     t.id_proyecto AS IdProyecto,
                     t.id_usuario_asignado AS IdUsuarioAsignado,
                     t.status AS Status,
-                    p.nombre AS ProyectoNombre
+                    p.nombre AS ProyectoNombre,
+                    CONCAT(u.nombres, ' ', u.primer_apellido) AS UsuarioAsignadoNombre
                 FROM Tareas t
                 LEFT JOIN Proyecto p ON t.id_proyecto = p.id_proyecto
+                LEFT JOIN Usuario u ON t.id_usuario_asignado = u.id_usuario
                 WHERE t.estado = 1
                 ORDER BY t.id_tarea DESC;";
 
-            // Dapper mapeará ProyectoNombre automáticamente
             var tareas = connection.Query<Tarea>(query).ToList();
             return tareas;
         }
@@ -46,7 +47,7 @@ namespace ServiceTarea.Infrastructure.Persistence.Repositories
             using var connection = _connectionSingleton.CreateConnection();
 
             string query = @"
-                SELECT 
+                SELECT DISTINCT
                     t.id_tarea AS Id, 
                     t.titulo AS Titulo, 
                     t.descripcion AS Descripcion, 
@@ -55,10 +56,13 @@ namespace ServiceTarea.Infrastructure.Persistence.Repositories
                     t.id_proyecto AS IdProyecto,
                     t.id_usuario_asignado AS IdUsuarioAsignado,
                     t.status AS Status,
-                    p.nombre AS ProyectoNombre
+                    p.nombre AS ProyectoNombre,
+                    CONCAT(u.nombres, ' ', u.primer_apellido) AS UsuarioAsignadoNombre
                 FROM Tareas t
+                INNER JOIN Tarea_Usuario tu ON t.id_tarea = tu.id_tarea
                 LEFT JOIN Proyecto p ON t.id_proyecto = p.id_proyecto
-                WHERE t.estado = 1 AND t.id_usuario_asignado = @UsuarioId
+                LEFT JOIN Usuario u ON t.id_usuario_asignado = u.id_usuario
+                WHERE t.estado = 1 AND tu.id_usuario = @UsuarioId AND tu.estado = 1
                 ORDER BY t.id_tarea DESC;";
 
             var tareas = connection.Query<Tarea>(query, new { UsuarioId = idUsuario }).ToList();
@@ -77,9 +81,11 @@ namespace ServiceTarea.Infrastructure.Persistence.Repositories
                     t.id_proyecto AS IdProyecto,
                     t.id_usuario_asignado AS IdUsuarioAsignado,
                     t.status AS Status,
-                    p.nombre AS ProyectoNombre
+                    p.nombre AS ProyectoNombre,
+                    CONCAT(u.nombres, ' ', u.primer_apellido) AS UsuarioAsignadoNombre
                 FROM Tareas t
                 LEFT JOIN Proyecto p ON t.id_proyecto = p.id_proyecto
+                LEFT JOIN Usuario u ON t.id_usuario_asignado = u.id_usuario
                 WHERE t.id_tarea = @Id AND t.estado = 1;";
 
             return _connectionSingleton.QueryFirstOrDefault<Tarea>(query, new { Id = id });

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 {
+    [AllowAnonymous]
     public class PrivacyModel : PageModel
     {
         private readonly ILogger<PrivacyModel> _logger;
@@ -16,5 +18,4 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
         {
         }
     }
-
 }

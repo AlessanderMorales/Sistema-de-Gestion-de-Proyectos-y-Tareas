@@ -10,13 +10,29 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
     public class CreateModel : PageModel
     {
         private readonly ProyectoService _proyectoService;
+        
         [BindProperty]
         public Proyecto Proyecto { get; set; } = new();
+
+        [TempData]
+        public string? MensajeExito { get; set; }
+
+        [TempData]
+        public string? MensajeError { get; set; }
+      
         public CreateModel(ProyectoService proyectoService)
         {
             _proyectoService = proyectoService;
         }
-        public void OnGet() { }
+     
+        public void OnGet()
+        {
+            Proyecto = new Proyecto
+            {
+                FechaInicio = DateTime.Today,
+                FechaFin = DateTime.Today
+            };
+        }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -24,9 +40,19 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             {
                 return Page();
             }
-            _proyectoService.CrearNuevoProyecto(Proyecto);
 
-            return RedirectToPage("./Index");
+            try
+            {
+                _proyectoService.CrearNuevoProyecto(Proyecto);
+
+                TempData["SuccessMessage"] = "Proyecto creado exitosamente.";
+                return RedirectToPage("./Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al crear el proyecto: {ex.Message}";
+                return RedirectToPage("./Index");
+            }
         }
     }
 }

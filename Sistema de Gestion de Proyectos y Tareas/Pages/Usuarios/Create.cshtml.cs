@@ -5,6 +5,7 @@ using ServiceUsuario.Application.Service;
 using ServiceUsuario.Domain.Entities;
 using ServiceCommon.Application.Services;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,11 +18,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
         private readonly EmailService _emailService;
 
         [BindProperty]
-        public Usuario Usuario { get; set; } = new();
-        
+        public Usuario Usuario { get; set; } = new Usuario { Rol = "Empleado" };
+
         [TempData]
         public string? MensajeExito { get; set; }
-        
+
         [TempData]
         public string? MensajeError { get; set; }
 
@@ -31,19 +32,32 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
             _emailService = emailService;
         }
 
-        public void OnGet() { }
+        public void OnGet()
+        {
+            Usuario = new Usuario { Rol = "Empleado" };
+        }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Remover la validación de contraseña del ModelState ya que se generará automáticamente
             ModelState.Remove("Usuario.Contraseña");
             ModelState.Remove("Usuario.NombreUsuario");
-            
+
+            var validationContext = new ValidationContext(Usuario, serviceProvider: null, items: null);
+            var validationResults = Usuario.Validate(validationContext).ToList();
+
+            foreach (var validationResult in validationResults)
+            {
+                foreach (var memberName in validationResult.MemberNames)
+                {
+                    ModelState.AddModelError($"Usuario.{memberName}", validationResult.ErrorMessage ?? "Error de validacion");
+                }
+            }
+
             if (_usuarioService.EmailYaExiste(Usuario.Email))
             {
-                ModelState.AddModelError("Usuario.Email", "Este correo electrónico ya está registrado.");
+                ModelState.AddModelError("Usuario.Email", "Este correo electronico ya esta registrado.");
             }
-            
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -51,44 +65,52 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 
             try
             {
-                // La contraseña y nombre de usuario se generan automáticamente en el servicio
-                string contraseñaGenerada = _usuarioService.CrearNuevoUsuario(Usuario);
+                string nombreCompleto = !string.IsNullOrEmpty(Usuario.SegundoApellido)
+                    ? $"{Usuario.Nombres} {Usuario.PrimerApellido} {Usuario.SegundoApellido}"
+                    : $"{Usuario.Nombres} {Usuario.PrimerApellido}";
 
-                // Obtener el usuario recién creado para acceder a su nombre de usuario generado
-                var usuarioCreado = _usuarioService.ObtenerTodosLosUsuarios()
-                    .FirstOrDefault(u => u.Email.Equals(Usuario.Email, StringComparison.OrdinalIgnoreCase));
+                string contrasenaGenerada = null;
 
-                if (usuarioCreado != null)
+                try
                 {
-                    // Enviar email con las credenciales
-                    string nombreCompleto = !string.IsNullOrEmpty(usuarioCreado.SegundoApellido)
-                        ? $"{usuarioCreado.Nombres} {usuarioCreado.PrimerApellido} {usuarioCreado.SegundoApellido}"
-                        : $"{usuarioCreado.Nombres} {usuarioCreado.PrimerApellido}";
+                    contrasenaGenerada = _usuarioService.CrearNuevoUsuario(Usuario);
+
+                    var usuarioCreado = _usuarioService.ObtenerTodosLosUsuarios()
+                        .FirstOrDefault(u => u.Email.Equals(Usuario.Email, StringComparison.OrdinalIgnoreCase));
+
+                    if (usuarioCreado == null)
+                    {
+                        MensajeError = "Error al crear el usuario. Intente nuevamente.";
+                        return RedirectToPage("./Index");
+                    }
 
                     bool emailEnviado = await _emailService.EnviarEmailContraseña(
-                        usuarioCreado.Email, 
+                        usuarioCreado.Email,
                         nombreCompleto,
-                        usuarioCreado.NombreUsuario,  // Ahora se envía el nombre de usuario
-                        contraseñaGenerada
+                        usuarioCreado.NombreUsuario,
+                        contrasenaGenerada
                     );
 
-                    if (emailEnviado)
+                    if (!emailEnviado)
                     {
-                        MensajeExito = $"Usuario creado exitosamente. Se ha enviado un correo a {usuarioCreado.Email} con las credenciales de acceso.";
+                        _usuarioService.EliminarUsuario(usuarioCreado.Id);
+
+                        MensajeError = "ERROR: No se envio el correo con las credenciales. El usuario NO fue creado. Revisa la configuracion del correo e intenta nuevamente.";
+                        return RedirectToPage("./Index");
                     }
-                    else
-                    {
-                        MensajeError = $"Usuario creado, pero hubo un error al enviar el correo. Usuario: {usuarioCreado.NombreUsuario} | Contraseña: {contraseñaGenerada}";
-                    }
+
+                    MensajeExito = $"Usuario creado exitosamente. Se envio un correo a {usuarioCreado.Email} con las credenciales de acceso.";
                 }
-                else
+                catch (Exception ex)
                 {
-                    MensajeError = "Usuario creado pero no se pudo recuperar la información para enviar el email.";
+                    MensajeError = $"Error al crear el usuario: {ex.Message}";
+                    return RedirectToPage("./Index");
                 }
             }
             catch (Exception ex)
             {
-                MensajeError = $"Error al crear el usuario: {ex.Message}";
+                MensajeError = $"Error inesperado: {ex.Message}";
+                return RedirectToPage("./Index");
             }
 
             return RedirectToPage("./Index");
