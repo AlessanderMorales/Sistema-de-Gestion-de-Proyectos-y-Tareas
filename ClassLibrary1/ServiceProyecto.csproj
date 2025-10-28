@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="itext7" Version="9.3.0" />
+	  <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.3.0" />
+	  <PackageReference Include="itext7.commons" Version="9.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\ClassLibrary2\ServiceTarea.csproj" />
 	  <ProjectReference Include="..\ServiceCommon\ServiceCommon.csproj" />
 	</ItemGroup>
