@@ -75,15 +75,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
             DirigidoAUsuarioId = JefeProyectoId;
 
             // ============================================
-            // NUEVA LÓGICA: Construir mapa de Tarea ? Usuarios asignados
+            // CORREGIDO: Construir mapa usando Tarea_Usuario
             // ============================================
             TareaUsuariosMap = new Dictionary<int, List<Usuario>>();
 
             if (User.IsInRole("Empleado"))
             {
                 // Para empleados: construir mapa de usuarios que comparten tareas
-                var todasLasTareas = _tareaService.ObtenerTodasLasTareas().ToList();
-
                 foreach (var tarea in Tareas)
                 {
                     var usuariosEnTarea = new List<Usuario>();
@@ -94,26 +92,18 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
                         usuariosEnTarea.Add(JefeProyecto);
                     }
 
-                    // Incluir SOLO usuarios que tengan asignada la misma tarea
-                    // (excluyendo el usuario actual y el SuperAdmin)
-                    foreach (var usuario in todosLosUsuarios)
-                    {
-                        if (usuario.Id != UsuarioActualId &&
-                            usuario.Rol != "SuperAdmin" &&
-                            usuario.Id != JefeProyectoId)
-                        {
-                            // Verificar si este usuario tiene asignada esta tarea específica
-                            var tareaDelUsuario = todasLasTareas.FirstOrDefault(t =>
-                                t.Id == tarea.Id &&
-                                t.IdUsuarioAsignado.HasValue &&
-                                t.IdUsuarioAsignado.Value == usuario.Id);
+                    // Obtener IDs de usuarios asignados a esta tarea desde Tarea_Usuario
+                    var idsUsuariosEnTarea = _tareaService.ObtenerIdsUsuariosAsignados(tarea.Id).ToList();
 
-                            if (tareaDelUsuario != null)
-                            {
-                                usuariosEnTarea.Add(usuario);
-                            }
-                        }
-                    }
+                    // Filtrar usuarios: excluir el usuario actual y SuperAdmin
+                    var usuariosAsignados = todosLosUsuarios
+                        .Where(u => idsUsuariosEnTarea.Contains(u.Id) &&
+                                    u.Id != UsuarioActualId &&
+                                    u.Rol != "SuperAdmin" &&
+                                    u.Id != JefeProyectoId)
+                        .ToList();
+
+                    usuariosEnTarea.AddRange(usuariosAsignados);
 
                     TareaUsuariosMap[tarea.Id] = usuariosEnTarea;
                 }
@@ -184,7 +174,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
             // ============================================
             
             // Los comentarios son simplemente mensajes entre usuarios sobre una tarea
-            // NO modifican quién tiene asignada la tarea
+            // NO modifican quién tiene  asignada la tarea
             
             // El campo "DirigidoAUsuarioId" es solo informativo:
             // - Indica a quién va dirigido el mensaje

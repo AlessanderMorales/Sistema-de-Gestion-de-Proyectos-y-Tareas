@@ -75,11 +75,14 @@ transition: all 0.3s ease;
     <dd class="col-sm-9 col-md-10">@($"{Model.Comentario.Usuario.Nombres} {Model.Comentario.Usuario.PrimerApellido}")</dd>
           }
 
-   @if (Model.Comentario.Tarea != null && !string.IsNullOrEmpty(Model.Comentario.Tarea.UsuarioAsignadoNombre))
-       {
-  <dt class="col-sm-3 col-md-2">Dirigido a</dt>
-<dd class="col-sm-9 col-md-10"><span class="text-warning">@Model.Comentario.Tarea.UsuarioAsignadoNombre</span></dd>
-   }
+@* Solo el Jefe ve a quién está dirigido *@
+@if ((User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin")) && 
+     Model.Comentario.Tarea != null && !string.IsNullOrEmpty(Model.Comentario.Tarea.UsuarioAsignadoNombre))
+{
+    <dt class="col-sm-3 col-md-2">Dirigido a</dt>
+    <dd class="col-sm-9 col-md-10"><span class="text-warning">@Model.Comentario.Tarea.UsuarioAsignadoNombre</span></dd>
+}
+
         </dl>
     </div>
 

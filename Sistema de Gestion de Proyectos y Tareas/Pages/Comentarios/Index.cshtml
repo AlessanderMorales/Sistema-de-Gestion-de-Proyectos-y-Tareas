@@ -143,49 +143,59 @@ color: white;
 <table class="table table-volcanic">
   <thead>
    <tr>
-      <th>Contenido</th>
-       <th>Fecha</th>
-         <th>Proyecto</th>
-  <th>Tarea</th>
+            <th>Contenido</th>
+  <th>Fecha</th>
+  <th>Proyecto</th>
+            <th>Tarea</th>
   <th>Autor</th>
- <th>Dirigido a</th>
-    <th class="text-center">Acciones</th>
+      @* Solo el Jefe ve la columna "Dirigido a" *@
+          @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
+   {
+          <th>Dirigido a</th>
+     }
+            <th class="text-center">Acciones</th>
         </tr>
     </thead>
     <tbody>
      @foreach (var c in Model.Comentarios)
-      {
+        {
          <tr>
-      <td>@c.Contenido</td>
+                <td>@c.Contenido</td>
       <td>@c.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
-    <td>@(c.Tarea != null && !string.IsNullOrEmpty(c.Tarea.ProyectoNombre) ? c.Tarea.ProyectoNombre : "-")</td>
-    <td>@(c.Tarea != null ? c.Tarea.Titulo : "-")</td>
-    <td>@(c.Usuario != null ? $"{c.Usuario.Nombres} {c.Usuario.PrimerApellido}" : "-")</td>
- <td>
-           @if (c.Tarea != null && !string.IsNullOrEmpty(c.Tarea.UsuarioAsignadoNombre))
-     {
-       <span class="text-warning">@c.Tarea.UsuarioAsignadoNombre</span>
-     }
-       else
+                <td>@(c.Tarea != null && !string.IsNullOrEmpty(c.Tarea.ProyectoNombre) ? c.Tarea.ProyectoNombre : "-")</td>
+<td>@(c.Tarea != null ? c.Tarea.Titulo : "-")</td>
+<td>@(c.Usuario != null ? $"{c.Usuario.Nombres} {c.Usuario.PrimerApellido}" : "-")</td>
+       
+            @* Solo el Jefe ve a quién está dirigido *@
+      @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
          {
-        <span class="text-muted">Sin asignar</span>
- }
-        </td>
-  <td class="text-center">
-     <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-sm btn-view">Ver</a>
-
- @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
-  {
-         <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-edit">Editar</a>
-          <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" style="display:inline;">
-  <button type="submit" class="btn btn-sm btn-delete"
-        onclick="return confirm('Deseas desactivar este comentario?');">
-Eliminar
-    </button>
-</form>
+      <td>
+       @if (c.Tarea != null && !string.IsNullOrEmpty(c.Tarea.UsuarioAsignadoNombre))
+         {
+              <span class="text-warning">@c.Tarea.UsuarioAsignadoNombre</span>
+             }
+      else
+             {
+            <span class="text-muted">Sin asignar</span>
      }
-      </td>
-       </tr>
+        </td>
+      }
+  
+  <td class="text-center">
+            <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-sm btn-view">Ver</a>
+
+             @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
+  {
+      <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-edit">Editar</a>
+                <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" style="display:inline;">
+             <button type="submit" class="btn btn-sm btn-delete"
+ onclick="return confirm('¿Deseas desactivar este comentario?');">
+           Eliminar
+         </button>
+   </form>
+   }
+                </td>
+ </tr>
         }
     </tbody>
 </table>
