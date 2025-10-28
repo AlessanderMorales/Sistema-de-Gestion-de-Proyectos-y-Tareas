@@ -74,24 +74,17 @@ namespace ServiceTarea.Application.Service
                 tarea.IdUsuarioAsignado = idUsuario;
                 repo.UpdateAsync(tarea);
 
-                // También agregar a la tabla Tarea_Usuario
                 var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
                 tareaUsuarioRepo.AsignarUsuario(idTarea, idUsuario);
             }
         }
 
-        /// <summary>
-        /// Asignar múltiples usuarios a una tarea
-        /// </summary>
         public void AsignarMultiplesUsuarios(int idTarea, List<int> idsUsuarios)
         {
             var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
             tareaUsuarioRepo.ReemplazarUsuarios(idTarea, idsUsuarios);
         }
 
-        /// <summary>
-        /// Obtener IDs de usuarios asignados a una tarea
-        /// </summary>
         public IEnumerable<int> ObtenerIdsUsuariosAsignados(int idTarea)
         {
             var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);

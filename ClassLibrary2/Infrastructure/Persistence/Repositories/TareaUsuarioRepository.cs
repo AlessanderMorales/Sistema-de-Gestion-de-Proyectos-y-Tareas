@@ -15,9 +15,6 @@ namespace ServiceTarea.Infrastructure.Persistence.Repositories
             _connectionSingleton = connectionSingleton;
         }
 
-        /// <summary>
-        /// Obtener todos los IDs de usuarios asignados a una tarea
-        /// </summary>
         public IEnumerable<int> GetUsuariosIdsByTareaId(int idTarea)
         {
             string query = @"
@@ -30,9 +27,6 @@ namespace ServiceTarea.Infrastructure.Persistence.Repositories
             return connection.Query<int>(query, new { IdTarea = idTarea }).ToList();
         }
 
-        /// <summary>
-        /// Obtener todas las tareas asignadas a un usuario
-        /// </summary>
         public IEnumerable<int> GetTareasIdsByUsuarioId(int idUsuario)
         {
             string query = @"
@@ -44,9 +38,6 @@ namespace ServiceTarea.Infrastructure.Persistence.Repositories
             return connection.Query<int>(query, new { IdUsuario = idUsuario }).ToList();
         }
 
-        /// <summary>
-        /// Asignar un usuario a una tarea
-        /// </summary>
         public void AsignarUsuario(int idTarea, int idUsuario)
         {
             string query = @"
@@ -57,9 +48,6 @@ ON DUPLICATE KEY UPDATE estado = 1, fecha_asignacion = NOW();";
             _connectionSingleton.ExcuteCommand(query, new { IdTarea = idTarea, IdUsuario = idUsuario });
         }
 
-        /// <summary>
-        /// Remover un usuario de una tarea
-        /// </summary>
         public void RemoverUsuario(int idTarea, int idUsuario)
         {
             string query = @"
@@ -70,14 +58,10 @@ ON DUPLICATE KEY UPDATE estado = 1, fecha_asignacion = NOW();";
             _connectionSingleton.ExcuteCommand(query, new { IdTarea = idTarea, IdUsuario = idUsuario });
         }
 
-        /// <summary>
-        /// Reemplazar todos los usuarios asignados a una tarea
-        /// </summary>
         public void ReemplazarUsuarios(int idTarea, List<int> idsUsuarios)
         {
             using var connection = _connectionSingleton.CreateConnection();
             
-  // Asegurarse de que la conexión esté abierta
     if (connection.State != System.Data.ConnectionState.Open)
     {
      connection.Open();
@@ -87,7 +71,6 @@ ON DUPLICATE KEY UPDATE estado = 1, fecha_asignacion = NOW();";
 
     try
     {
-      // Desactivar todas las asignaciones actuales
  string deleteQuery = @"
             UPDATE Tarea_Usuario
   SET estado = 0
@@ -95,7 +78,6 @@ ON DUPLICATE KEY UPDATE estado = 1, fecha_asignacion = NOW();";
      
         connection.Execute(deleteQuery, new { IdTarea = idTarea }, transaction);
 
-        // Insertar/reactivar las nuevas asignaciones
         if (idsUsuarios != null && idsUsuarios.Any())
         {
   string insertQuery = @"
@@ -118,9 +100,6 @@ ON DUPLICATE KEY UPDATE estado = 1, fecha_asignacion = NOW();";
     }
 }
 
-  /// <summary>
-    /// Verificar si un usuario está asignado a una tarea
-   /// </summary>
         public bool UsuarioEstaAsignado(int idTarea, int idUsuario)
      {
       string query = @"
