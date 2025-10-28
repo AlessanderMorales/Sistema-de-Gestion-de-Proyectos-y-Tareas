@@ -35,7 +35,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 
         public IActionResult OnPost(int id)
         {
-            // Prevent Empleado role from deleting projects
             if (User.IsInRole("Empleado"))
             {
                 TempData["ErrorMessage"] = "No estás autorizado para eliminar proyectos.";
@@ -47,14 +46,12 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             {
                 _proyectoService.EliminarProyecto(proyecto);
             }
-            // Some services may also expose direct delete by id
             try
             {
                 _proyectoService.EliminarProyectoPorId(id);
             }
             catch
             {
-                // ignore if method not implemented
             }
 
             TempData["SuccessMessage"] = "Proyecto eliminado correctamente.";

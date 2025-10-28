@@ -28,40 +28,44 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
         }
 
         public IEnumerable<Comentario> Comentarios { get; set; } = new List<Comentario>();
+        public int UsuarioActualId { get; set; } // ? NUEVO: Para identificar enviados vs recibidos
 
         public void OnGet()
         {
+            // ? Obtener ID del usuario actual
+            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(idClaim, out var usuarioId))
+            {
+                UsuarioActualId = usuarioId;
+            }
+
             if (User.IsInRole("Empleado"))
             {
-                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (int.TryParse(idClaim, out var usuarioId))
+                var tareas = _tareaService.ObtenerTareasPorUsuarioAsignado(UsuarioActualId);
+                var comentariosFiltrados = new List<Comentario>();
+                
+                foreach (var tarea in tareas)
                 {
-                    var tareas = _tareaService.ObtenerTareasPorUsuarioAsignado(usuarioId);
-                    var comentariosFiltrados = new List<Comentario>();
-                    
-                    foreach (var tarea in tareas)
+                    var todos = _comentarioService.GetAll();
+                    foreach (var c in todos)
                     {
-                        var todos = _comentarioService.GetAll();
-                        foreach (var c in todos)
+                        if (c.IdTarea == tarea.Id && c.Estado == 1)
                         {
-                            if (c.IdTarea == tarea.Id && c.Estado == 1)
+                            c.Tarea = tarea;
+                            
+                            var proyecto = _proyectoService.ObtenerProyectoPorId(tarea.IdProyecto);
+                            if (proyecto != null && c.Tarea != null)
                             {
-                                c.Tarea = tarea;
-                                
-                                var proyecto = _proyectoService.ObtenerProyectoPorId(tarea.IdProyecto);
-                                if (proyecto != null && c.Tarea != null)
-                                {
-                                    c.Tarea.ProyectoNombre = proyecto.Nombre;
-                                }
-                                
-                                comentariosFiltrados.Add(c);
+                                c.Tarea.ProyectoNombre = proyecto.Nombre;
                             }
+                            
+                            comentariosFiltrados.Add(c);
                         }
                     }
-
-                    Comentarios = comentariosFiltrados;
-                    return;
                 }
+
+                Comentarios = comentariosFiltrados;
+                return;
             }
 
             var todosLosComentarios = _comentarioService.GetAll().ToList();

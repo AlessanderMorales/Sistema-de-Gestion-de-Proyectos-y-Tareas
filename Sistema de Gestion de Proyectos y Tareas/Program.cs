@@ -33,14 +33,17 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole(Roles.SuperAdmin));
 
     options.AddPolicy("OnlyJefeOrEmpleado", policy =>
-        policy.RequireAssertion(ctx => ctx.User.IsInRole(Roles.JefeDeProyecto) || ctx.User.IsInRole(Roles.Empleado)));
+      policy.RequireAssertion(ctx => 
+     ctx.User.IsInRole(Roles.JefeDeProyecto) || 
+            ctx.User.IsInRole(Roles.Empleado) ||
+    ctx.User.IsInRole(Roles.SuperAdmin))); // ✅ Agregar SuperAdmin
 
     options.AddPolicy("OnlyJefe", policy =>
         policy.RequireRole(Roles.JefeDeProyecto));
 
     options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
-     .RequireAuthenticatedUser()
-        .Build();
+    .RequireAuthenticatedUser()
+ .Build();
 });
 
 builder.Services.AddSingleton<MySqlConnectionSingleton>();

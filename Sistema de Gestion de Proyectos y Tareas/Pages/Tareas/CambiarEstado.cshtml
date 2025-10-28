@@ -134,7 +134,6 @@ font-weight: bold;
       <div class="form-group mb-3">
        <label asp-for="NuevoStatus" class="form-label">Nuevo Estado</label>
               <select asp-for="NuevoStatus" class="form-select" asp-items="Model.StatusDisponibles">
-          <option value="">-- Selecciona un estado --</option>
        </select>
        <span asp-validation-for="NuevoStatus" class="text-danger"></span>
       </div>

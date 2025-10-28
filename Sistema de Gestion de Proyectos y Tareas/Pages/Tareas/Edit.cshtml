@@ -103,7 +103,6 @@
             <div class="mb-3">
                 <label asp-for="Tarea.Prioridad" class="form-label"></label>
                 <select asp-for="Tarea.Prioridad" class="form-select">
-                    <option value="">-- Seleccione Prioridad --</option>
                     <option value="Alta">Alta</option>
                     <option value="Media">Media</option>
                     <option value="Baja">Baja</option>
@@ -113,7 +112,6 @@
             <div class="mb-3">
                 <label asp-for="Tarea.IdProyecto" class="form-label">Proyecto</label>
                 <select asp-for="Tarea.IdProyecto" class="form-select" asp-items="Model.ProyectosDisponibles">
-                    <option value="">-- Seleccione un Proyecto --</option>
                 </select>
                 <span asp-validation-for="Tarea.IdProyecto" class="text-danger"></span>
             </div>

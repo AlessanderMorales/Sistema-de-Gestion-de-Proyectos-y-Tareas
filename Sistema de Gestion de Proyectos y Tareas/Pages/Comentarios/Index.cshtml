@@ -128,9 +128,31 @@ color: white;
    background-color: #4a4a50;
     border: none;
      color: white;
-        font-weight: bold;
+    font-weight: bold;
   padding: 10px 20px;
-        border-radius: 8px;
+   border-radius: 8px;
+    }
+
+    /* Estilos para badges de Tipo (Enviado/Recibido) */
+ .badge {
+        font-size: 0.85rem;
+     font-weight: 600;
+  padding: 6px 12px;
+    border-radius: 20px;
+  text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+.badge.bg-info {
+     background: linear-gradient(135deg, #2196F3, #1976D2) !important;
+ color: white;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+    }
+
+    .badge.bg-success {
+   background: linear-gradient(135deg, #4CAF50, #388E3C) !important;
+ color: white;
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
     }
 </style>
 
@@ -143,61 +165,81 @@ color: white;
 <table class="table table-volcanic">
   <thead>
    <tr>
+      @* NUEVO: Columna Tipo solo para empleados *@
+            @if (User.IsInRole("Empleado"))
+   {
+   <th class="text-center">Tipo</th>
+    }
             <th>Contenido</th>
   <th>Fecha</th>
   <th>Proyecto</th>
-            <th>Tarea</th>
+ <th>Tarea</th>
   <th>Autor</th>
       @* Solo el Jefe ve la columna "Dirigido a" *@
-          @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
+  @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
    {
-          <th>Dirigido a</th>
+      <th>Dirigido a</th>
      }
-            <th class="text-center">Acciones</th>
+       <th class="text-center">Acciones</th>
         </tr>
     </thead>
     <tbody>
      @foreach (var c in Model.Comentarios)
         {
-         <tr>
-                <td>@c.Contenido</td>
+  <tr>
+  @* NUEVO: Columna Tipo para empleados *@
+            @if (User.IsInRole("Empleado"))
+         {
+              <td class="text-center">
+ @if (c.IdUsuario == Model.UsuarioActualId)
+   {
+            <span class="badge bg-info">Enviado</span>
+        }
+      else
+             {
+       <span class="badge bg-success">Recibido</span>
+           }
+ </td>
+      }
+
+<td>@c.Contenido</td>
       <td>@c.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@(c.Tarea != null && !string.IsNullOrEmpty(c.Tarea.ProyectoNombre) ? c.Tarea.ProyectoNombre : "-")</td>
+              <td>@(c.Tarea != null && !string.IsNullOrEmpty(c.Tarea.ProyectoNombre) ? c.Tarea.ProyectoNombre : "-")</td>
 <td>@(c.Tarea != null ? c.Tarea.Titulo : "-")</td>
 <td>@(c.Usuario != null ? $"{c.Usuario.Nombres} {c.Usuario.PrimerApellido}" : "-")</td>
-       
-            @* Solo el Jefe ve a quién está dirigido *@
+ 
+      @* Solo el Jefe ve a quién está dirigido *@
       @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
-         {
+       {
       <td>
        @if (c.Tarea != null && !string.IsNullOrEmpty(c.Tarea.UsuarioAsignadoNombre))
-         {
+       {
               <span class="text-warning">@c.Tarea.UsuarioAsignadoNombre</span>
              }
       else
              {
-            <span class="text-muted">Sin asignar</span>
-     }
-        </td>
-      }
+      <span class="text-muted">Sin asignar</span>
+ }
+  </td>
+  }
   
   <td class="text-center">
-            <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-sm btn-view">Ver</a>
+        <a asp-page="Mostrar" asp-route-id="@c.Id" class="btn btn-sm btn-view">Ver</a>
 
-             @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
+          @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
   {
       <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-edit">Editar</a>
-                <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" style="display:inline;">
-             <button type="submit" class="btn btn-sm btn-delete"
+    <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" style="display:inline;">
+        <button type="submit" class="btn btn-sm btn-delete"
  onclick="return confirm('¿Deseas desactivar este comentario?');">
-           Eliminar
+      Eliminar
          </button>
    </form>
    }
-                </td>
+       </td>
  </tr>
         }
-    </tbody>
+  </tbody>
 </table>
 
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">

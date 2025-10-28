@@ -30,13 +30,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
                 }
             }
 
-            // JefeDeProyecto (and others allowed) see all
             Tareas = _tareaService.ObtenerTodasLasTareas();
         }
 
         public IActionResult OnPost(int id)
         {
-            // Prevent Empleado role from deleting tasks
             if (User.IsInRole("Empleado"))
             {
                 TempData["ErrorMessage"] = "No estás autorizado para eliminar tareas.";

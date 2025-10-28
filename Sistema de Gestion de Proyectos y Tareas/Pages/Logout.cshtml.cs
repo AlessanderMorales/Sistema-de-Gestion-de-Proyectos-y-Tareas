@@ -1,5 +1,3 @@
-// Archivo: Pages/Logout.cshtml.cs
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -92,55 +92,42 @@
     </div>
 
    <div class="form-group mb-3">
-      <label asp-for="Comentario.IdTarea" class="form-label">Tarea</label>
-    <select id="tareaSelect" asp-for="Comentario.IdTarea" class="form-select">
-    @if (Model.Tareas != null && Model.Tareas.Any())
-{
+        <label asp-for="Comentario.IdTarea" class="form-label">Tarea</label>
+ <select id="tareaSelect" asp-for="Comentario.IdTarea" class="form-select">
+        @if (Model.Tareas != null && Model.Tareas.Any())
+  {
     var primeraTarea = Model.Tareas.First();
-     <option value="@primeraTarea.Id" selected>@primeraTarea.Titulo</option>
- @foreach (var tarea in Model.Tareas.Skip(1))
-       {
-  <option value="@tarea.Id">@tarea.Titulo</option>
- }
-   }
-  else
- {
-        <option value="">No hay tareas disponibles</option>
-   }
- </select>
-   <span asp-validation-for="Comentario.IdTarea" class="text-danger"></span>
-   </div>
-
-    <!-- Selector "Dirigido a" para Jefe y Admin -->
-@if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
-        {
-  <div class="form-group mb-3">
-       <label class="form-label">Dirigido a</label>
-  <select asp-for="DirigidoAUsuarioId" class="form-select">
-  @if (Model.JefeProyecto != null)
+          <option value="@primeraTarea.Id" selected>@primeraTarea.Titulo</option>
+         @foreach (var tarea in Model.Tareas.Skip(1))
   {
- <option value="@Model.JefeProyecto.Id" selected>@($"{Model.JefeProyecto.Nombres} {Model.JefeProyecto.PrimerApellido}") (Jefe de Proyecto)</option>
-     }
-      @foreach (var usuario in Model.Usuarios.Where(u => u.Id != Model.JefeProyecto?.Id))
-  {
-     <option value="@usuario.Id">@($"{usuario.Nombres} {usuario.PrimerApellido}") @(usuario.Rol == "Empleado" ? "(Empleado)" : "")</option>
-  }
-   </select>
-    <small class="text-muted">Por defecto se envia al Jefe de Proyecto. Puedes cambiarlo a cualquier empleado.</small>
-  </div>
+      <option value="@tarea.Id">@tarea.Titulo</option>
+      }
 }
-
-   <!-- Selector "Dirigido a" para Empleados (DINÁMICO) -->
-      @if (User.IsInRole("Empleado"))
+        else
         {
-      <div class="form-group mb-3">
-      <label class="form-label">Dirigido a</label>
-  <select id="dirigidoASelect" asp-for="DirigidoAUsuarioId" class="form-select">
+   <option value="">No hay tareas disponibles</option>
+ }
+        </select>
+ <span asp-validation-for="Comentario.IdTarea" class="text-danger"></span>
+    </div>
+
+    <!-- Selector "Dirigido a" DINÁMICO para TODOS los usuarios -->
+    <div class="form-group mb-3">
+ <label class="form-label">Dirigido a</label>
+        <select id="dirigidoASelect" asp-for="DirigidoAUsuarioId" class="form-select">
   <!-- Opciones generadas dinámicamente por JavaScript -->
-</select>
-   <small class="text-muted">Solo puedes enviar comentarios al Jefe de Proyecto o a empleados asignados a la misma tarea.</small>
-   </div>
-    }
+  </select>
+        <small class="text-muted">
+  @if (User.IsInRole("Empleado"))
+   {
+        <text>Solo puedes enviar comentarios a usuarios asignados a la misma tarea.</text>
+     }
+   else if (User.IsInRole("JefeDeProyecto"))
+   {
+      <text>Solo puedes enviar comentarios a empleados asignados a la tarea seleccionada.</text>
+  }
+        </small>
+  </div>
 
        <div class="mt-4">
  <button type="submit" class="btn btn-volcanic-primary">Guardar Comentario</button>
@@ -153,64 +140,74 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     
-@if (User.IsInRole("Empleado"))
-    {
     <script>
-     // Mapa de tareas a usuarios (del backend)
-        var tareaUsuariosMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-      Model.TareaUsuariosMap.ToDictionary(
-     kvp => kvp.Key.ToString(),
-           kvp => kvp.Value.Select(u => new {
-      Id = u.Id,
-     Nombres = u.Nombres,
-      PrimerApellido = u.PrimerApellido,
-  Rol = u.Rol
-   }).ToList()
-    )
-   ));
+   // Mapa de tareas a usuarios (del backend) - PARA TODOS LOS ROLES
+  var tareaUsuariosMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+          Model.TareaUsuariosMap.ToDictionary(
+            kvp => kvp.Key.ToString(),
+      kvp => kvp.Value.Select(u => new {
+              Id = u.Id,
+             Nombres = u.Nombres,
+  PrimerApellido = u.PrimerApellido,
+     Rol = u.Rol
+       }).ToList()
+      )
+        ));
 
-  var jefeProyectoId = @Model.JefeProyectoId;
-
-   // Función para actualizar el selector de destinatarios
-    function actualizarDestinatarios() {
+      // Función para actualizar el selector de destinatarios
+  function actualizarDestinatarios() {
       var tareaId = document.getElementById('tareaSelect').value;
- var dirigidoASelect = document.getElementById('dirigidoASelect');
-   
-    // Limpiar opciones
+            var dirigidoASelect = document.getElementById('dirigidoASelect');
+
+            // Limpiar opciones
       dirigidoASelect.innerHTML = '';
-       
-   if (!tareaId || !tareaUsuariosMap[tareaId]) {
-     return;
-     }
-       
-         var usuarios = tareaUsuariosMap[tareaId];
-    var primeraOpcion = true;
-   
-      usuarios.forEach(function(usuario) {
-      var option = document.createElement('option');
-   option.value = usuario.Id;
- 
-  var nombreCompleto = usuario.Nombres + ' ' + usuario.PrimerApellido;
-  var etiqueta = usuario.Rol === 'JefeDeProyecto' ? ' (Jefe de Proyecto)' : ' (Empleado)';
-          
+
+            if (!tareaId || !tareaUsuariosMap[tareaId]) {
+         // Si no hay tarea o no hay usuarios, mostrar mensaje
+    var option = document.createElement('option');
+      option.value = '';
+   option.text = 'No hay usuarios disponibles para esta tarea';
+       option.disabled = true;
+   dirigidoASelect.appendChild(option);
+    return;
+         }
+
+var usuarios = tareaUsuariosMap[tareaId];
+
+     if (usuarios.length === 0) {
+     var option = document.createElement('option');
+    option.value = '';
+ option.text = 'No hay usuarios asignados a esta tarea';
+      option.disabled = true;
+       dirigidoASelect.appendChild(option);
+         return;
+ }
+
+   // Agregar usuarios disponibles
+   usuarios.forEach(function(usuario, index) {
+         var option = document.createElement('option');
+          option.value = usuario.Id;
+
+   var nombreCompleto = usuario.Nombres + ' ' + usuario.PrimerApellido;
+      var etiqueta = usuario.Rol === 'JefeDeProyecto' ? ' (Jefe de Proyecto)' : ' (Empleado)';
+
     option.text = nombreCompleto + etiqueta;
-    
-       // Seleccionar al Jefe por defecto
-  if (usuario.Id === jefeProyectoId) {
-    option.selected = true;
-  }
-       
-     dirigidoASelect.appendChild(option);
-     });
+
+     // Seleccionar el primero por defecto
+       if (index === 0) {
+           option.selected = true;
+      }
+
+      dirigidoASelect.appendChild(option);
+            });
         }
 
    // Ejecutar al cargar la página
-            document.addEventListener('DOMContentLoaded', function() {
-   actualizarDestinatarios();
-   
- // Ejecutar cuando cambie la tarea seleccionada
+        document.addEventListener('DOMContentLoaded', function() {
+      actualizarDestinatarios();
+
+   // Ejecutar cuando cambie la tarea seleccionada
      document.getElementById('tareaSelect').addEventListener('change', actualizarDestinatarios);
-    });
- </script>
-    }
+  });
+    </script>
 }

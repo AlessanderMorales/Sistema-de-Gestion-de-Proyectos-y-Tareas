@@ -37,11 +37,9 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
      {
    TareaId = id;
       
- // Obtener nombre de la tarea
          var tarea = _tareaService.ObtenerTareaPorId(id);
    NombreTarea = tarea?.Titulo ?? "Tarea desconocida";
             
-      // Obtener usuarios disponibles
             var usuarios = _usuarioService.ObtenerTodosLosUsuarios()
  .Where(u => u.Rol != "SuperAdmin")
     .Select(u => new {
@@ -51,10 +49,8 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
         })
      .ToList();
   
-         // Obtener IDs de usuarios actualmente asignados
             var idsAsignados = _tareaService.ObtenerIdsUsuariosAsignados(id).ToList();
    
-            // Obtener objetos Usuario completos para mostrar
     UsuariosActualmenteAsignados = _usuarioService.ObtenerTodosLosUsuarios()
                 .Where(u => idsAsignados.Contains(u.Id))
  .ToList();

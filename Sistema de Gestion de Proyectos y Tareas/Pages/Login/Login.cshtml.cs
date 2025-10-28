@@ -74,7 +74,15 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
                     var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                     await HttpContext.SignInAsync("MyCookieAuth", claimsPrincipal);
 
-                    return LocalRedirect(returnUrl);
+                    // ? Redirigir según el rol del usuario
+                    if (normalizedRole == Roles.SuperAdmin)
+                    {
+                        return RedirectToPage("/Usuarios/Index");
+                    }
+                    else
+                    {
+                        return LocalRedirect(returnUrl);
+                    }
                 }
                 else
                 {

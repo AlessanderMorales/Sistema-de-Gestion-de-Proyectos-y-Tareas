@@ -59,7 +59,6 @@
     font-size: 0.9rem;
     }
 
-    /* Estilos para checkboxes personalizados */
     .users-list {
         background-color: #3a3a40;
       border: 1px solid #555;
@@ -160,7 +159,6 @@
     color: white;
     }
 
-    /* Scrollbar personalizado */
  .users-list::-webkit-scrollbar {
         width: 8px;
     }
@@ -256,14 +254,12 @@ onclick="event.stopPropagation();"
 
 @section Scripts {
     <script>
-      // Función para toggle al hacer clic en el div
     function toggleUser(element, userId) {
             const checkbox = element.querySelector('input[type="checkbox"]');
             checkbox.checked = !checkbox.checked;
       updateSelection(checkbox);
      }
 
-        // Función para actualizar la visualización cuando cambia un checkbox
         function updateSelection(checkbox) {
      const container = checkbox.closest('.user-checkbox-item');
  
@@ -277,7 +273,6 @@ onclick="event.stopPropagation();"
        updateSubmitButton();
         }
 
-        // Actualizar contador de seleccionados
 function updateCounter() {
     const selectedCount = document.querySelectorAll('.user-checkbox-item input:checked').length;
             const counterElement = document.getElementById('selectedCount');
@@ -291,7 +286,6 @@ function updateCounter() {
   }
         }
 
-        // Habilitar/deshabilitar botón de enviar
         function updateSubmitButton() {
  const selectedCount = document.querySelectorAll('.user-checkbox-item input:checked').length;
  const submitBtn = document.getElementById('submitBtn');
@@ -305,12 +299,10 @@ function updateCounter() {
             }
         }
 
-        // Inicializar al cargar la página
       document.addEventListener('DOMContentLoaded', function() {
             updateCounter();
             updateSubmitButton();
  
-         // Validar antes de enviar
             document.getElementById('assignForm').addEventListener('submit', function(e) {
            const selectedCount = document.querySelectorAll('.user-checkbox-item input:checked').length;
      

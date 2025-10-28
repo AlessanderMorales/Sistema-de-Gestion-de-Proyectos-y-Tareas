@@ -71,49 +71,38 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Comentarios
             JefeProyecto = todosLosUsuarios.FirstOrDefault(u => u.Rol == "JefeDeProyecto");
             JefeProyectoId = JefeProyecto?.Id ?? 0;
 
-            // Establecer DirigidoAUsuarioId por defecto al Jefe de Proyecto
-            DirigidoAUsuarioId = JefeProyectoId;
-
             // ============================================
-            // CORREGIDO: Construir mapa usando Tarea_Usuario
+            // NUEVO: JEFE Y EMPLEADO USAN EL MISMO SISTEMA DINÁMICO
             // ============================================
             TareaUsuariosMap = new Dictionary<int, List<Usuario>>();
 
-            if (User.IsInRole("Empleado"))
+            foreach (var tarea in Tareas)
             {
-                // Para empleados: construir mapa de usuarios que comparten tareas
-                foreach (var tarea in Tareas)
-                {
-                    var usuariosEnTarea = new List<Usuario>();
+                var usuariosEnTarea = new List<Usuario>();
 
-                    // Siempre incluir al Jefe de Proyecto
-                    if (JefeProyecto != null)
-                    {
-                        usuariosEnTarea.Add(JefeProyecto);
-                    }
+                // Obtener IDs de usuarios asignados a esta tarea
+                var idsUsuariosEnTarea = _tareaService.ObtenerIdsUsuariosAsignados(tarea.Id).ToList();
 
-                    // Obtener IDs de usuarios asignados a esta tarea desde Tarea_Usuario
-                    var idsUsuariosEnTarea = _tareaService.ObtenerIdsUsuariosAsignados(tarea.Id).ToList();
-
-                    // Filtrar usuarios: excluir el usuario actual y SuperAdmin
-                    var usuariosAsignados = todosLosUsuarios
-                        .Where(u => idsUsuariosEnTarea.Contains(u.Id) &&
-                                    u.Id != UsuarioActualId &&
-                                    u.Rol != "SuperAdmin" &&
-                                    u.Id != JefeProyectoId)
-                        .ToList();
-
-                    usuariosEnTarea.AddRange(usuariosAsignados);
-
-                    TareaUsuariosMap[tarea.Id] = usuariosEnTarea;
-                }
-            }
-            else
-            {
-                // Para Jefe/Admin: todos los usuarios menos SuperAdmin y el usuario actual
-                Usuarios = todosLosUsuarios
-                    .Where(u => u.Rol != "SuperAdmin" && u.Id != UsuarioActualId)
+                // Filtrar usuarios: solo los asignados a la tarea, excluyendo al usuario actual y SuperAdmin
+                var usuariosAsignados = todosLosUsuarios
+                    .Where(u => idsUsuariosEnTarea.Contains(u.Id) &&
+                                u.Id != UsuarioActualId && // No puede comentarse a sí mismo
+                                u.Rol != "SuperAdmin") // No puede comentar al Admin
                     .ToList();
+
+                usuariosEnTarea.AddRange(usuariosAsignados);
+
+                TareaUsuariosMap[tarea.Id] = usuariosEnTarea;
+            }
+
+            // Establecer primer destinatario disponible si hay tareas
+            if (Tareas.Any() && TareaUsuariosMap.ContainsKey(Tareas.First().Id))
+            {
+                var primerosUsuarios = TareaUsuariosMap[Tareas.First().Id];
+                if (primerosUsuarios.Any())
+                {
+                    DirigidoAUsuarioId = primerosUsuarios.First().Id;
+                }
             }
         }
 

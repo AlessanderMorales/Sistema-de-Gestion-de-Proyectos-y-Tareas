@@ -67,7 +67,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Configuracion
 
             int usuarioId = int.Parse(usuarioIdClaim.Value);
 
-            // Validar que la nueva contraseña cumpla los requisitos
             if (!ValidarContraseña(Input.NuevaContraseña))
             {
                 ModelState.AddModelError("Input.NuevaContraseña", 

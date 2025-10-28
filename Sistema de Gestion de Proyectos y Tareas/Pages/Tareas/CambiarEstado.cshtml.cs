@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using ServiceTarea.Application.Service;
 using ServiceTarea.Domain.Entities;
 using System.Security.Claims;
+using System.Linq;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
@@ -38,15 +39,20 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
            return RedirectToPage("Index");
             }
 
-            // Verificar permisos
+
     var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
        if (int.TryParse(idClaim, out var usuarioId))
       {
-       // Si es empleado, verificar que la tarea le pertenece
-          if (User.IsInRole("Empleado") && Tarea.IdUsuarioAsignado != usuarioId)
-             {
-          TempData["ErrorMessage"] = "No tienes permiso para cambiar el estado de esta tarea.";
-            return RedirectToPage("Index");
+          // ? NUEVO: Verificar usando Tarea_Usuario (asignación múltiple)
+        if (User.IsInRole("Empleado"))
+        {
+       var idsUsuariosAsignados = _tareaService.ObtenerIdsUsuariosAsignados(id).ToList();
+            
+         if (!idsUsuariosAsignados.Contains(usuarioId))
+ {
+        TempData["ErrorMessage"] = "No tienes permiso para cambiar el estado de esta tarea. No estás asignado a ella.";
+      return RedirectToPage("Index");
+          }
         }
          }
 
@@ -58,6 +64,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
         };
 
       StatusDisponibles = new SelectList(estados, "Value", "Text", Tarea.Status);
+    NuevoStatus = Tarea.Status; // ? Establecer valor por defecto
 
   return Page();
 }
@@ -72,29 +79,34 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
  return RedirectToPage("Index");
             }
 
-          // Verificar permisos
      var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
   if (int.TryParse(idClaim, out var usuarioId))
        {
-    if (User.IsInRole("Empleado") && tarea.IdUsuarioAsignado != usuarioId)
+    // ? NUEVO: Verificar usando Tarea_Usuario (asignación múltiple)
+  if (User.IsInRole("Empleado"))
+        {
+            var idsUsuariosAsignados = _tareaService.ObtenerIdsUsuariosAsignados(TareaId).ToList();
+            
+      if (!idsUsuariosAsignados.Contains(usuarioId))
     {
-        TempData["ErrorMessage"] = "No tienes permiso para cambiar el estado de esta tarea.";
-   return RedirectToPage("Index");
-     }
-            }
-
-            try
-            {
-       tarea.Status = NuevoStatus;
-    _tareaService.ActualizarTarea(tarea);
-                TempData["SuccessMessage"] = "Estado de la tarea actualizado exitosamente.";
-            }
-      catch (Exception ex)
- {
-   TempData["ErrorMessage"] = $"Error al actualizar el estado: {ex.Message}";
+       TempData["ErrorMessage"] = "No tienes permiso para cambiar el estado de esta tarea. No estás asignado a ella.";
+         return RedirectToPage("Index");
+   }
+        }
     }
 
-      return RedirectToPage("Index");
-        }
+    try
+  {
+        tarea.Status = NuevoStatus;
+        _tareaService.ActualizarTarea(tarea);
+TempData["SuccessMessage"] = "Estado de la tarea actualizado exitosamente.";
+    }
+    catch (Exception ex)
+    {
+        TempData["ErrorMessage"] = $"Error al actualizar el estado: {ex.Message}";
+    }
+
+    return RedirectToPage("Index");
+}
     }
 }
