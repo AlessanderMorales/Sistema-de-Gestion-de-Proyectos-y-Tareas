@@ -14,6 +14,7 @@ using ServiceTarea.Infrastructure.Persistence.Factories;
 using ServiceUsuario.Application.Service;
 using ServiceUsuario.Domain.Entities;
 using ServiceUsuario.Infrastructure.Persistence.Factories;
+using ServiceProyecto.Application.Service.Reportes; // ✅ NUEVO: Para el ReporteService
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +57,8 @@ builder.Services.AddScoped<ProyectoService>();
 builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComentarioService>();
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<EmailService>(); 
+builder.Services.AddScoped<ReporteService>(); // ✅ NUEVO: Registramos el ReporteService
 
 builder.Services.AddRazorPages(options =>
 {
