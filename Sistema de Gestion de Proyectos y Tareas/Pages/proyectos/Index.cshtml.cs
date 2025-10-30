@@ -66,7 +66,15 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
         public IActionResult OnPostGenerarPdfGeneral()
         {
             var proyectos = _proyectoService.ObtenerTodosLosProyectos();
-            var pdfBytes = _reporteService.GenerarReporteGeneralProyectosPdf(proyectos);
+
+            // Prefer email claim, fallback to Name, fallback to Identifier
+            var usuarioNombre = User.FindFirst(ClaimTypes.Email)?.Value
+                                ?? User.Identity?.Name
+                                ?? User.FindFirst(ClaimTypes.Name)?.Value
+                                ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                                ?? "Sistema";
+
+            var pdfBytes = _reporteService.GenerarReporteGeneralProyectosPdf(proyectos, usuarioNombre);
             return File(pdfBytes, "application/pdf", "Reporte_General_Proyectos.pdf");
         }
     }
