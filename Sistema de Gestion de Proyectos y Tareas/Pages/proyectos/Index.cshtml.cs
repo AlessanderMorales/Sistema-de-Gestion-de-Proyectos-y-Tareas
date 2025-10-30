@@ -13,13 +13,18 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
     {
         private readonly ProyectoService _proyectoService;
         private readonly ReporteService _reporteService;
+        private readonly ReporteExcelService _reporteExcelService; // <-- agregado
 
         public IEnumerable<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
 
-        public IndexModel(ProyectoService proyectoService, ReporteService reporteService)
+        public IndexModel(
+            ProyectoService proyectoService,
+            ReporteService reporteService,
+            ReporteExcelService reporteExcelService) // <-- agregado
         {
             _proyectoService = proyectoService;
             _reporteService = reporteService;
+            _reporteExcelService = reporteExcelService;
         }
 
         public void OnGet()
@@ -56,7 +61,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             }
             catch
             {
-                // ignore if not implemented
+                // ignore
             }
 
             TempData["SuccessMessage"] = "Proyecto eliminado correctamente.";
@@ -67,7 +72,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
         {
             var proyectos = _proyectoService.ObtenerTodosLosProyectos();
 
-            // Prefer email claim, fallback to Name, fallback to Identifier
             var usuarioNombre = User.FindFirst(ClaimTypes.Email)?.Value
                                 ?? User.Identity?.Name
                                 ?? User.FindFirst(ClaimTypes.Name)?.Value
@@ -76,6 +80,15 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 
             var pdfBytes = _reporteService.GenerarReporteGeneralProyectosPdf(proyectos, usuarioNombre);
             return File(pdfBytes, "application/pdf", "Reporte_General_Proyectos.pdf");
+        }
+
+        // 🚀 NUEVO: Generar Excel
+        public IActionResult OnPostGenerarExcelGeneral()
+        {
+            var excelBytes = _reporteExcelService.GenerarReporteGeneralProyectosExcel();
+            return File(excelBytes, 
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+                        "Reporte_General_Proyectos.xlsx");
         }
     }
 }

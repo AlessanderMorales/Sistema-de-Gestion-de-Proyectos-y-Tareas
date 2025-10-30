@@ -155,6 +155,12 @@
                 📄 Descargar Reporte General
             </button>
         </form>
+        <form method="post" asp-page-handler="GenerarExcelGeneral">
+            <button type="submit" class="btn btn-volcanic-primary">
+                📊 Descargar Reporte Excel
+            </button>
+        </form>
+
 
         @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
         {

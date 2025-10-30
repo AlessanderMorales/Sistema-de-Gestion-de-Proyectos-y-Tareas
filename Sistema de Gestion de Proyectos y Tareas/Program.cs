@@ -23,9 +23,9 @@ builder.Services.AddAuthentication("MyCookieAuth")
     {
         options.Cookie.Name = "Sgpt.AuthCookie";
         options.LoginPath = "/Login/Login";
-     options.AccessDeniedPath = "/AccessDenied";
+        options.AccessDeniedPath = "/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-   options.SlidingExpiration = true;
+        options.SlidingExpiration = true;
     });
 
 builder.Services.AddAuthorization(options =>
@@ -34,10 +34,10 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole(Roles.SuperAdmin));
 
     options.AddPolicy("OnlyJefeOrEmpleado", policy =>
-      policy.RequireAssertion(ctx => 
-     ctx.User.IsInRole(Roles.JefeDeProyecto) || 
+      policy.RequireAssertion(ctx =>
+     ctx.User.IsInRole(Roles.JefeDeProyecto) ||
             ctx.User.IsInRole(Roles.Empleado) ||
-    ctx.User.IsInRole(Roles.SuperAdmin))); // ✅ Agregar SuperAdmin
+     ctx.User.IsInRole(Roles.SuperAdmin))); // ✅ Agregar SuperAdmin
 
     options.AddPolicy("OnlyJefe", policy =>
         policy.RequireRole(Roles.JefeDeProyecto));
@@ -57,8 +57,9 @@ builder.Services.AddScoped<ProyectoService>();
 builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComentarioService>();
-builder.Services.AddScoped<EmailService>(); 
+builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ReporteService>(); // ✅ NUEVO: Registramos el ReporteService
+builder.Services.AddTransient<ReporteExcelService>(); // 👈 NUEVO: Registramos el servicio de Excel
 
 builder.Services.AddRazorPages(options =>
 {
@@ -97,7 +98,7 @@ app.UseAuthorization();
 
 app.Use(async (context, next) =>
 {
-  await next();
+    await next();
     if (context.Response.StatusCode == 403)
     {
         context.Response.Redirect("/AccessDenied");
