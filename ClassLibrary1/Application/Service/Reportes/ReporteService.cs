@@ -97,6 +97,9 @@ namespace ServiceProyecto.Application.Service.Reportes
                 .SetFontColor(ColorConstants.GRAY)
                 .SetMarginTop(6));
 
+            // Add pie chart for this single project: completed vs remaining
+            AddPieChartForSingleProject(pdf, document, proyecto);
+
             // Close document to finalize pages
             document.Close();
 
@@ -188,6 +191,9 @@ namespace ServiceProyecto.Application.Service.Reportes
                 // Invisible spacing between projects
                 document.Add(new Paragraph().SetMarginBottom(10));
             }
+
+            // Add pie chart for all projects at the end
+            AddPieChartForProjects(pdf, document, proyectos);
 
             // Close document to finalize pages
             document.Close();
@@ -550,6 +556,190 @@ namespace ServiceProyecto.Application.Service.Reportes
 
             pdfDoc.Close();
             return outputStream.ToArray();
+        }
+
+        // Pie chart helpers
+        private void AddPieChartForSingleProject(PdfDocument pdf, Document document, Proyecto proyecto)
+        {
+            // compute completed vs remaining
+            int completed = proyecto.Tareas?.Count(t => MapStatusToFriendly(t.Status, t.Estado) == "Completado") ?? 0;
+            int total = proyecto.Tareas?.Count() ?? 0;
+            int remaining = Math.Max(0, total - completed);
+
+            // Create a dedicated page for chart and table
+            document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+            // add a title
+            var title = new Paragraph("Tareas Completadas")
+                .SetFont(_fontBold)
+                .SetFontSize(14)
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetMarginTop(10);
+            document.Add(title);
+
+            // mini table: project name and completed count (show even zero)
+            var table = new Table(UnitValue.CreatePercentArray(new float[] { 4, 1 })).UseAllAvailableWidth().SetMarginTop(8).SetMarginLeft(50).SetMarginRight(50);
+            table.AddHeaderCell(CrearCelda("Proyecto", true));
+            table.AddHeaderCell(CrearCelda("Completadas", true));
+            table.AddCell(CrearCelda(proyecto.Nombre ?? "-"));
+            table.AddCell(CrearCelda(completed.ToString()));
+            document.Add(table);
+
+            // draw pie chart centered below
+            var lastPage = pdf.GetLastPage();
+            var pageSize = lastPage.GetPageSize();
+            var canvas = new PdfCanvas(lastPage.NewContentStreamAfter(), lastPage.GetResources(), pdf);
+
+            float cx = pageSize.GetWidth() / 2;
+            float cy = (float)(pageSize.GetBottom() + 200);
+            float radius = 80;
+
+            var slices = new List<(double value, DeviceRgb color, string label)>();
+            if (completed > 0) slices.Add((completed, new DeviceRgb(200, 230, 201), "Completadas"));
+            if (remaining > 0) slices.Add((remaining, new DeviceRgb(255, 244, 179), "Restantes"));
+
+            DrawPie(canvas, cx, cy, radius, slices);
+
+            // legend (draw with layout canvas to avoid layout issues)
+            var layoutCanvas = new iText.Layout.Canvas(canvas, pageSize);
+            float legendX = cx - radius;
+            float legendY = cy - radius - 30;
+            foreach (var s in slices)
+            {
+                // color box with PdfCanvas
+                canvas.SaveState();
+                canvas.SetFillColor(s.color);
+                canvas.Rectangle(legendX, legendY, 10, 10);
+                canvas.Fill();
+                canvas.RestoreState();
+
+                // label
+                var p = new Paragraph(s.label).SetFont(_fontRegular).SetFontSize(9);
+                layoutCanvas.ShowTextAligned(p, legendX + 16, legendY + 2, TextAlignment.LEFT);
+                legendY -= 14;
+            }
+            layoutCanvas.Close();
+        }
+
+        private void AddPieChartForProjects(PdfDocument pdf, Document document, IEnumerable<Proyecto> proyectos)
+        {
+            // build list of projects with completed counts (include zeros for the mini-table)
+            var allCounts = proyectos.Select(p => new { Name = p.Nombre ?? "-", Completed = p.Tareas?.Count(t => MapStatusToFriendly(t.Status, t.Estado) == "Completado") ?? 0 }).ToList();
+            var slicesData = allCounts.Where(x => x.Completed > 0).ToList();
+
+            if (!allCounts.Any())
+            {
+                document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+                var pageMsg = pdf.GetLastPage();
+                var pageSizeMsg = pageMsg.GetPageSize();
+                var msg = new Paragraph("Tareas Completadas\nNo hay proyectos para mostrar.")
+                    .SetFont(_fontRegular).SetFontSize(12).SetTextAlignment(TextAlignment.CENTER);
+                document.Add(msg);
+                return;
+            }
+
+            // new page
+            document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+
+            var title = new Paragraph("Tareas Completadas").SetFont(_fontBold).SetFontSize(14).SetTextAlignment(TextAlignment.CENTER);
+            document.Add(title);
+
+            // mini table with all projects and their completed counts
+            var table = new Table(UnitValue.CreatePercentArray(new float[] { 4, 1 })).UseAllAvailableWidth().SetMarginTop(8).SetMarginLeft(50).SetMarginRight(50);
+            table.AddHeaderCell(CrearCelda("Proyecto", true));
+            table.AddHeaderCell(CrearCelda("Completadas", true));
+            foreach (var c in allCounts)
+            {
+                table.AddCell(CrearCelda(c.Name));
+                table.AddCell(CrearCelda(c.Completed.ToString()));
+            }
+            document.Add(table);
+
+            // draw pie on the same last page
+            var lastPage = pdf.GetLastPage();
+            var pageSize = lastPage.GetPageSize();
+            var canvas = new PdfCanvas(lastPage.NewContentStreamAfter(), lastPage.GetResources(), pdf);
+
+            float cx = pageSize.GetWidth() / 2;
+            float cy = (float)(pageSize.GetBottom() + 220);
+            float radius = 100;
+
+            var palette = new List<DeviceRgb>
+            {
+                new DeviceRgb(141, 196, 63), // green
+                new DeviceRgb(255, 192, 0),  // yellow
+                new DeviceRgb(0, 176, 240),  // blue
+                new DeviceRgb(255, 102, 102),// red
+                new DeviceRgb(153, 102, 255) // purple
+            };
+
+            var slices = new List<(double value, DeviceRgb color, string label)>();
+            int pi = 0;
+            foreach (var c in slicesData)
+            {
+                var color = palette[pi % palette.Count];
+                slices.Add((c.Completed, color, c.Name));
+                pi++;
+            }
+
+            DrawPie(canvas, cx, cy, radius, slices);
+
+            // legend below pie
+            var layoutCanvas = new iText.Layout.Canvas(canvas, pageSize);
+            float legendX = cx - radius;
+            float legendY = cy - radius - 30;
+            for (int i = 0; i < slices.Count; i++)
+            {
+                var s = slices[i];
+                canvas.SaveState();
+                canvas.SetFillColor(s.color);
+                canvas.Rectangle(legendX, legendY, 12, 12);
+                canvas.Fill();
+                canvas.RestoreState();
+
+                var labelPara = new Paragraph(s.label).SetFont(_fontRegular).SetFontSize(9);
+                layoutCanvas.ShowTextAligned(labelPara, legendX + 18, legendY + 3, TextAlignment.LEFT);
+                legendY -= 14;
+            }
+            layoutCanvas.Close();
+        }
+
+        private void DrawPie(PdfCanvas canvas, float cx, float cy, float r, List<(double value, DeviceRgb color, string label)> slices)
+        {
+            double total = slices.Sum(s => s.value);
+            if (total <= 0) return;
+
+            double startAngle = 0; // degrees
+            foreach (var s in slices)
+            {
+                double sweep = s.value / total * 360.0;
+                canvas.SaveState();
+                canvas.SetFillColor(s.color);
+
+                // draw slice by approximating with PDF arc: use circle sector path
+                // iText arc uses degrees and ellipse; use PdfCanvas.Ellipse? we'll approximate with arc
+                double start = startAngle;
+                double end = startAngle + sweep;
+
+                // compute start point on circle
+                double sx = cx + r * Math.Cos(start * Math.PI / 180.0);
+                double sy = cy + r * Math.Sin(start * Math.PI / 180.0);
+                double ex = cx + r * Math.Cos(end * Math.PI / 180.0);
+                double ey = cy + r * Math.Sin(end * Math.PI / 180.0);
+
+                // Start a new sub-path for this sector
+                canvas.MoveTo(cx, cy);
+                canvas.LineTo((float)sx, (float)sy);
+                canvas.Arc(cx - r, cy - r, cx + r, cy + r, (float)start, (float)sweep);
+                canvas.LineTo(cx, cy);
+
+                // close the subpath and fill just the sector
+                canvas.ClosePath();
+                canvas.Fill();
+                canvas.RestoreState();
+
+                startAngle += sweep;
+            }
         }
     }
 }
