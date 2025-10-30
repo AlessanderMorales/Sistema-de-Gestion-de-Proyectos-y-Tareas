@@ -585,6 +585,15 @@ namespace ServiceProyecto.Application.Service.Reportes
             table.AddCell(CrearCelda(completed.ToString()));
             document.Add(table);
 
+            // Small heading above the chart
+            var smallHeading = new Paragraph("Tareas")
+                .SetFont(_fontBold)
+                .SetFontSize(12)
+                .SetFontColor(ColorConstants.DARK_GRAY)
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetMarginTop(6);
+            document.Add(smallHeading);
+
             // draw pie chart centered below
             var lastPage = pdf.GetLastPage();
             var pageSize = lastPage.GetPageSize();
@@ -597,6 +606,11 @@ namespace ServiceProyecto.Application.Service.Reportes
             var slices = new List<(double value, DeviceRgb color, string label)>();
             if (completed > 0) slices.Add((completed, new DeviceRgb(200, 230, 201), "Completadas"));
             if (remaining > 0) slices.Add((remaining, new DeviceRgb(255, 244, 179), "Restantes"));
+
+            // draw heading close to chart using layout canvas
+            var layoutCanvasForChart = new iText.Layout.Canvas(canvas, pageSize);
+            var headingPara = new Paragraph("Tareas").SetFont(_fontBold).SetFontSize(12).SetFontColor(ColorConstants.DARK_GRAY);
+            layoutCanvasForChart.ShowTextAligned(headingPara, cx, cy + radius + 14, TextAlignment.CENTER);
 
             DrawPie(canvas, cx, cy, radius, slices);
 
@@ -615,10 +629,10 @@ namespace ServiceProyecto.Application.Service.Reportes
 
                 // label
                 var p = new Paragraph(s.label).SetFont(_fontRegular).SetFontSize(9);
-                layoutCanvas.ShowTextAligned(p, legendX + 16, legendY + 2, TextAlignment.LEFT);
+                layoutCanvasForChart.ShowTextAligned(p, legendX + 16, legendY + 2, TextAlignment.LEFT);
                 legendY -= 14;
             }
-            layoutCanvas.Close();
+            layoutCanvasForChart.Close();
         }
 
         private void AddPieChartForProjects(PdfDocument pdf, Document document, IEnumerable<Proyecto> proyectos)
@@ -682,12 +696,16 @@ namespace ServiceProyecto.Application.Service.Reportes
                 pi++;
             }
 
+            // draw heading close to chart using layout canvas
+            var layoutCanvasForChartAll = new iText.Layout.Canvas(canvas, pageSize);
+            var headingAll = new Paragraph("Tareas").SetFont(_fontBold).SetFontSize(12).SetFontColor(ColorConstants.DARK_GRAY);
+            layoutCanvasForChartAll.ShowTextAligned(headingAll, cx, cy + radius + 14, TextAlignment.CENTER);
+
             DrawPie(canvas, cx, cy, radius, slices);
 
             // legend below pie
-            var layoutCanvas = new iText.Layout.Canvas(canvas, pageSize);
-            float legendX = cx - radius;
-            float legendY = cy - radius - 30;
+            var legendX = cx - radius;
+            var legendY = cy - radius - 30;
             for (int i = 0; i < slices.Count; i++)
             {
                 var s = slices[i];
@@ -698,10 +716,10 @@ namespace ServiceProyecto.Application.Service.Reportes
                 canvas.RestoreState();
 
                 var labelPara = new Paragraph(s.label).SetFont(_fontRegular).SetFontSize(9);
-                layoutCanvas.ShowTextAligned(labelPara, legendX + 18, legendY + 3, TextAlignment.LEFT);
+                layoutCanvasForChartAll.ShowTextAligned(labelPara, legendX + 18, legendY + 3, TextAlignment.LEFT);
                 legendY -= 14;
             }
-            layoutCanvas.Close();
+            layoutCanvasForChartAll.Close();
         }
 
         private void DrawPie(PdfCanvas canvas, float cx, float cy, float r, List<(double value, DeviceRgb color, string label)> slices)
