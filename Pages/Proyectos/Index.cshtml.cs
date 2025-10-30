@@ -1,12 +1,13 @@
-ï»¿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServiceProyecto.Application.Service;
 using ServiceProyecto.Application.Service.Reportes;
-using ServiceProyecto.Domain.Entities;
-using System.Security.Claims;
-using Microsoft.Extensions.DependencyInjection;
 using ServiceProyecto.Application.Service.Reportes.Builders;
+using ServiceProyecto.Domain.Entities;
+using ServiceTarea.Application.Service;
+using ServiceUsuario.Application.Service;
+using System.Security.Claims;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 {
@@ -15,13 +16,21 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
     {
         private readonly ProyectoService _proyectoService;
         private readonly ReporteService _reporteService;
+        private readonly TareaService _tareaService;
+        private readonly UsuarioService _usuarioService;
 
         public IEnumerable<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
 
-        public IndexModel(ProyectoService proyectoService, ReporteService reporteService)
+        public IndexModel(
+            ProyectoService proyectoService,
+            ReporteService reporteService,
+            TareaService tareaService,
+            UsuarioService usuarioService)
         {
             _proyectoService = proyectoService;
             _reporteService = reporteService;
+            _tareaService = tareaService;
+            _usuarioService = usuarioService;
         }
 
         public void OnGet()
@@ -43,7 +52,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
         {
             if (User.IsInRole("Empleado"))
             {
-                TempData["ErrorMessage"] = "No estÃ¡s autorizado para eliminar proyectos.";
+                TempData["ErrorMessage"] = "No estás autorizado para eliminar proyectos.";
                 return RedirectToPage("./Index");
             }
 
@@ -69,7 +78,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
         {
             var proyectos = _proyectoService.ObtenerTodosLosProyectos();
 
-            // Prefer email claim, fallback to Name, fallback to Identifier
             var usuarioNombre = User.FindFirst(ClaimTypes.Email)?.Value
                                 ?? User.Identity?.Name
                                 ?? User.FindFirst(ClaimTypes.Name)?.Value
@@ -80,10 +88,10 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             return File(pdfBytes, "application/pdf", "Reporte_General_Proyectos.pdf");
         }
 
-        // Nuevo manejador para generar y devolver el Excel
+        // Asegúrate de que este método exista para descargar Excel
         public IActionResult OnPostGenerarExcelGeneral()
         {
-            var proyectos = _proyectoService.ObtenerTodosLosProyectos() ?? Enumerable.Empty<Proyecto>();
+            var proyectos = _proyectoService.ObtenerTodosLosProyectos();
 
             var usuarioNombre = User.FindFirst(ClaimTypes.Email)?.Value
                                 ?? User.Identity?.Name
@@ -91,25 +99,15 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
                                 ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                                 ?? "Sistema";
 
-            // Resolver servicios necesarios para el builder desde el contenedor DI
-            var tareaService = HttpContext.RequestServices.GetService<ServiceTarea.Application.Service.TareaService>();
-            var usuarioService = HttpContext.RequestServices.GetService<ServiceUsuario.Application.Service.UsuarioService>();
-
-            if (tareaService == null || usuarioService == null)
+            // Usa ExcelReportBuilder (ya incluido en tu proyecto)
+            var builder = new ServiceProyecto.Application.Service.Reportes.Builders.ExcelReportBuilder(_tareaService, _usuarioService);
+            builder.Start(usuarioNombre);
+            foreach (var p in proyectos)
             {
-                TempData["ErrorMessage"] = "Servicios para generar el reporte no disponibles.";
-                return RedirectToPage("./Index");
+                builder.AddProject(p);
             }
-
-            var builder = new ExcelReportBuilder(tareaService, usuarioService);
-            var director = new ReporteDirector();
-            var excelBytes = director.BuildGeneral(builder, proyectos, usuarioNombre);
-
-            if (excelBytes == null || excelBytes.Length == 0)
-            {
-                TempData["ErrorMessage"] = "No se pudo generar el reporte Excel.";
-                return RedirectToPage("./Index");
-            }
+            builder.Finish();
+            var excelBytes = builder.GetReport();
 
             return File(excelBytes,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

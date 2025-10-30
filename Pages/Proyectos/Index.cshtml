@@ -150,13 +150,13 @@
     <h1 class="title-volcanic m-0">@ViewData["Title"]</h1>
 
     <div class="header-buttons">
-        <form method="post" asp-page-handler="GenerarPdfGeneral">
+        <form method="post" asp-page-handler="GenerarPdfGeneral" style="display:inline">
             <button type="submit" class="btn btn-volcanic-primary">
                 📄 Descargar Reporte General
             </button>
         </form>
 
-        <form method="post" asp-page-handler="GenerarExcelGeneral">
+        <form method="post" asp-page-handler="GenerarExcelGeneral" style="display:inline; margin-left:8px;">
             <button type="submit" class="btn btn-volcanic-primary">
                 📥 Descargar Reporte Excel
             </button>
@@ -234,19 +234,23 @@
             var confirmDeleteButton = document.getElementById('confirmDeleteButton');
             var projectIdToDelete;
 
-            confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget;
-                projectIdToDelete = button.getAttribute('data-project-id');
-            });
+            if (confirmDeleteModal) {
+                confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    projectIdToDelete = button ? button.getAttribute('data-project-id') : null;
+                });
+            }
 
-            confirmDeleteButton.addEventListener('click', function () {
-                if (projectIdToDelete) {
-                    var form = document.getElementById('deleteForm-' + projectIdToDelete);
-                    if (form) {
-                        form.submit();
+            if (confirmDeleteButton) {
+                confirmDeleteButton.addEventListener('click', function () {
+                    if (projectIdToDelete) {
+                        var form = document.getElementById('deleteForm-' + projectIdToDelete);
+                        if (form) {
+                            form.submit();
+                        }
                     }
-                }
-            });
+                });
+            }
         });
     </script>
 }
