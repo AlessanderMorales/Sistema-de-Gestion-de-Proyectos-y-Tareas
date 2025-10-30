@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace ServiceProyecto.Application.Service.Reportes
 {
-    public class ExcelReporteBuilder
+    public class ExcelReporteBuilder : IExcelReporteBuilder
     {
         private readonly ProyectoService _proyectoService;
         private readonly TareaService _tareaService;
@@ -21,7 +21,6 @@ namespace ServiceProyecto.Application.Service.Reportes
         public ExcelReporteBuilder(ProyectoService proyectoService, TareaService tareaService, UsuarioService usuarioService)
         {
             _proyectoService = proyectoService;
-            _tarea_service_placeholder: _ = tareaService; // evita advertencias si no se usa directamente
             _tareaService = tareaService;
             _usuarioService = usuarioService;
         }
@@ -45,16 +44,15 @@ namespace ServiceProyecto.Application.Service.Reportes
             using var workbook = new XLWorkbook();
             var ws = workbook.Worksheets.Add("Proyectos");
 
-            // ? ELIMINADO: "Proyecto ID" y "Tarea ID"
             var headers = new[]
             {
-                // "Proyecto ID", // ? ELIMINADO
+                "Proyecto ID",
                 "Proyecto",
                 "Descripción",
                 "Fecha Inicio",
                 "Fecha Fin",
                 "Estado Proyecto",
-                // "Tarea ID", // ? ELIMINADO
+                "Tarea ID",
                 "Tarea Título",
                 "Prioridad",
                 "Estado Tarea",
@@ -88,27 +86,30 @@ namespace ServiceProyecto.Application.Service.Reportes
 
                 if (proyecto.Tareas == null || !proyecto.Tareas.Any())
                 {
-                    ws.Cell(row, 1).Value = proyecto.Nombre ?? "-";
-                    ws.Cell(row, 2).Value = proyecto.Descripcion ?? "-";
-                    ws.Cell(row, 3).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                    ws.Cell(row, 4).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                    ws.Cell(row, 5).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
-                    for (int c = 6; c <= 9; c++) ws.Cell(row, c).Value = string.Empty;
+                    ws.Cell(row, 1).Value = proyecto.Id;
+                    ws.Cell(row, 2).Value = proyecto.Nombre ?? "-";
+                    ws.Cell(row, 3).Value = proyecto.Descripcion ?? "-";
+                    ws.Cell(row, 4).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    ws.Cell(row, 5).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    ws.Cell(row, 6).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
+                    for (int c = 7; c <= 11; c++) ws.Cell(row, c).Value = string.Empty;
                     row++;
                 }
                 else
                 {
                     foreach (var tarea in proyecto.Tareas)
                     {
-                        ws.Cell(row, 1).Value = proyecto.Nombre ?? "-";
-                        ws.Cell(row, 2).Value = proyecto.Descripcion ?? "-";
-                        ws.Cell(row, 3).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                        ws.Cell(row, 4).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                        ws.Cell(row, 5).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
+                        ws.Cell(row, 1).Value = proyecto.Id;
+                        ws.Cell(row, 2).Value = proyecto.Nombre ?? "-";
+                        ws.Cell(row, 3).Value = proyecto.Descripcion ?? "-";
+                        ws.Cell(row, 4).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        ws.Cell(row, 5).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        ws.Cell(row, 6).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
 
-                        ws.Cell(row, 6).Value = tarea.Titulo ?? "-";
-                        ws.Cell(row, 7).Value = tarea.Prioridad ?? "-";
-                        ws.Cell(row, 8).Value = MapStatusToFriendly(tarea.Status, tarea.Estado);
+                        ws.Cell(row, 7).Value = tarea.Id;
+                        ws.Cell(row, 8).Value = tarea.Titulo ?? "-";
+                        ws.Cell(row, 9).Value = tarea.Prioridad ?? "-";
+                        ws.Cell(row, 10).Value = MapStatusToFriendly(tarea.Status, tarea.Estado);
 
                         var usuariosNombres = new List<string>();
                         if (tarea.IdUsuarioAsignado.HasValue)
@@ -128,7 +129,7 @@ namespace ServiceProyecto.Application.Service.Reportes
                         }
 
                         var usuariosStr = usuariosNombres.Any() ? string.Join(", ", usuariosNombres.Distinct()) : "*Sin Empleados Asignados*";
-                        ws.Cell(row, 9).Value = usuariosStr;
+                        ws.Cell(row, 11).Value = usuariosStr;
 
                         row++;
                     }
@@ -144,176 +145,10 @@ namespace ServiceProyecto.Application.Service.Reportes
             ws.Cell(row + 1, 1).Value = $"Reporte generado por: {usuarioNombre}";
             ws.Cell(row + 2, 1).Value = $"Fecha: {DateTime.Now.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)}";
 
-            // ? NUEVO: Agregar hoja de estadísticas con gráficos
-            AgregarHojaEstadisticas(workbook, proyectos);
-
             using var ms = new MemoryStream();
             workbook.SaveAs(ms);
             return ms.ToArray();
         }
-
-        /// <summary>
-        /// ? NUEVO: Agregar hoja con estadísticas y representación visual
-        /// </summary>
-        private void AgregarHojaEstadisticas(XLWorkbook workbook, IEnumerable<Proyecto> proyectos)
-        {
-            var wsStats = workbook.Worksheets.Add("Estadísticas");
-
-            // Obtener todas las tareas
-            var todasLasTareas = proyectos
-                .SelectMany(p => p.Tareas ?? Enumerable.Empty<Tarea>())
-                .ToList();
-
-            if (!todasLasTareas.Any())
-            {
-                wsStats.Cell(1, 1).Value = "No hay tareas para generar estadísticas.";
-                return;
-            }
-
-            // Título principal
-            wsStats.Cell(1, 1).Value = "?? ESTADÍSTICAS GENERALES DE TAREAS";
-            wsStats.Cell(1, 1).Style.Font.Bold = true;
-            wsStats.Cell(1, 1).Style.Font.FontSize = 16;
-            wsStats.Cell(1, 1).Style.Fill.BackgroundColor = XLColor.DarkBlue;
-            wsStats.Cell(1, 1).Style.Font.FontColor = XLColor.White;
-            wsStats.Range(1, 1, 1, 6).Merge();
-            wsStats.Cell(1, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-            // === SECCIÓN 1: DISTRIBUCIÓN POR ESTADO ===
-            wsStats.Cell(3, 1).Value = "Distribución por Estado";
-            wsStats.Cell(3, 1).Style.Font.Bold = true;
-            wsStats.Cell(3, 1).Style.Font.FontSize = 12;
-            wsStats.Cell(3, 1).Style.Fill.BackgroundColor = XLColor.LightGray;
-            wsStats.Range(3, 1, 3, 2).Merge();
-
-// Headers
- wsStats.Cell(4, 1).Value = "Estado";
-wsStats.Cell(4, 2).Value = "Cantidad";
-       wsStats.Cell(4, 3).Value = "Porcentaje";
-   wsStats.Range(4, 1, 4, 3).Style.Font.Bold = true;
-  wsStats.Range(4, 1, 4, 3).Style.Fill.BackgroundColor = XLColor.LightGray;
-
-     var tareasCompletadas = todasLasTareas.Count(t => t.Status == "Completada");
-     var tareasEnProgreso = todasLasTareas.Count(t => t.Status == "EnProgreso");
-      var tareasSinIniciar = todasLasTareas.Count(t => t.Status == "SinIniciar");
-    int totalTareas = todasLasTareas.Count;
-
-  // Completadas
-    wsStats.Cell(5, 1).Value = "? Completadas";
-      wsStats.Cell(5, 2).Value = tareasCompletadas;
- wsStats.Cell(5, 3).Value = $"{(tareasCompletadas * 100.0 / totalTareas):F1}%";
-    wsStats.Range(5, 1, 5, 3).Style.Fill.BackgroundColor = XLColor.FromArgb(200, 230, 201);
-        wsStats.Cell(5, 1).Style.Font.Bold = true;
-
-  // En Progreso
-        wsStats.Cell(6, 1).Value = "? En Progreso";
-   wsStats.Cell(6, 2).Value = tareasEnProgreso;
-        wsStats.Cell(6, 3).Value = $"{(tareasEnProgreso * 100.0 / totalTareas):F1}%";
-wsStats.Range(6, 1, 6, 3).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 244, 179);
-        wsStats.Cell(6, 1).Style.Font.Bold = true;
-
-       // Sin Iniciar
-    wsStats.Cell(7, 1).Value = "? Sin Iniciar";
-     wsStats.Cell(7, 2).Value = tareasSinIniciar;
-       wsStats.Cell(7, 3).Value = $"{(tareasSinIniciar * 100.0 / totalTareas):F1}%";
-    wsStats.Range(7, 1, 7, 3).Style.Fill.BackgroundColor = XLColor.FromArgb(224, 224, 224);
-wsStats.Cell(7, 1).Style.Font.Bold = true;
-
-        // Total
-   wsStats.Cell(8, 1).Value = "TOTAL";
-    wsStats.Cell(8, 2).Value = totalTareas;
-   wsStats.Cell(8, 3).Value = "100%";
-  wsStats.Range(8, 1, 8, 3).Style.Font.Bold = true;
-     wsStats.Range(8, 1, 8, 3).Style.Fill.BackgroundColor = XLColor.Gray;
-   wsStats.Range(8, 1, 8, 3).Style.Font.FontColor = XLColor.White;
-
-            // === SECCIÓN 2: DISTRIBUCIÓN POR PRIORIDAD ===
-            wsStats.Cell(3, 5).Value = "Distribución por Prioridad";
-             wsStats.Cell(3, 5).Style.Font.Bold = true;
-            wsStats.Cell(3, 5).Style.Font.FontSize = 12;
-             wsStats.Cell(3, 5).Style.Fill.BackgroundColor = XLColor.LightGray;
-                wsStats.Range(3, 5, 3, 7).Merge();
-
-// Headers
-   wsStats.Cell(4, 5).Value = "Prioridad";
-   wsStats.Cell(4, 6).Value = "Cantidad";
-       wsStats.Cell(4, 7).Value = "Porcentaje";
-    wsStats.Range(4, 5, 4, 7).Style.Font.Bold = true;
-   wsStats.Range(4, 5, 4, 7).Style.Fill.BackgroundColor = XLColor.LightGray;
-
- var tareasAlta = todasLasTareas.Count(t => t.Prioridad == "Alta");
-  var tareasMedia = todasLasTareas.Count(t => t.Prioridad == "Media");
-   var tareasBaja = todasLasTareas.Count(t => t.Prioridad == "Baja");
-
-  // Alta
-  wsStats.Cell(5, 5).Value = "?? Alta";
-     wsStats.Cell(5, 6).Value = tareasAlta;
-    wsStats.Cell(5, 7).Value = $"{(tareasAlta * 100.0 / totalTareas):F1}%";
- wsStats.Range(5, 5, 5, 7).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 205, 210);
-   wsStats.Cell(5, 5).Style.Font.Bold = true;
-
-// Media
-     wsStats.Cell(6, 5).Value = "?? Media";
-wsStats.Cell(6, 6).Value = tareasMedia;
-    wsStats.Cell(6, 7).Value = $"{(tareasMedia * 100.0 / totalTareas):F1}%";
-       wsStats.Range(6, 5, 6, 7).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 224, 178);
-  wsStats.Cell(6, 5).Style.Font.Bold = true;
-
-  // Baja
-  wsStats.Cell(7, 5).Value = "?? Baja";
-    wsStats.Cell(7, 6).Value = tareasBaja;
-    wsStats.Cell(7, 7).Value = $"{(tareasBaja * 100.0 / totalTareas):F1}%";
-       wsStats.Range(7, 5, 7, 7).Style.Fill.BackgroundColor = XLColor.FromArgb(200, 230, 201);
-      wsStats.Cell(7, 5).Style.Font.Bold = true;
-
-   // Total
-       wsStats.Cell(8, 5).Value = "TOTAL";
-   wsStats.Cell(8, 6).Value = totalTareas;
-     wsStats.Cell(8, 7).Value = "100%";
- wsStats.Range(8, 5, 8, 7).Style.Font.Bold = true;
-      wsStats.Range(8, 5, 8, 7).Style.Fill.BackgroundColor = XLColor.Gray;
-       wsStats.Range(8, 5, 8, 7).Style.Font.FontColor = XLColor.White;
-
- // === RESUMEN NUMÉRICO ===
-  wsStats.Cell(11, 1).Value = "?? RESUMEN TOTAL";
-       wsStats.Cell(11, 1).Style.Font.Bold = true;
-  wsStats.Cell(11, 1).Style.Font.FontSize = 14;
-  wsStats.Cell(11, 1).Style.Fill.BackgroundColor = XLColor.DarkBlue;
-   wsStats.Cell(11, 1).Style.Font.FontColor = XLColor.White;
-  wsStats.Range(11, 1, 11, 7).Merge();
-     wsStats.Cell(11, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-   wsStats.Cell(13, 1).Value = "Total de Proyectos:";
-   wsStats.Cell(13, 2).Value = proyectos.Count();
-  wsStats.Cell(13, 1).Style.Font.Bold = true;
-
-      wsStats.Cell(14, 1).Value = "Total de Tareas:";
-    wsStats.Cell(14, 2).Value = totalTareas;
-wsStats.Cell(14, 1).Style.Font.Bold = true;
-
-wsStats.Cell(15, 1).Value = "% Completado:";
-       wsStats.Cell(15, 2).Value = $"{(tareasCompletadas * 100.0 / totalTareas):F1}%";
-     wsStats.Cell(15, 1).Style.Font.Bold = true;
-   wsStats.Cell(15, 2).Style.Fill.BackgroundColor = XLColor.LightGreen;
-
-       wsStats.Cell(16, 1).Value = "% En Progreso:";
-     wsStats.Cell(16, 2).Value = $"{(tareasEnProgreso * 100.0 / totalTareas):F1}%";
-   wsStats.Cell(16, 1).Style.Font.Bold = true;
-        wsStats.Cell(16, 2).Style.Fill.BackgroundColor = XLColor.LightYellow;
-
-  wsStats.Cell(17, 1).Value = "% Pendiente:";
-     wsStats.Cell(17, 2).Value = $"{(tareasSinIniciar * 100.0 / totalTareas):F1}%";
-   wsStats.Cell(17, 1).Style.Font.Bold = true;
-     wsStats.Cell(17, 2).Style.Fill.BackgroundColor = XLColor.LightGray;
-
-  // Agregar bordes a todas las celdas con datos
-   wsStats.Range(3, 1, 8, 3).Style.Border.OutsideBorder = XLBorderStyleValues.Thick;
-        wsStats.Range(3, 5, 8, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thick;
-    wsStats.Range(13, 1, 17, 2).Style.Border.OutsideBorder = XLBorderStyleValues.Thick;
-
-        // Ajustar ancho de columnas
-       wsStats.ColumnsUsed().AdjustToContents();
-    }
 
         private string MapStatusToFriendly(string status, int estado)
         {

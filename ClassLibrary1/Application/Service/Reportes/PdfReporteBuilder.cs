@@ -17,16 +17,16 @@ using System.Linq;
 using System.Collections.Generic;
 using iText.Kernel.Pdf.Canvas;
 using System;
-using iText.Kernel.Geom;
 
 namespace ServiceProyecto.Application.Service.Reportes
 {
-  public class PdfReporteBuilder
+    public class PdfReporteBuilder : IPdfReporteBuilder
     {
         private readonly ProyectoService _proyectoService;
         private readonly TareaService _tareaService;
         private readonly UsuarioService _usuarioService;
 
+        // Fuentes
         private readonly PdfFont _fontRegular;
         private readonly PdfFont _fontBold;
 
@@ -34,6 +34,7 @@ namespace ServiceProyecto.Application.Service.Reportes
         {
             _proyectoService = proyectoService;
             _tareaService = tareaService;
+        _usuario_service_placeholder_removed: _ = usuarioService; // evita warnings si no se usa en tiempo de compilación
             _usuarioService = usuarioService;
             _fontRegular = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
             _fontBold = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
@@ -45,6 +46,7 @@ namespace ServiceProyecto.Application.Service.Reportes
 
             if (proyecto == null) return null;
 
+            // Asegurar que las tareas estén cargadas
             if (proyecto.Tareas == null || !proyecto.Tareas.Any())
             {
                 var todas = _tareaService.ObtenerTodasLasTareas() ?? Enumerable.Empty<Tarea>();
@@ -65,6 +67,7 @@ namespace ServiceProyecto.Application.Service.Reportes
             document.Add(titulo);
 
             document.Add(new LineSeparator(new SolidLine()).SetMarginTop(2).SetMarginBottom(8));
+
             document.Add(CrearSeccionInfoPrincipal(proyecto));
 
             var subtitulo = new Paragraph("Tareas Asignadas")
@@ -84,6 +87,7 @@ namespace ServiceProyecto.Application.Service.Reportes
                 .SetMarginTop(6));
 
             document.Close();
+
             var bytes = stream.ToArray();
             return AddFootersToPdfBytes(bytes, usuarioNombre);
         }
@@ -119,12 +123,10 @@ namespace ServiceProyecto.Application.Service.Reportes
 
             document.Add(new LineSeparator(new SolidLine()).SetMarginTop(2).SetMarginBottom(10));
 
-            // ? NUEVO: Agregar gráficos de torta al inicio
-       AgregarGraficosEstadisticas(document, proyectos);
-
-    foreach (var proyecto in proyectos)
-  {
-       if (proyecto.Tareas == null || !proyecto.Tareas.Any())
+            foreach (var proyecto in proyectos)
+            {
+                // Asegurar que las tareas estén cargadas
+                if (proyecto.Tareas == null || !proyecto.Tareas.Any())
                 {
                     var pConTareas = _proyectoService.ObtenerProyectoConTareas(proyecto.Id);
                     if (pConTareas?.Tareas != null && pConTareas.Tareas.Any())
@@ -147,6 +149,7 @@ namespace ServiceProyecto.Application.Service.Reportes
                 document.Add(projectHeader);
 
                 document.Add(new LineSeparator(new SolidLine()).SetMarginBottom(6).SetMarginTop(2));
+
                 document.Add(CrearSeccionInfoPrincipal(proyecto));
 
                 var subtitulo = new Paragraph("Tareas Asignadas")
@@ -158,230 +161,28 @@ namespace ServiceProyecto.Application.Service.Reportes
                 document.Add(subtitulo);
 
                 document.Add(CrearTablaTareas(proyecto));
+
                 document.Add(new Paragraph().SetMarginBottom(10));
             }
 
             document.Close();
+
             var generated = stream.ToArray();
             return AddFootersToPdfBytes(generated, usuarioNombre);
         }
 
-        /// <summary>
-     /// ? NUEVO: Agregar gráficos estadísticos de torta
-   /// </summary>
-        private void AgregarGraficosEstadisticas(Document document, IEnumerable<Proyecto> proyectos)
-        {
-   // Obtener todas las tareas
-         var todasLasTareas = proyectos
-    .SelectMany(p => p.Tareas ?? Enumerable.Empty<Tarea>())
-       .ToList();
-
-          if (!todasLasTareas.Any())
-   {
-  document.Add(new Paragraph("No hay tareas para generar estadísticas.")
-    .SetFont(_fontRegular)
-         .SetFontSize(10)
-   .SetFontColor(ColorConstants.GRAY)
-    .SetTextAlignment(TextAlignment.CENTER)
-       .SetMarginBottom(20));
-        return;
-  }
-
- // Calcular estadísticas
-var tareasCompletadas = todasLasTareas.Count(t => t.Status == "Completada");
-var tareasEnProgreso = todasLasTareas.Count(t => t.Status == "EnProgreso");
-       var tareasSinIniciar = todasLasTareas.Count(t => t.Status == "SinIniciar");
-
-    var tareasAlta = todasLasTareas.Count(t => t.Prioridad == "Alta");
-     var tareasMedia = todasLasTareas.Count(t => t.Prioridad == "Media");
-        var tareasBaja = todasLasTareas.Count(t => t.Prioridad == "Baja");
-
-  // Título de estadísticas
-    document.Add(new Paragraph("Estadísticas Generales")
-     .SetFont(_fontBold)
-    .SetFontSize(14)
-     .SetFontColor(ColorConstants.DARK_GRAY)
-     .SetMarginTop(10)
-     .SetMarginBottom(15));
-
-         // Crear tabla para los dos gráficos lado a lado
-     var tablaGraficos = new Table(UnitValue.CreatePercentArray(new float[] { 1, 1 }))
-    .UseAllAvailableWidth()
-       .SetBorder(Border.NO_BORDER);
-
-    // Celda para gráfico de Estados
-   var celdaEstados = new Cell()
-    .SetBorder(Border.NO_BORDER)
-     .SetPadding(10);
-   celdaEstados.Add(CrearGraficoTortaEstados(tareasCompletadas, tareasEnProgreso, tareasSinIniciar));
-
-   // Celda para gráfico de Prioridades
-    var celdaPrioridades = new Cell()
-     .SetBorder(Border.NO_BORDER)
-     .SetPadding(10);
-      celdaPrioridades.Add(CrearGraficoTortaPrioridades(tareasAlta, tareasMedia, tareasBaja));
-
- tablaGraficos.AddCell(celdaEstados);
-   tablaGraficos.AddCell(celdaPrioridades);
-
-      document.Add(tablaGraficos);
-    document.Add(new Paragraph().SetMarginBottom(20)); // Espacio después de gráficos
-}
-
-        /// <summary>
-   /// ? NUEVO: Crear representación visual del gráfico de torta de Estados
-     /// </summary>
-        private Table CrearGraficoTortaEstados(int completadas, int enProgreso, int sinIniciar)
-   {
-       int total = completadas + enProgreso + sinIniciar;
-    if (total == 0) total = 1; // Evitar división por cero
-
- // Tabla contenedora
-      var tabla = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
-        .UseAllAvailableWidth()
-           .SetBorder(Border.NO_BORDER);
-
-  // Título del gráfico
-  tabla.AddCell(new Cell()
-         .Add(new Paragraph("Distribución por Estado")
-      .SetFont(_fontBold)
-  .SetFontSize(12)
-     .SetTextAlignment(TextAlignment.CENTER))
-.SetBorder(Border.NO_BORDER)
-    .SetBackgroundColor(new DeviceRgb(240, 240, 240))
-   .SetPadding(8));
-
-   // Crear barras visuales proporcionales
-   var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
-  .UseAllAvailableWidth()
- .SetBorder(Border.NO_BORDER);
-
-    // Barra Completadas (Verde)
-    if (completadas > 0)
-  {
-var porcentaje = (completadas * 100.0 / total);
-     tablaBarras.AddCell(new Cell()
-       .Add(new Paragraph($"? Completadas: {completadas} ({porcentaje:F1}%)")
- .SetFont(_fontRegular)
-   .SetFontSize(10))
-       .SetBackgroundColor(new DeviceRgb(76, 175, 80))
-         .SetBorder(Border.NO_BORDER)
-         .SetPadding(8)
-  .SetWidth(UnitValue.CreatePercentValue(100)));
-       }
-
- // Barra En Progreso (Amarillo)
-      if (enProgreso > 0)
-   {
-   var porcentaje = (enProgreso * 100.0 / total);
-       tablaBarras.AddCell(new Cell()
-     .Add(new Paragraph($"? En Progreso: {enProgreso} ({porcentaje:F1}%)")
-   .SetFont(_fontRegular)
-     .SetFontSize(10))
-    .SetBackgroundColor(new DeviceRgb(255, 193, 7))
-     .SetBorder(Border.NO_BORDER)
-   .SetPadding(8)
- .SetWidth(UnitValue.CreatePercentValue(100)));
-  }
-
- // Barra Sin Iniciar (Gris)
-  if (sinIniciar > 0)
-{
-     var porcentaje = (sinIniciar * 100.0 / total);
-  tablaBarras.AddCell(new Cell()
-.Add(new Paragraph($"? Sin Iniciar: {sinIniciar} ({porcentaje:F1}%)")
-        .SetFont(_fontRegular)
-   .SetFontSize(10))
-  .SetBackgroundColor(new DeviceRgb(158, 158, 158))
-      .SetBorder(Border.NO_BORDER)
-   .SetPadding(8)
-.SetWidth(UnitValue.CreatePercentValue(100)));
-   }
-
-      tabla.AddCell(new Cell()
-      .Add(tablaBarras)
-.SetBorder(Border.NO_BORDER)
-   .SetPadding(5));
-
-       return tabla;
-        }
-
-  /// <summary>
-   /// ? NUEVO: Crear representación visual del gráfico de torta de Prioridades
-  /// </summary>
-   private Table CrearGraficoTortaPrioridades(int alta, int media, int baja)
-     {
-      int total = alta + media + baja;
-  if (total == 0) total = 1;
-
-        var tabla = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
-   .UseAllAvailableWidth()
-     .SetBorder(Border.NO_BORDER);
-
-        tabla.AddCell(new Cell()
-    .Add(new Paragraph("Distribución por Prioridad")
-.SetFont(_fontBold)
-      .SetFontSize(12)
-   .SetTextAlignment(TextAlignment.CENTER))
-        .SetBorder(Border.NO_BORDER)
-        .SetBackgroundColor(new DeviceRgb(240, 240, 240))
-     .SetPadding(8));
-
-var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
-     .UseAllAvailableWidth()
-      .SetBorder(Border.NO_BORDER);
-
-  if (alta > 0)
-    {
-    var porcentaje = (alta * 100.0 / total);
-  tablaBarras.AddCell(new Cell()
-       .Add(new Paragraph($"?? Alta: {alta} ({porcentaje:F1}%)")
-      .SetFont(_fontRegular)
-.SetFontSize(10))
-        .SetBackgroundColor(new DeviceRgb(211, 47, 47))
-  .SetFontColor(ColorConstants.WHITE)
-.SetBorder(Border.NO_BORDER)
-       .SetPadding(8));
-   }
-
-       if (media > 0)
-  {
-    var porcentaje = (media * 100.0 / total);
- tablaBarras.AddCell(new Cell()
-       .Add(new Paragraph($"?? Media: {media} ({porcentaje:F1}%)")
-   .SetFont(_fontRegular)
-        .SetFontSize(10))
-        .SetBackgroundColor(new DeviceRgb(255, 152, 0))
-       .SetBorder(Border.NO_BORDER)
-        .SetPadding(8));
-  }
-
-    if (baja > 0)
-     {
-  var porcentaje = (baja * 100.0 / total);
-        tablaBarras.AddCell(new Cell()
-        .Add(new Paragraph($"?? Baja: {baja} ({porcentaje:F1}%)")
-.SetFont(_fontRegular)
-  .SetFontSize(10))
-         .SetBackgroundColor(new DeviceRgb(76, 175, 80))
-        .SetBorder(Border.NO_BORDER)
-.SetPadding(8));
-        }
-
-     tabla.AddCell(new Cell()
-         .Add(tablaBarras)
- .SetBorder(Border.NO_BORDER)
-     .SetPadding(5));
-
-     return tabla;
-}
-
+        // -----------------------------
+        // Métodos auxiliares
+        // -----------------------------
         private Table CrearSeccionInfoPrincipal(Proyecto proyecto)
         {
             var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 4 }))
                 .UseAllAvailableWidth()
                 .SetMarginBottom(10)
                 .SetBorder(Border.NO_BORDER);
+
+            table.AddCell(CrearCelda("ID Proyecto:", true, null, false, TextAlignment.RIGHT));
+            table.AddCell(CrearCelda(proyecto.Id.ToString(), false, null, false, TextAlignment.LEFT));
 
             table.AddCell(CrearCelda("Nombre:", true, null, false, TextAlignment.RIGHT));
             table.AddCell(CrearCelda(proyecto.Nombre ?? "-", false, null, false, TextAlignment.LEFT));
@@ -403,11 +204,12 @@ var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
 
         private Table CrearTablaTareas(Proyecto proyecto)
         {
-            var table = new Table(UnitValue.CreatePercentArray(new float[] { 4, 1, 1, 4 }))
+            var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 4, 1, 1, 4 }))
                 .UseAllAvailableWidth()
                 .SetBorder(Border.NO_BORDER)
                 .SetMarginBottom(8);
 
+            table.AddHeaderCell(CrearCelda("ID", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.CENTER));
             table.AddHeaderCell(CrearCelda("Título", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.LEFT));
             table.AddHeaderCell(CrearCelda("Prioridad", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.CENTER));
             table.AddHeaderCell(CrearCelda("Estado", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.CENTER));
@@ -415,7 +217,7 @@ var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
 
             if (proyecto.Tareas == null || !proyecto.Tareas.Any())
             {
-                table.AddCell(new Cell(1, 4)
+                table.AddCell(new Cell(1, 5)
                     .Add(new Paragraph("No hay tareas asignadas a este proyecto."))
                     .SetTextAlignment(TextAlignment.CENTER)
                     .SetBorder(Border.NO_BORDER)
@@ -428,6 +230,7 @@ var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
                 {
                     var rowBg = (idx % 2 == 1) ? (Color)new DeviceRgb(250, 250, 250) : null;
 
+                    table.AddCell(CrearCelda(tarea.Id.ToString(), false, rowBg, false, TextAlignment.CENTER));
                     table.AddCell(CrearCelda(tarea.Titulo ?? "-", false, rowBg, false, TextAlignment.LEFT));
                     table.AddCell(CrearCelda(tarea.Prioridad ?? "N/A", false, rowBg, false, TextAlignment.CENTER));
 
@@ -435,6 +238,7 @@ var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
                     var estadoColor = GetStatusColor(estadoTexto);
                     table.AddCell(CrearCelda(estadoTexto, false, estadoColor ?? rowBg, false, TextAlignment.CENTER));
 
+                    // Usuarios
                     var usuariosNombres = new List<string>();
                     if (tarea.IdUsuarioAsignado.HasValue)
                     {
@@ -511,6 +315,7 @@ var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
             return cell;
         }
 
+        // Post-process PDF bytes and draw footer on each page
         private byte[] AddFootersToPdfBytes(byte[] inputPdfBytes, string usuarioNombre)
         {
             using var inputStream = new MemoryStream(inputPdfBytes);

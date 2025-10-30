@@ -60,6 +60,9 @@ builder.Services.AddScoped<ComentarioService>();
 builder.Services.AddScoped<EmailService>(); 
 builder.Services.AddScoped<ReporteService>();
 builder.Services.AddScoped<Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Facades.GestionProyectosFacade>(); // ✅ NUEVO: Registrar Facade
+builder.Services.AddScoped<ServiceProyecto.Application.Service.Reportes.IPdfReporteBuilder, ServiceProyecto.Application.Service.Reportes.PdfReporteBuilder>();
+builder.Services.AddScoped<ServiceProyecto.Application.Service.Reportes.IExcelReporteBuilder, ServiceProyecto.Application.Service.Reportes.ExcelReporteBuilder>();
+builder.Services.AddScoped<ServiceProyecto.Application.Service.Reportes.ReporteService>();
 
 builder.Services.AddRazorPages(options =>
 {
