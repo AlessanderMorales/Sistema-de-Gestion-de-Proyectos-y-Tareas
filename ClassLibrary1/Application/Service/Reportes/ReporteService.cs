@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Geom;
 using System;
+using ClosedXML.Excel;
+using System.Globalization;
 
 namespace ServiceProyecto.Application.Service.Reportes
 {
@@ -193,6 +195,145 @@ namespace ServiceProyecto.Application.Service.Reportes
             // Post-process bytes to add footers safely
             var generated = stream.ToArray();
             return AddFootersToPdfBytes(generated, usuarioNombre);
+        }
+
+        // -----------------------------
+        // Nueva funcionalidad: Generar Excel
+        // -----------------------------
+        public byte[] GenerarReporteGeneralProyectosExcel(string usuarioNombre = "Sistema")
+        {
+            var proyectos = _proyectoService.ObtenerTodosLosProyectos()?.ToList() ?? new List<Proyecto>();
+
+            // Asegurarse de que cada proyecto tenga sus tareas cargadas
+            var proyectosConTareas = new List<Proyecto>();
+            foreach (var p in proyectos)
+            {
+                var pConTareas = _proyectoService.ObtenerProyectoConTareas(p.Id) ?? p;
+                proyectosConTareas.Add(pConTareas);
+            }
+
+            return GenerarReporteGeneralProyectosExcel(proyectosConTareas, usuarioNombre);
+        }
+
+        public byte[] GenerarReporteGeneralProyectosExcel(IEnumerable<Proyecto> proyectos, string usuarioNombre = "Sistema")
+        {
+            using var workbook = new XLWorkbook();
+            var ws = workbook.Worksheets.Add("Proyectos");
+
+            // Encabezados
+            var headers = new[]
+            {
+                "Proyecto ID",
+                "Proyecto",
+                "Descripción",
+                "Fecha Inicio",
+                "Fecha Fin",
+                "Estado Proyecto",
+                "Tarea ID",
+                "Tarea Título",
+                "Prioridad",
+                "Estado Tarea",
+                "Usuarios Asignados"
+            };
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                ws.Cell(1, i + 1).Value = headers[i];
+            }
+            ws.Row(1).Style.Font.Bold = true;
+            ws.Row(1).Style.Fill.BackgroundColor = XLColor.LightGray;
+            ws.SheetView.FreezeRows(1);
+
+            int row = 2;
+            foreach (var proyecto in proyectos)
+            {
+                // Asegurar que las tareas estén cargadas
+                if (proyecto.Tareas == null || !proyecto.Tareas.Any())
+                {
+                    var pConTareas = _proyectoService.ObtenerProyectoConTareas(proyecto.Id);
+                    if (pConTareas?.Tareas != null && pConTareas.Tareas.Any())
+                    {
+                        proyecto.Tareas = pConTareas.Tareas;
+                    }
+                    else
+                    {
+                        var todas = _tareaService.ObtenerTodasLasTareas() ?? Enumerable.Empty<Tarea>();
+                        proyecto.Tareas = todas.Where(t => t.IdProyecto == proyecto.Id).ToList();
+                    }
+                }
+
+                if (proyecto.Tareas == null || !proyecto.Tareas.Any())
+                {
+                    // fila de proyecto sin tareas
+                    ws.Cell(row, 1).Value = proyecto.Id;
+                    ws.Cell(row, 2).Value = proyecto.Nombre ?? "-";
+                    ws.Cell(row, 3).Value = proyecto.Descripcion ?? "-";
+                    ws.Cell(row, 4).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    ws.Cell(row, 5).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    ws.Cell(row, 6).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
+
+                    // columnas de tarea vacías
+                    for (int c = 7; c <= 11; c++) ws.Cell(row, c).Value = string.Empty;
+
+                    row++;
+                }
+                else
+                {
+                    foreach (var tarea in proyecto.Tareas)
+                    {
+                        ws.Cell(row, 1).Value = proyecto.Id;
+                        ws.Cell(row, 2).Value = proyecto.Nombre ?? "-";
+                        ws.Cell(row, 3).Value = proyecto.Descripcion ?? "-";
+                        ws.Cell(row, 4).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        ws.Cell(row, 5).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        ws.Cell(row, 6).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
+
+                        ws.Cell(row, 7).Value = tarea.Id;
+                        ws.Cell(row, 8).Value = tarea.Titulo ?? "-";
+                        ws.Cell(row, 9).Value = tarea.Prioridad ?? "-";
+                        ws.Cell(row, 10).Value = MapStatusToFriendly(tarea.Status, tarea.Estado);
+
+                        // Usuarios asignados (IdUsuarioAsignado + otros)
+                        var usuariosNombres = new List<string>();
+                        if (tarea.IdUsuarioAsignado.HasValue)
+                        {
+                            var usuario = _usuarioService.ObtenerUsuarioPorId(tarea.IdUsuarioAsignado.Value);
+                            if (usuario != null)
+                                usuariosNombres.Add(($"{usuario.Nombres} {usuario.PrimerApellido}").Trim());
+                        }
+
+                        var otrosIds = _tareaService.ObtenerIdsUsuariosAsignados(tarea.Id) ?? Enumerable.Empty<int>();
+                        foreach (var uid in otrosIds)
+                        {
+                            if (tarea.IdUsuarioAsignado.HasValue && uid == tarea.IdUsuarioAsignado.Value) continue;
+                            var usuario = _usuarioService.ObtenerUsuarioPorId(uid);
+                            if (usuario != null)
+                                usuariosNombres.Add(($"{usuario.Nombres} {usuario.PrimerApellido}").Trim());
+                        }
+
+                        var usuariosStr = usuariosNombres.Any() ? string.Join(", ", usuariosNombres.Distinct()) : "*Sin Empleados Asignados*";
+                        ws.Cell(row, 11).Value = usuariosStr;
+
+                        row++;
+                    }
+                }
+            }
+
+            // Ajustar ancho
+            ws.ColumnsUsed().AdjustToContents();
+
+            // Metadatos
+            workbook.Properties.Author = usuarioNombre;
+            workbook.Properties.Title = "Reporte General Proyectos";
+            workbook.Properties.Created = DateTime.Now;
+
+            // Pie simple en última fila (informativo)
+            ws.Cell(row + 1, 1).Value = $"Reporte generado por: {usuarioNombre}";
+            ws.Cell(row + 2, 1).Value = $"Fecha: {DateTime.Now.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)}";
+
+            using var ms = new MemoryStream();
+            workbook.SaveAs(ms);
+            return ms.ToArray();
         }
 
         // -----------------------------

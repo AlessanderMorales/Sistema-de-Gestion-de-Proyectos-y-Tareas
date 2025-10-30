@@ -45,20 +45,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
                 return RedirectToPage("./Index");
             }
 
-            var proyecto = _proyectoService.ObtenerProyectoPorId(id);
-            if (proyecto != null)
-            {
-                _proyectoService.EliminarProyecto(proyecto);
-            }
-            try
-            {
-                _proyectoService.EliminarProyectoPorId(id);
-            }
-            catch
-            {
-                // ignore if not implemented
-            }
-
+            _proyectoService.EliminarProyectoPorId(id);
             TempData["SuccessMessage"] = "Proyecto eliminado correctamente.";
             return RedirectToPage("./Index");
         }
@@ -67,7 +54,6 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
         {
             var proyectos = _proyectoService.ObtenerTodosLosProyectos();
 
-            // Prefer email claim, fallback to Name, fallback to Identifier
             var usuarioNombre = User.FindFirst(ClaimTypes.Email)?.Value
                                 ?? User.Identity?.Name
                                 ?? User.FindFirst(ClaimTypes.Name)?.Value
@@ -76,6 +62,20 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 
             var pdfBytes = _reporteService.GenerarReporteGeneralProyectosPdf(proyectos, usuarioNombre);
             return File(pdfBytes, "application/pdf", "Reporte_General_Proyectos.pdf");
+        }
+
+        public IActionResult OnPostGenerarExcelGeneral()
+        {
+            var proyectos = _proyectoService.ObtenerTodosLosProyectos();
+
+            var usuarioNombre = User.FindFirst(ClaimTypes.Email)?.Value
+                                ?? User.Identity?.Name
+                                ?? User.FindFirst(ClaimTypes.Name)?.Value
+                                ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                                ?? "Sistema";
+
+            var excelBytes = _reporteService.GenerarReporteGeneralProyectosExcel(proyectos, usuarioNombre);
+            return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte_General_Proyectos.xlsx");
         }
     }
 }

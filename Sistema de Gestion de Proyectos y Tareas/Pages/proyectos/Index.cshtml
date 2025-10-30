@@ -5,28 +5,28 @@
 }
 
 <style>
-  :root {
+    :root {
         --accent-red: #D32F2F;
         --accent-orange: #FF5722;
-   --accent-gold: #FFD700;
-      --accent-edit: #ffc107;
+        --accent-gold: #FFD700;
+        --accent-edit: #ffc107;
         --accent-view: #17a2b8;
     }
 
- .title-volcanic {
+    .title-volcanic {
         background: linear-gradient(45deg, var(--accent-gold), var(--accent-orange));
         -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+        -webkit-text-fill-color: transparent;
         font-weight: 700;
     }
 
     .header-actions {
         display: flex;
-   justify-content: space-between;
-     align-items: center;
-  margin-bottom: 2rem;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
         border-bottom: 2px solid rgba(255,255,255,0.1);
-      padding-bottom: 1rem;
+        padding-bottom: 1rem;
     }
 
     .header-buttons {
@@ -37,7 +37,7 @@
     .table-volcanic {
         background-color: transparent;
         color: #e0e0e0;
-    border-collapse: separate;
+        border-collapse: separate;
         border-spacing: 0 10px;
     }
 
@@ -98,7 +98,7 @@
     }
 
     .btn-volcanic-primary {
-      background: linear-gradient(45deg, var(--accent-red), var(--accent-orange));
+        background: linear-gradient(45deg, var(--accent-red), var(--accent-orange));
         border: none;
         color: white;
         font-weight: bold;
@@ -114,13 +114,13 @@
 
     .modal-content.volcanic-modal {
         background-color: #2c2c31;
-   color: #f5f5f7;
-  border: 1px solid rgba(255,255,255,0.2);
+        color: #f5f5f7;
+        border: 1px solid rgba(255,255,255,0.2);
         border-radius: 15px;
     }
 
     .volcanic-modal .modal-header {
-     border-bottom: 1px solid var(--accent-orange);
+        border-bottom: 1px solid var(--accent-orange);
     }
 
     .volcanic-modal .modal-footer {
@@ -133,14 +133,14 @@
         color: white;
         font-weight: bold;
         padding: 10px 20px;
- border-radius: 8px;
+        border-radius: 8px;
     }
 
     .btn-volcanic-secondary-modal {
         background-color: #4a4a50;
-      border: none;
+        border: none;
         color: white;
-  font-weight: bold;
+        font-weight: bold;
         padding: 10px 20px;
         border-radius: 8px;
     }
@@ -156,6 +156,12 @@
             </button>
         </form>
 
+        <form method="post" asp-page-handler="GenerarExcelGeneral">
+            <button type="submit" class="btn btn-volcanic-primary">
+                📥 Descargar Reporte Excel
+            </button>
+        </form>
+
         @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
         {
             <a asp-page="Create" class="btn btn-volcanic-primary">Crear Nuevo Proyecto</a>
@@ -166,10 +172,10 @@
 <table class="table table-volcanic">
     <thead>
         <tr>
-    <th>Nombre</th>
-     <th>Descripcion</th>
+            <th>Nombre</th>
+            <th>Descripcion</th>
             <th>Inicio</th>
-         <th>Fin</th>
+            <th>Fin</th>
             <th class="text-center">Acciones</th>
         </tr>
     </thead>
@@ -224,23 +230,23 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-      var confirmDeleteModal = document.getElementById('confirmDeleteModal');
-         var confirmDeleteButton = document.getElementById('confirmDeleteButton');
+            var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            var confirmDeleteButton = document.getElementById('confirmDeleteButton');
             var projectIdToDelete;
 
-     confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
-       var button = event.relatedTarget;
-      projectIdToDelete = button.getAttribute('data-project-id');
- });
+            confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                projectIdToDelete = button.getAttribute('data-project-id');
+            });
 
-   confirmDeleteButton.addEventListener('click', function () {
-   if (projectIdToDelete) {
-          var form = document.getElementById('deleteForm-' + projectIdToDelete);
-           if (form) {
-             form.submit();
-       }
-      }
- });
+            confirmDeleteButton.addEventListener('click', function () {
+                if (projectIdToDelete) {
+                    var form = document.getElementById('deleteForm-' + projectIdToDelete);
+                    if (form) {
+                        form.submit();
+                    }
+                }
+            });
         });
     </script>
 }
