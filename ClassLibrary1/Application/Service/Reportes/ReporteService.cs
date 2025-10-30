@@ -15,6 +15,9 @@ using ServiceUsuario.Application.Service;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using iText.Kernel.Pdf.Canvas;
+using iText.Kernel.Geom;
+using System;
 
 namespace ServiceProyecto.Application.Service.Reportes
 {
@@ -40,7 +43,7 @@ namespace ServiceProyecto.Application.Service.Reportes
         // -----------------------------
         // Método para 1 proyecto
         // -----------------------------
-        public byte[] GenerarReporteProyectoPdf(int idProyecto)
+        public byte[] GenerarReporteProyectoPdf(int idProyecto, string usuarioNombre = "Sistema")
         {
             var proyecto = _proyectoService.ObtenerProyectoConTareas(idProyecto);
 
@@ -87,14 +90,18 @@ namespace ServiceProyecto.Application.Service.Reportes
                 .SetFontSize(10)
                 .SetFontColor(ColorConstants.GRAY));
 
+            // Close document to finalize pages
             document.Close();
-            return stream.ToArray();
+
+            // Post-process bytes to add footers safely
+            var bytes = stream.ToArray();
+            return AddFootersToPdfBytes(bytes, usuarioNombre);
         }
 
         // -----------------------------
         // Nuevo método: todos los proyectos (usa ProyectoService para obtenerlos)
         // -----------------------------
-        public byte[] GenerarReporteGeneralProyectosPdf()
+        public byte[] GenerarReporteGeneralProyectosPdf(string usuarioNombre = "Sistema")
         {
             var proyectos = _proyectoService.ObtenerTodosLosProyectos()?.ToList() ?? new List<Proyecto>();
 
@@ -106,11 +113,11 @@ namespace ServiceProyecto.Application.Service.Reportes
                 proyectosConTareas.Add(pConTareas);
             }
 
-            return GenerarReporteGeneralProyectosPdf(proyectosConTareas);
+            return GenerarReporteGeneralProyectosPdf(proyectosConTareas, usuarioNombre);
         }
 
         // Mantengo el método existente que recibe proyectos (compatibilidad)
-        public byte[] GenerarReporteGeneralProyectosPdf(IEnumerable<Proyecto> proyectos)
+        public byte[] GenerarReporteGeneralProyectosPdf(IEnumerable<Proyecto> proyectos, string usuarioNombre = "Sistema")
         {
             using var stream = new MemoryStream();
             using var writer = new PdfWriter(stream);
@@ -168,8 +175,12 @@ namespace ServiceProyecto.Application.Service.Reportes
                 }
             }
 
+            // Close document to finalize pages
             document.Close();
-            return stream.ToArray();
+
+            // Post-process bytes to add footers safely
+            var generated = stream.ToArray();
+            return AddFootersToPdfBytes(generated, usuarioNombre);
         }
 
         // -----------------------------
@@ -289,6 +300,52 @@ namespace ServiceProyecto.Application.Service.Reportes
             }
 
             return new Cell().Add(paragraph);
+        }
+
+        // Post-process PDF bytes and draw footer on each page
+        private byte[] AddFootersToPdfBytes(byte[] inputPdfBytes, string usuarioNombre)
+        {
+            using var inputStream = new MemoryStream(inputPdfBytes);
+            using var reader = new PdfReader(inputStream);
+            using var outputStream = new MemoryStream();
+            using var writer = new PdfWriter(outputStream);
+            using var pdfDoc = new PdfDocument(reader, writer);
+
+            // create local fonts for this pdf processing (do not reuse _fontRegular/_fontBold)
+            var footerFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+            var footerFontSmall = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+
+            int total = pdfDoc.GetNumberOfPages();
+            for (int i = 1; i <= total; i++)
+            {
+                var page = pdfDoc.GetPage(i);
+                var pageSize = page.GetPageSize();
+                var canvas = new PdfCanvas(page.NewContentStreamAfter(), page.GetResources(), pdfDoc);
+                var layoutCanvas = new iText.Layout.Canvas(canvas, pageSize);
+
+                float x = pageSize.GetRight() - 40;
+                float y = pageSize.GetBottom() + 30;
+
+                var pageNumPara = new Paragraph($"Página {i}")
+                    .SetFont(footerFont)
+                    .SetFontSize(9)
+                    .SetFontColor(ColorConstants.GRAY);
+
+                layoutCanvas.ShowTextAligned(pageNumPara, x, y, TextAlignment.RIGHT);
+
+                var generatedAt = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+                var genPara = new Paragraph($"Reporte Generado Por: {usuarioNombre} - {generatedAt}")
+                    .SetFont(footerFontSmall)
+                    .SetFontSize(8)
+                    .SetFontColor(ColorConstants.GRAY);
+
+                layoutCanvas.ShowTextAligned(genPara, x, y - 10, TextAlignment.RIGHT);
+
+                layoutCanvas.Close();
+            }
+
+            pdfDoc.Close();
+            return outputStream.ToArray();
         }
     }
 }
