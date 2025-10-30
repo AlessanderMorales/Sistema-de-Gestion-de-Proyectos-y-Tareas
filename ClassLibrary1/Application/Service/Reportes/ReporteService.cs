@@ -9,6 +9,9 @@ using iText.Layout.Element;
 using iText.Layout.Properties;
 using ServiceProyecto.Application.Service;
 using ServiceProyecto.Domain.Entities;
+using ServiceTarea.Application.Service;
+using ServiceTarea.Domain.Entities;
+using ServiceUsuario.Application.Service;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -18,14 +21,18 @@ namespace ServiceProyecto.Application.Service.Reportes
     public class ReporteService
     {
         private readonly ProyectoService _proyectoService;
+        private readonly TareaService _tareaService;
+        private readonly UsuarioService _usuarioService;
 
         // ✅ Fuentes (una regular y una en negrita)
         private readonly PdfFont _fontRegular;
         private readonly PdfFont _fontBold;
 
-        public ReporteService(ProyectoService proyectoService)
+        public ReporteService(ProyectoService proyectoService, TareaService tareaService, UsuarioService usuarioService)
         {
             _proyectoService = proyectoService;
+            _tareaService = tareaService;
+            _usuarioService = usuarioService;
             _fontRegular = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
             _fontBold = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
         }
@@ -38,6 +45,15 @@ namespace ServiceProyecto.Application.Service.Reportes
             var proyecto = _proyectoService.ObtenerProyectoConTareas(idProyecto);
 
             if (proyecto == null) return null;
+
+            // Asegurar que las tareas estén cargadas; si no, intentar obtenerlas desde TareaService
+            if (proyecto.Tareas == null || !proyecto.Tareas.Any())
+            {
+                var todas = _tareaService.ObtenerTodasLasTareas() ?? Enumerable.Empty<Tarea>();
+                var tareasFallback = todas.Where(t => t.IdProyecto == proyecto.Id).ToList();
+
+                proyecto.Tareas = tareasFallback;
+            }
 
             using var stream = new MemoryStream();
             using var writer = new PdfWriter(stream);
@@ -66,7 +82,7 @@ namespace ServiceProyecto.Application.Service.Reportes
             document.Add(CrearTablaTareas(proyecto));
 
             // Nota
-            document.Add(new Paragraph("Integrantes: (Deducidos de las tareas - Falta lógica de UsuarioService)")
+            document.Add(new Paragraph("Integrantes: (Listado consultado desde UsuarioService según tareas asignadas)")
                 .SetFont(_fontRegular)
                 .SetFontSize(10)
                 .SetFontColor(ColorConstants.GRAY));
@@ -76,8 +92,24 @@ namespace ServiceProyecto.Application.Service.Reportes
         }
 
         // -----------------------------
-        // Nuevo método: todos los proyectos
+        // Nuevo método: todos los proyectos (usa ProyectoService para obtenerlos)
         // -----------------------------
+        public byte[] GenerarReporteGeneralProyectosPdf()
+        {
+            var proyectos = _proyectoService.ObtenerTodosLosProyectos()?.ToList() ?? new List<Proyecto>();
+
+            // Asegurarse de que cada proyecto tenga sus tareas cargadas
+            var proyectosConTareas = new List<Proyecto>();
+            foreach (var p in proyectos)
+            {
+                var pConTareas = _proyectoService.ObtenerProyectoConTareas(p.Id) ?? p;
+                proyectosConTareas.Add(pConTareas);
+            }
+
+            return GenerarReporteGeneralProyectosPdf(proyectosConTareas);
+        }
+
+        // Mantengo el método existente que recibe proyectos (compatibilidad)
         public byte[] GenerarReporteGeneralProyectosPdf(IEnumerable<Proyecto> proyectos)
         {
             using var stream = new MemoryStream();
@@ -97,6 +129,21 @@ namespace ServiceProyecto.Application.Service.Reportes
 
             foreach (var proyecto in proyectos)
             {
+                // Asegurar que las tareas estén cargadas; intentar ObtenerProyectoConTareas y luego fallback a TareaService
+                if (proyecto.Tareas == null || !proyecto.Tareas.Any())
+                {
+                    var pConTareas = _proyectoService.ObtenerProyectoConTareas(proyecto.Id);
+                    if (pConTareas?.Tareas != null && pConTareas.Tareas.Any())
+                    {
+                        proyecto.Tareas = pConTareas.Tareas;
+                    }
+                    else
+                    {
+                        var todas = _tareaService.ObtenerTodasLasTareas() ?? Enumerable.Empty<Tarea>();
+                        proyecto.Tareas = todas.Where(t => t.IdProyecto == proyecto.Id).ToList();
+                    }
+                }
+
                 // Info principal
                 document.Add(CrearSeccionInfoPrincipal(proyecto));
 
@@ -109,7 +156,7 @@ namespace ServiceProyecto.Application.Service.Reportes
                 document.Add(CrearTablaTareas(proyecto));
 
                 // Nota
-                document.Add(new Paragraph("Integrantes: (Deducidos de las tareas - Falta lógica de UsuarioService)")
+                document.Add(new Paragraph("Integrantes: (Listado consultado desde UsuarioService según tareas asignadas)")
                     .SetFont(_fontRegular)
                     .SetFontSize(10)
                     .SetFontColor(ColorConstants.GRAY));
@@ -155,9 +202,10 @@ namespace ServiceProyecto.Application.Service.Reportes
             return table;
         }
 
+        // Ahora incluye columna "Usuarios" con los usuarios asignados a cada tarea (tanto IdUsuarioAsignado como asignaciones en TareaUsuario)
         private Table CrearTablaTareas(Proyecto proyecto)
         {
-            var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 3, 1, 1 }))
+            var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 3, 1, 1, 3 }))
                 .UseAllAvailableWidth()
                 .SetBorder(new SolidBorder(ColorConstants.BLACK, 1));
 
@@ -166,10 +214,11 @@ namespace ServiceProyecto.Application.Service.Reportes
             table.AddHeaderCell(CrearCelda("Título", true, ColorConstants.LIGHT_GRAY));
             table.AddHeaderCell(CrearCelda("Prioridad", true, ColorConstants.LIGHT_GRAY));
             table.AddHeaderCell(CrearCelda("Estado", true, ColorConstants.LIGHT_GRAY));
+            table.AddHeaderCell(CrearCelda("Usuarios", true, ColorConstants.LIGHT_GRAY));
 
-            if (!proyecto.Tareas.Any())
+            if (proyecto.Tareas == null || !proyecto.Tareas.Any())
             {
-                table.AddCell(new Cell(1, 4)
+                table.AddCell(new Cell(1, 5)
                     .Add(new Paragraph("No hay tareas asignadas a este proyecto."))
                     .SetTextAlignment(TextAlignment.CENTER));
             }
@@ -179,8 +228,43 @@ namespace ServiceProyecto.Application.Service.Reportes
                 {
                     table.AddCell(CrearCelda(tarea.Id.ToString()));
                     table.AddCell(CrearCelda(tarea.Titulo));
-                    table.AddCell(CrearCelda(tarea.Prioridad.ToString()));
+                    table.AddCell(CrearCelda(tarea.Prioridad?.ToString() ?? "N/A"));
                     table.AddCell(CrearCelda(tarea.Estado.ToString()));
+
+                    // Construir lista de usuarios asociados a la tarea
+                    var usuariosNombres = new List<string>();
+
+                    // Usuario asignado directamente en la tarea
+                    if (tarea.IdUsuarioAsignado.HasValue)
+                    {
+                        var usuario = _usuarioService.ObtenerUsuarioPorId(tarea.IdUsuarioAsignado.Value);
+                        if (usuario != null)
+                        {
+                            var nombreCompleto = $"{usuario.Nombres} {usuario.PrimerApellido}".Trim();
+                            usuariosNombres.Add(nombreCompleto);
+                        }
+                    }
+
+                    // Usuarios en tabla intermedia (TareaUsuario)
+                    var otrosIds = _tareaService.ObtenerIdsUsuariosAsignados(tarea.Id) ?? Enumerable.Empty<int>();
+                    foreach (var uid in otrosIds)
+                    {
+                        // Evitar duplicados con el IdUsuarioAsignado
+                        if (tarea.IdUsuarioAsignado.HasValue && uid == tarea.IdUsuarioAsignado.Value) continue;
+
+                        var usuario = _usuarioService.ObtenerUsuarioPorId(uid);
+                        if (usuario != null)
+                        {
+                            var nombreCompleto = $"{usuario.Nombres} {usuario.PrimerApellido}".Trim();
+                            usuariosNombres.Add(nombreCompleto);
+                        }
+                    }
+
+                    var usuariosStr = usuariosNombres.Any()
+                        ? string.Join(", ", usuariosNombres.Distinct())
+                        : "N/A";
+
+                    table.AddCell(CrearCelda(usuariosStr));
                 }
             }
 
@@ -204,4 +288,3 @@ namespace ServiceProyecto.Application.Service.Reportes
         }
     }
 }
-
