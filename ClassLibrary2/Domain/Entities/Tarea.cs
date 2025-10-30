@@ -28,7 +28,7 @@ namespace ServiceTarea.Domain.Entities
         public int IdProyecto { get; set; }
 
         public int? IdUsuarioAsignado { get; set; }
-        public string Status { get; set; } = "SinIniciar";
+        public string Status { get; set; } = "Sin Iniciar";
 
         public int Estado { get; set; } = 1;
         public ICollection<int> IdComentarios { get; set; } = new List<int>();

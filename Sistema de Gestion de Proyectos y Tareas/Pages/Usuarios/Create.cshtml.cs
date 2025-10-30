@@ -73,7 +73,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 
                 try
                 {
-                    contrasenaGenerada = _usuarioService.CrearNuevoUsuario(Usuario);
+                    contrasenaGenerada = _usuarioService.CrearNuevoUsuario(
+                        Usuario.Nombres,
+                        Usuario.PrimerApellido,
+                        Usuario.SegundoApellido,
+                        Usuario.Email,
+                        Usuario.Rol
+                    );
 
                     var usuarioCreado = _usuarioService.ObtenerTodosLosUsuarios()
                         .FirstOrDefault(u => u.Email.Equals(Usuario.Email, StringComparison.OrdinalIgnoreCase));

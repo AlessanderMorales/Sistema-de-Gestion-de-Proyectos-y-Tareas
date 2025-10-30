@@ -11,20 +11,19 @@ namespace ServiceCommon.Infrastructure.Persistence.Data
     public class MySqlConnectionSingleton : IDbConnectionFactory
     {
         private readonly string _connectionString;
-        private static MySqlConnectionSingleton? _instance;
    
         public MySqlConnectionSingleton()
         {
             throw new InvalidOperationException(
         "Use el constructor con IConfiguration. " +
-        "La cadena de conexión debe configurarse en appsettings.json");
+        "La cadena de conexion debe configurarse en appsettings.json");
         }
 
         public MySqlConnectionSingleton(IConfiguration configuration)
         {
             var cs = configuration?.GetConnectionString("MySqlConnection");
             if (string.IsNullOrWhiteSpace(cs))
-                throw new InvalidOperationException("La cadena de conexión 'MySqlConnection' no está configurada en appsettings.json");
+                throw new InvalidOperationException("La cadena de conexion 'MySqlConnection' no esta configurada en appsettings.json");
             _connectionString = cs;
         }
 

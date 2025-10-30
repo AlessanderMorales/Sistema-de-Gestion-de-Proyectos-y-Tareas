@@ -41,7 +41,6 @@ namespace ServiceUsuario.Infrastructure.Persistence.Repositories
         {
             using var connection = _connectionFactory.CreateConnection();
             
-            // ✅ CORREGIDO: Mantener case sensitivity en nombre_usuario, case insensitive en email
      return connection.QueryFirstOrDefault<Usuario>(
          @"SELECT id_usuario AS Id, nombres AS Nombres, primer_apellido AS PrimerApellido, 
    segundo_apellido AS SegundoApellido, nombre_usuario AS NombreUsuario,

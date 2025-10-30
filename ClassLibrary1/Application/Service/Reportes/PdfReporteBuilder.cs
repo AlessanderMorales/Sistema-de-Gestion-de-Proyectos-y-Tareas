@@ -120,7 +120,6 @@ namespace ServiceProyecto.Application.Service.Reportes
 
             document.Add(new LineSeparator(new SolidLine()).SetMarginTop(2).SetMarginBottom(10));
 
-            // ? NUEVO: Agregar gráficos de torta al inicio
        AgregarGraficosEstadisticas(document, proyectos);
 
     foreach (var proyecto in proyectos)
@@ -167,9 +166,6 @@ namespace ServiceProyecto.Application.Service.Reportes
             return AddFootersToPdfBytes(generated, usuarioNombre);
         }
 
-        /// <summary>
-     /// ? NUEVO: Agregar gráficos estadísticos de torta
-   /// </summary>
         private void AgregarGraficosEstadisticas(Document document, IEnumerable<Proyecto> proyectos)
         {
        var todasLasTareas = proyectos

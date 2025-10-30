@@ -52,31 +52,54 @@
     .btn-volcanic-secondary:hover { background-color: #6c757d; color: white; }
 </style>
 
-@if (Model.Proyecto != null)
+@if (Model.ProyectoDetallado != null)
 {
-    <h1 class="title-volcanic">@Model.Proyecto.Nombre</h1>
+    <h1 class="title-volcanic">@Model.ProyectoDetallado.Proyecto.Nombre</h1>
 
     <div>
      <h4>Informacion del Proyecto</h4>
   <dl class="row details-list">
  <dt class="col-sm-3 col-md-2">Descripcion</dt>
-       <dd class="col-sm-9 col-md-10">@Model.Proyecto.Descripcion</dd>
+     <dd class="col-sm-9 col-md-10">@Model.ProyectoDetallado.Proyecto.Descripcion</dd>
 
    <dt class="col-sm-3 col-md-2">Fecha de Inicio</dt>
-            <dd class="col-sm-9 col-md-10">@Model.Proyecto.FechaInicio.ToShortDateString()</dd>
+       <dd class="col-sm-9 col-md-10">@Model.ProyectoDetallado.Proyecto.FechaInicio.ToShortDateString()</dd>
 
         <dt class="col-sm-3 col-md-2">Fecha de Fin</dt>
-          <dd class="col-sm-9 col-md-10">@Model.Proyecto.FechaFin.ToShortDateString()</dd>
-        </dl>
+          <dd class="col-sm-9 col-md-10">@Model.ProyectoDetallado.Proyecto.FechaFin.ToShortDateString()</dd>
+
+     <dt class="col-sm-3 col-md-2">Total Tareas</dt>
+    <dd class="col-sm-9 col-md-10">
+         <span class="badge bg-primary">@Model.ProyectoDetallado.TotalTareas</span>
+            Completadas: <span class="badge bg-success">@Model.ProyectoDetallado.TareasCompletadas</span>
+  En Progreso: <span class="badge bg-warning">@Model.ProyectoDetallado.TareasEnProgreso</span>
+ Pendientes: <span class="badge bg-secondary">@Model.ProyectoDetallado.TareasPendientes</span>
+        </dd>
+
+   <dt class="col-sm-3 col-md-2">Usuarios Asignados</dt>
+   <dd class="col-sm-9 col-md-10">
+            @if (Model.ProyectoDetallado.UsuariosAsignados.Any())
+            {
+         foreach (var usuario in Model.ProyectoDetallado.UsuariosAsignados)
+       {
+     <span class="badge bg-info me-1">@usuario.Nombres @usuario.PrimerApellido</span>
+      }
+    }
+            else
+   {
+       <span class="text-muted">Sin usuarios asignados</span>
+  }
+   </dd>
+  </dl>
     </div>
 
     <hr class="section-divider" />
 
     <div>
         <h4>Tareas Asociadas</h4>
-   @if (Model.Proyecto.Tareas != null && Model.Proyecto.Tareas.Any())
-        {
-        <table class="table table-volcanic">
+   @if (Model.ProyectoDetallado.Proyecto.Tareas != null && Model.ProyectoDetallado.Proyecto.Tareas.Any())
+      {
+    <table class="table table-volcanic">
    <thead>
 <tr>
        <th>Titulo</th>
@@ -85,29 +108,29 @@
           @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
          {
       <th>Acciones</th>
-         }
+      }
  </tr>
   </thead>
-      <tbody>
-  @foreach (var tarea in Model.Proyecto.Tareas)
+    <tbody>
+  @foreach (var tarea in Model.ProyectoDetallado.Proyecto.Tareas)
        {
-      <tr>
-               <td>@tarea.Titulo</td>
+   <tr>
+            <td>@tarea.Titulo</td>
        <td>@tarea.Descripcion</td>
      <td>@tarea.Prioridad</td>
           @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
           {
-        <td>
+    <td>
         <a asp-page="/Tareas/Edit" asp-route-id="@tarea.Id" class="btn btn-sm btn-outline-warning">Editar Tarea</a>
            </td>
-        }
-              </tr>
+   }
+      </tr>
   }
     </tbody>
-            </table>
-        }
+        </table>
+ }
       else
-        {
+      {
      <div class="alert alert-secondary bg-dark text-white" role="alert">
         Este proyecto no tiene tareas asignadas todavia.
     </div>
@@ -116,8 +139,8 @@
 
     <div class="mt-4">
         @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
-        {
-            <a asp-page="/Tareas/Create" asp-route-idProyecto="@Model.Proyecto.Id" class="btn btn-volcanic-primary">Anadir Nueva Tarea</a>
+    {
+ <a asp-page="/Tareas/Create" asp-route-idProyecto="@Model.ProyectoDetallado.Proyecto.Id" class="btn btn-volcanic-primary">Anadir Nueva Tarea</a>
         }
     <a asp-page="./Index" class="btn btn-volcanic-secondary ms-2">Volver a la Lista</a>
     </div>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServiceProyecto.Application.Service;
 using ServiceProyecto.Application.Service.Reportes;
 using ServiceProyecto.Domain.Entities;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Facades;
 using System.Security.Claims;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
@@ -13,13 +14,15 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
     {
         private readonly ProyectoService _proyectoService;
         private readonly ReporteService _reporteService;
+        private readonly GestionProyectosFacade _facade;
 
         public IEnumerable<Proyecto> Proyectos { get; private set; } = new List<Proyecto>();
 
-        public IndexModel(ProyectoService proyectoService, ReporteService reporteService)
+        public IndexModel(ProyectoService proyectoService, ReporteService reporteService, GestionProyectosFacade facade)
         {
             _proyectoService = proyectoService;
             _reporteService = reporteService;
+            _facade = facade;
         }
 
         public void OnGet()
@@ -45,8 +48,16 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
                 return RedirectToPage("./Index");
             }
 
-            _proyectoService.EliminarProyectoPorId(id);
-            TempData["SuccessMessage"] = "Proyecto eliminado correctamente.";
+            try
+            {
+                _facade.EliminarProyectoCompleto(id);
+                TempData["SuccessMessage"] = "Proyecto, sus tareas y comentarios eliminados correctamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al eliminar el proyecto: {ex.Message}";
+            }
+
             return RedirectToPage("./Index");
         }
 
