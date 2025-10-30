@@ -58,7 +58,8 @@ builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComentarioService>();
 builder.Services.AddScoped<EmailService>(); 
-builder.Services.AddScoped<ReporteService>(); 
+builder.Services.AddScoped<ReporteService>();
+builder.Services.AddScoped<Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Facades.GestionProyectosFacade>(); // ✅ NUEVO: Registrar Facade
 
 builder.Services.AddRazorPages(options =>
 {

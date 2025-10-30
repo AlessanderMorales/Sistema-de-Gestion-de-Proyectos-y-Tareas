@@ -40,14 +40,18 @@ namespace ServiceUsuario.Infrastructure.Persistence.Repositories
         public Usuario GetByEmailOrUsername(string emailOrUsername)
         {
             using var connection = _connectionFactory.CreateConnection();
-            return connection.QueryFirstOrDefault<Usuario>(
+            
+            // ✅ CORREGIDO: Búsqueda case-insensitive y trim de espacios
+       return connection.QueryFirstOrDefault<Usuario>(
                 @"SELECT id_usuario AS Id, nombres AS Nombres, primer_apellido AS PrimerApellido, 
-                         segundo_apellido AS SegundoApellido, nombre_usuario AS NombreUsuario,
-                         contraseña, email, rol AS Rol, estado AS Estado 
-                  FROM Usuario 
-                  WHERE (email = @EmailOrUsername OR nombre_usuario = @EmailOrUsername) 
-                  AND estado = 1;",
-                new { EmailOrUsername = emailOrUsername });
+    segundo_apellido AS SegundoApellido, nombre_usuario AS NombreUsuario,
+   contraseña, email, rol AS Rol, estado AS Estado 
+              FROM Usuario 
+    WHERE (LOWER(TRIM(email)) = LOWER(TRIM(@EmailOrUsername)) 
+            OR LOWER(TRIM(nombre_usuario)) = LOWER(TRIM(@EmailOrUsername)))
+    AND estado = 1
+         LIMIT 1;",
+                new { EmailOrUsername = emailOrUsername?.Trim() });
         }
 
         public void AddAsync(Usuario entity)

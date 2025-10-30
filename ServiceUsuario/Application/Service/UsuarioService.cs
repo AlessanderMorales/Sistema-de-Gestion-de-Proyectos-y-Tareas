@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using ServiceCommon.Infrastructure.Persistence.Data;
 using ServiceUsuario.Domain.Entities;
+using ServiceUsuario.Domain.Builders; // ✅ NUEVO: Importar Builder
 
 namespace ServiceUsuario.Application.Service
 {
@@ -28,6 +29,27 @@ namespace ServiceUsuario.Application.Service
         {
             var repo = _usuarioFactory.CreateRepository();
             return repo.GetByIdAsync(id);
+        }
+
+        /// <summary>
+        /// ✅ NUEVO: Crear usuario usando el Builder Pattern
+        /// </summary>
+        public string CrearNuevoUsuarioConBuilder(string nombres, string primerApellido, string? segundoApellido, string email, string rol)
+        {
+            // ✅ Uso del Builder Pattern
+            var (usuario, contraseñaPlana) = new UsuarioBuilder()
+                .ConNombres(nombres)
+                .ConApellidos(primerApellido, segundoApellido)
+                .ConEmail(email)
+                .ConRol(rol)
+                .ConContraseñaAutomatica()
+                .Construir();
+
+            // Guardar en BD
+            var repo = _usuarioFactory.CreateRepository();
+            repo.AddAsync(usuario);
+
+            return contraseñaPlana;
         }
 
         public string CrearNuevoUsuario(Usuario usuario)
@@ -85,6 +107,12 @@ namespace ServiceUsuario.Application.Service
 
         public Usuario ValidarUsuario(string emailOrUsername, string password)
         {
+            // ✅ NUEVO: Validar y limpiar input
+            if (string.IsNullOrWhiteSpace(emailOrUsername) || string.IsNullOrWhiteSpace(password))
+                return null;
+
+            emailOrUsername = emailOrUsername.Trim();
+
             var repo = _usuarioFactory.CreateRepository();
             var usuarioRepo = repo as Infrastructure.Persistence.Repositories.UsuarioRepository;
             
@@ -92,24 +120,28 @@ namespace ServiceUsuario.Application.Service
 
             if (usuario == null) return null;
 
+            // ✅ Limpiar rol si existe
             if (!string.IsNullOrEmpty(usuario.Rol)) usuario.Rol = usuario.Rol.Trim();
+            
+            // ✅ Verificar contraseña hasheada (PBKDF2)
             if (!string.IsNullOrEmpty(usuario.Contraseña) && usuario.Contraseña.StartsWith("PBKDF2:", StringComparison.Ordinal))
-            {
-                if (VerifyHashedPassword(usuario.Contraseña, password))
-                {
-                    return usuario;
-                }
-                return null;
-            }
+   {
+     if (VerifyHashedPassword(usuario.Contraseña, password))
+      {
+       return usuario;
+ }
+          return null;
+       }
 
-            if (usuario.Contraseña == password)
+    // ✅ Contraseña en texto plano (legacy - actualizar automáticamente)
+    if (usuario.Contraseña == password)
             {
-                usuario.Contraseña = HashPassword(password);
-                repo.UpdateAsync(usuario);
-                return usuario;
-            }
+usuario.Contraseña = HashPassword(password);
+     repo.UpdateAsync(usuario);
+       return usuario;
+      }
 
-            return null;
+   return null;
         }
 
         private string GenerarNombreUsuario(string email)
@@ -230,13 +262,12 @@ namespace ServiceUsuario.Application.Service
             }
         }
 
-
         public bool EmailYaExiste(string email)
         {
-            var repo = _usuarioFactory.CreateRepository();
-            var usuarioExistente = repo.GetAllAsync()
-                                    .FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-            return usuarioExistente != null;
-        }
+     var repo = _usuarioFactory.CreateRepository();
+          var usuarioExistente = repo.GetAllAsync()
+     .FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+      return usuarioExistente != null;
+      }
     }
 }

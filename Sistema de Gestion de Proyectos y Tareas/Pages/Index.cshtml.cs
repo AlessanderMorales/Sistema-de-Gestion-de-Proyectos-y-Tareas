@@ -1,12 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
+using Sistema_de_Gestion_de_Proyectos_y_Tareas.Application.Facades; // ? Namespace correcto
+using System.Security.Claims;
 
 namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
 {
     [Authorize]
     public class IndexModel : PageModel
     {
+        private readonly GestionProyectosFacade _facade;
+
+        public IndexModel(GestionProyectosFacade facade)
+        {
+            _facade = facade;
+        }
+
+        // ? Propiedades para mostrar estadísticas
+        public EstadisticasGeneralesViewModel Estadisticas { get; set; }
+        public DashboardUsuarioViewModel DashboardUsuario { get; set; }
+
         public IActionResult OnGet()
         {
             // Redirigir SuperAdmin a su página principal
@@ -15,7 +28,22 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
                 return RedirectToPage("/Usuarios/Index");
             }
 
-            // Jefes y Empleados ven la página de inicio normal
+            // ? Obtener estadísticas usando el Facade
+            if (User.IsInRole("JefeDeProyecto"))
+            {
+                Estadisticas = _facade.ObtenerEstadisticasGenerales();
+            }
+
+            // ? Obtener dashboard del usuario usando el Facade
+            if (User.IsInRole("Empleado") || User.IsInRole("JefeDeProyecto"))
+            {
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(idClaim, out var usuarioId))
+                {
+                    DashboardUsuario = _facade.ObtenerDashboardUsuario(usuarioId);
+                }
+            }
+
             return Page();
         }
     }
