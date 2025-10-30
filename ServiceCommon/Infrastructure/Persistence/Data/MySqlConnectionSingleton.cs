@@ -15,14 +15,16 @@ namespace ServiceCommon.Infrastructure.Persistence.Data
    
         public MySqlConnectionSingleton()
         {
-            _connectionString = "Server=localhost;Port=3306;Database=gestion_proyectos;Uid=root;Pwd=your_password;";
+            throw new InvalidOperationException(
+        "Use el constructor con IConfiguration. " +
+        "La cadena de conexión debe configurarse en appsettings.json");
         }
 
         public MySqlConnectionSingleton(IConfiguration configuration)
         {
             var cs = configuration?.GetConnectionString("MySqlConnection");
             if (string.IsNullOrWhiteSpace(cs))
-                throw new InvalidOperationException("La cadena de conexión 'MySqlConnection' no está configurada.");
+                throw new InvalidOperationException("La cadena de conexión 'MySqlConnection' no está configurada en appsettings.json");
             _connectionString = cs;
         }
 

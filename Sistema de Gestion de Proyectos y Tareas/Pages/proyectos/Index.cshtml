@@ -92,8 +92,14 @@
     }
 
     .btn-delete {
-        background-color: var(--accent-red);
+      background-color: var(--accent-red);
         border-color: var(--accent-red);
+      color: white;
+    }
+
+    .btn-assign {
+    background-color: #4CAF50;
+   border-color: #4CAF50;
         color: white;
     }
 
@@ -152,13 +158,13 @@
     <div class="header-buttons">
         <form method="post" asp-page-handler="GenerarPdfGeneral">
             <button type="submit" class="btn btn-volcanic-primary">
-                📄 Descargar Reporte General
-            </button>
+   Descargar Reporte PDF
+   </button>
         </form>
 
         <form method="post" asp-page-handler="GenerarExcelGeneral">
-            <button type="submit" class="btn btn-volcanic-primary">
-                📥 Descargar Reporte Excel
+         <button type="submit" class="btn btn-volcanic-primary">
+  Descargar Reporte Excel
             </button>
         </form>
 
@@ -192,6 +198,7 @@
 
                     @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
                     {
+                        <a class="btn btn-sm btn-action btn-assign" asp-page="./GestionarUsuarios" asp-route-id="@item.Id" title="Gestionar Empleados">Empleados</a>
                         <a class="btn btn-sm btn-action btn-edit" asp-page="./Edit" asp-route-id="@item.Id">Editar</a>
 
                         <form method="post" asp-route-id="@item.Id" style="display:inline" id="deleteForm-@item.Id">

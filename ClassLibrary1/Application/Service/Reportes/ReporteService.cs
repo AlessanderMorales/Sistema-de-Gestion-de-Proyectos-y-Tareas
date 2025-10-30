@@ -18,16 +18,13 @@ namespace ServiceProyecto.Application.Service.Reportes
         public ReporteService(ProyectoService proyectoService, TareaService tareaService, UsuarioService usuarioService)
         {
             _proyectoService = proyectoService;
-            _tarea_service_placeholder: _ = tareaService; // evita warnings
             _tareaService = tareaService;
             _usuarioService = usuarioService;
 
-            // Builders delegan la lógica de generación
             _pdfBuilder = new PdfReporteBuilder(_proyectoService, _tareaService, _usuarioService);
             _excelBuilder = new ExcelReporteBuilder(_proyectoService, _tareaService, _usuarioService);
         }
 
-        // Compatibilidad: envoltorios que reutilizan builders
         public byte[] GenerarReporteProyectoPdf(int idProyecto, string usuarioNombre = "Sistema")
             => _pdfBuilder.GenerarReporteProyectoPdf(idProyecto, usuarioNombre);
 

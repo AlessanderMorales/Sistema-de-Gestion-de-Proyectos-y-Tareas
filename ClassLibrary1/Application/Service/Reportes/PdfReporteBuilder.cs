@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using iText.Kernel.Pdf.Canvas;
 using System;
 using iText.Kernel.Geom;
+using iText.Kernel.Pdf.Xobject;
 
 namespace ServiceProyecto.Application.Service.Reportes
 {
@@ -171,211 +172,196 @@ namespace ServiceProyecto.Application.Service.Reportes
    /// </summary>
         private void AgregarGraficosEstadisticas(Document document, IEnumerable<Proyecto> proyectos)
         {
-   // Obtener todas las tareas
-         var todasLasTareas = proyectos
-    .SelectMany(p => p.Tareas ?? Enumerable.Empty<Tarea>())
-       .ToList();
+       var todasLasTareas = proyectos
+         .SelectMany(p => p.Tareas ?? Enumerable.Empty<Tarea>())
+  .ToList();
 
-          if (!todasLasTareas.Any())
-   {
-  document.Add(new Paragraph("No hay tareas para generar estadísticas.")
-    .SetFont(_fontRegular)
-         .SetFontSize(10)
+            if (!todasLasTareas.Any())
+            {
+                document.Add(new Paragraph("No hay tareas para generar estadisticas.")
+        .SetFont(_fontRegular)
+   .SetFontSize(10)
    .SetFontColor(ColorConstants.GRAY)
     .SetTextAlignment(TextAlignment.CENTER)
-       .SetMarginBottom(20));
-        return;
-  }
+           .SetMarginBottom(20));
+      return;
+    }
 
- // Calcular estadísticas
-var tareasCompletadas = todasLasTareas.Count(t => t.Status == "Completada");
-var tareasEnProgreso = todasLasTareas.Count(t => t.Status == "EnProgreso");
-       var tareasSinIniciar = todasLasTareas.Count(t => t.Status == "SinIniciar");
+   var tareasCompletadas = todasLasTareas.Count(t => t.Status == "Completada");
+          var tareasEnProgreso = todasLasTareas.Count(t => t.Status == "EnProgreso");
+     var tareasSinIniciar = todasLasTareas.Count(t => t.Status == "SinIniciar");
 
     var tareasAlta = todasLasTareas.Count(t => t.Prioridad == "Alta");
-     var tareasMedia = todasLasTareas.Count(t => t.Prioridad == "Media");
-        var tareasBaja = todasLasTareas.Count(t => t.Prioridad == "Baja");
+            var tareasMedia = todasLasTareas.Count(t => t.Prioridad == "Media");
+            var tareasBaja = todasLasTareas.Count(t => t.Prioridad == "Baja");
 
-  // Título de estadísticas
-    document.Add(new Paragraph("Estadísticas Generales")
-     .SetFont(_fontBold)
-    .SetFontSize(14)
-     .SetFontColor(ColorConstants.DARK_GRAY)
-     .SetMarginTop(10)
-     .SetMarginBottom(15));
+        document.Add(new Paragraph("Estadisticas Generales")
+    .SetFont(_fontBold)
+   .SetFontSize(14)
+                .SetFontColor(ColorConstants.DARK_GRAY)
+    .SetMarginTop(10)
+  .SetMarginBottom(15));
 
-         // Crear tabla para los dos gráficos lado a lado
      var tablaGraficos = new Table(UnitValue.CreatePercentArray(new float[] { 1, 1 }))
-    .UseAllAvailableWidth()
-       .SetBorder(Border.NO_BORDER);
-
-    // Celda para gráfico de Estados
-   var celdaEstados = new Cell()
-    .SetBorder(Border.NO_BORDER)
-     .SetPadding(10);
-   celdaEstados.Add(CrearGraficoTortaEstados(tareasCompletadas, tareasEnProgreso, tareasSinIniciar));
-
-   // Celda para gráfico de Prioridades
-    var celdaPrioridades = new Cell()
-     .SetBorder(Border.NO_BORDER)
-     .SetPadding(10);
-      celdaPrioridades.Add(CrearGraficoTortaPrioridades(tareasAlta, tareasMedia, tareasBaja));
-
- tablaGraficos.AddCell(celdaEstados);
-   tablaGraficos.AddCell(celdaPrioridades);
-
-      document.Add(tablaGraficos);
-    document.Add(new Paragraph().SetMarginBottom(20)); // Espacio después de gráficos
-}
-
-        /// <summary>
-   /// ? NUEVO: Crear representación visual del gráfico de torta de Estados
-     /// </summary>
-        private Table CrearGraficoTortaEstados(int completadas, int enProgreso, int sinIniciar)
-   {
-       int total = completadas + enProgreso + sinIniciar;
-    if (total == 0) total = 1; // Evitar división por cero
-
- // Tabla contenedora
-      var tabla = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
-        .UseAllAvailableWidth()
-           .SetBorder(Border.NO_BORDER);
-
-  // Título del gráfico
-  tabla.AddCell(new Cell()
-         .Add(new Paragraph("Distribución por Estado")
-      .SetFont(_fontBold)
-  .SetFontSize(12)
-     .SetTextAlignment(TextAlignment.CENTER))
-.SetBorder(Border.NO_BORDER)
-    .SetBackgroundColor(new DeviceRgb(240, 240, 240))
-   .SetPadding(8));
-
-   // Crear barras visuales proporcionales
-   var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
-  .UseAllAvailableWidth()
+       .UseAllAvailableWidth()
  .SetBorder(Border.NO_BORDER);
 
-    // Barra Completadas (Verde)
-    if (completadas > 0)
-  {
-var porcentaje = (completadas * 100.0 / total);
-     tablaBarras.AddCell(new Cell()
-       .Add(new Paragraph($"? Completadas: {completadas} ({porcentaje:F1}%)")
- .SetFont(_fontRegular)
-   .SetFontSize(10))
-       .SetBackgroundColor(new DeviceRgb(76, 175, 80))
-         .SetBorder(Border.NO_BORDER)
-         .SetPadding(8)
-  .SetWidth(UnitValue.CreatePercentValue(100)));
-       }
+            var celdaEstados = new Cell()
+  .SetBorder(Border.NO_BORDER)
+   .SetPadding(10)
+     .SetHeight(200);
+   
+   var imageEstados = CrearImagenGraficoTorta(
+      new[] { tareasCompletadas, tareasEnProgreso, tareasSinIniciar },
+     new[] { 
+        new DeviceRgb(76, 175, 80),// Verde
+  new DeviceRgb(255, 193, 7),     // Amarillo
+ new DeviceRgb(158, 158, 158)    // Gris
+                },
+         new[] { "Completadas", "En Progreso", "Sin Iniciar" }
+            );
+            
+    if (imageEstados != null)
+     {
+            var tablaEstados = new Table(1).UseAllAvailableWidth().SetBorder(Border.NO_BORDER);
+      tablaEstados.AddCell(new Cell()
+        .Add(new Paragraph("Distribucion por Estado")
+              .SetFont(_fontBold)
+          .SetFontSize(12)
+          .SetTextAlignment(TextAlignment.CENTER))
+        .SetBorder(Border.NO_BORDER)
+          .SetPadding(5));
+                tablaEstados.AddCell(new Cell()
+         .Add(imageEstados)
+          .SetBorder(Border.NO_BORDER)
+ .SetPadding(5)
+                .SetTextAlignment(TextAlignment.CENTER));
+      celdaEstados.Add(tablaEstados);
+   }
 
- // Barra En Progreso (Amarillo)
-      if (enProgreso > 0)
-   {
-   var porcentaje = (enProgreso * 100.0 / total);
-       tablaBarras.AddCell(new Cell()
-     .Add(new Paragraph($"? En Progreso: {enProgreso} ({porcentaje:F1}%)")
-   .SetFont(_fontRegular)
-     .SetFontSize(10))
-    .SetBackgroundColor(new DeviceRgb(255, 193, 7))
-     .SetBorder(Border.NO_BORDER)
-   .SetPadding(8)
- .SetWidth(UnitValue.CreatePercentValue(100)));
-  }
-
- // Barra Sin Iniciar (Gris)
-  if (sinIniciar > 0)
-{
-     var porcentaje = (sinIniciar * 100.0 / total);
-  tablaBarras.AddCell(new Cell()
-.Add(new Paragraph($"? Sin Iniciar: {sinIniciar} ({porcentaje:F1}%)")
-        .SetFont(_fontRegular)
-   .SetFontSize(10))
-  .SetBackgroundColor(new DeviceRgb(158, 158, 158))
+ var celdaPrioridades = new Cell()
+           .SetBorder(Border.NO_BORDER)
+                .SetPadding(10)
+         .SetHeight(200);
+   
+            var imagePrioridades = CrearImagenGraficoTorta(
+            new[] { tareasAlta, tareasMedia, tareasBaja },
+      new[] { 
+        new DeviceRgb(211, 47, 47),     // Rojo
+       new DeviceRgb(255, 152, 0),     // Naranja
+       new DeviceRgb(76, 175, 80)   // Verde
+  },
+                new[] { "Alta", "Media", "Baja" }
+            );
+ 
+       if (imagePrioridades != null)
+     {
+  var tablaPrioridades = new Table(1).UseAllAvailableWidth().SetBorder(Border.NO_BORDER);
+    tablaPrioridades.AddCell(new Cell()
+          .Add(new Paragraph("Distribucion por Prioridad")
+  .SetFont(_fontBold)
+  .SetFontSize(12)
+            .SetTextAlignment(TextAlignment.CENTER))
       .SetBorder(Border.NO_BORDER)
-   .SetPadding(8)
-.SetWidth(UnitValue.CreatePercentValue(100)));
+        .SetPadding(5));
+       tablaPrioridades.AddCell(new Cell()
+          .Add(imagePrioridades)
+             .SetBorder(Border.NO_BORDER)
+          .SetPadding(5)
+              .SetTextAlignment(TextAlignment.CENTER));
+           celdaPrioridades.Add(tablaPrioridades);
+            }
+
+            tablaGraficos.AddCell(celdaEstados);
+            tablaGraficos.AddCell(celdaPrioridades);
+
+          document.Add(tablaGraficos);
+            document.Add(new Paragraph().SetMarginBottom(20));
+      }
+
+        private iText.Layout.Element.Image CrearImagenGraficoTorta(int[] valores, DeviceRgb[] colores, string[] etiquetas)
+        {
+       int total = valores.Sum();
+            if (total == 0) return null;
+
+        int width = 180;
+          int height = 180;
+ float radio = 60;
+            float centerX = width / 2f;
+   float centerY = height / 2f;
+
+            using var memStream = new MemoryStream();
+   using var writer = new PdfWriter(memStream);
+  using var tempPdf = new PdfDocument(writer);
+    var tempPage = tempPdf.AddNewPage(new PageSize(width, height));
+      var canvas = new PdfCanvas(tempPage);
+
+            canvas.SetFillColor(ColorConstants.WHITE);
+      canvas.Rectangle(0, 0, width, height);
+     canvas.Fill();
+
+    float startAngle = 0;
+      
+          for (int i = 0; i < valores.Length; i++)
+            {
+     if (valores[i] == 0) continue;
+
+  float sweepAngle = (valores[i] / (float)total) * 360;
+           
+      canvas.SaveState();
+         canvas.SetFillColor(colores[i]);
+   
+          double startRad = (startAngle - 90) * Math.PI / 180.0;
+  double endRad = (startAngle + sweepAngle - 90) * Math.PI / 180.0;
+            
+     canvas.MoveTo(centerX, centerY);
+            
+         for (double angle = startRad; angle <= endRad; angle += 0.1)
+     {
+        float x = centerX + (float)(radio * Math.Cos(angle));
+float y = centerY + (float)(radio * Math.Sin(angle));
+            canvas.LineTo(x, y);
+   }
+                
+     canvas.LineTo(centerX, centerY);
+           canvas.Fill();
+       canvas.RestoreState();
+
+                startAngle += sweepAngle;
    }
 
-      tabla.AddCell(new Cell()
-      .Add(tablaBarras)
-.SetBorder(Border.NO_BORDER)
-   .SetPadding(5));
+       canvas.SetStrokeColor(ColorConstants.WHITE);
+  canvas.SetLineWidth(2);
+  canvas.Circle(centerX, centerY, radio);
+     canvas.Stroke();
 
-       return tabla;
-        }
+    float legendY = 15;
+      for (int i = 0; i < etiquetas.Length; i++)
+            {
+ if (valores[i] == 0) continue;
 
-  /// <summary>
-   /// ? NUEVO: Crear representación visual del gráfico de torta de Prioridades
-  /// </summary>
-   private Table CrearGraficoTortaPrioridades(int alta, int media, int baja)
-     {
-      int total = alta + media + baja;
-  if (total == 0) total = 1;
+                canvas.SaveState();
+            canvas.SetFillColor(colores[i]);
+                canvas.Rectangle(10, legendY, 8, 8);
+                canvas.Fill();
+       canvas.RestoreState();
 
-        var tabla = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
-   .UseAllAvailableWidth()
-     .SetBorder(Border.NO_BORDER);
+     canvas.BeginText();
+ canvas.SetFontAndSize(_fontRegular, 8);
+       canvas.SetFillColor(ColorConstants.BLACK);
+        canvas.MoveText(22, legendY + 1);
+          float porcentaje = (valores[i] / (float)total) * 100;
+             canvas.ShowText($"{etiquetas[i]}: {valores[i]} ({porcentaje:F1}%)");
+              canvas.EndText();
 
-        tabla.AddCell(new Cell()
-    .Add(new Paragraph("Distribución por Prioridad")
-.SetFont(_fontBold)
-      .SetFontSize(12)
-   .SetTextAlignment(TextAlignment.CENTER))
-        .SetBorder(Border.NO_BORDER)
-        .SetBackgroundColor(new DeviceRgb(240, 240, 240))
-     .SetPadding(8));
+           legendY += 12;
+          }
 
-var tablaBarras = new Table(UnitValue.CreatePercentArray(new float[] { 1 }))
-     .UseAllAvailableWidth()
-      .SetBorder(Border.NO_BORDER);
+      tempPdf.Close();
 
-  if (alta > 0)
-    {
-    var porcentaje = (alta * 100.0 / total);
-  tablaBarras.AddCell(new Cell()
-       .Add(new Paragraph($"?? Alta: {alta} ({porcentaje:F1}%)")
-      .SetFont(_fontRegular)
-.SetFontSize(10))
-        .SetBackgroundColor(new DeviceRgb(211, 47, 47))
-  .SetFontColor(ColorConstants.WHITE)
-.SetBorder(Border.NO_BORDER)
-       .SetPadding(8));
-   }
-
-       if (media > 0)
-  {
-    var porcentaje = (media * 100.0 / total);
- tablaBarras.AddCell(new Cell()
-       .Add(new Paragraph($"?? Media: {media} ({porcentaje:F1}%)")
-   .SetFont(_fontRegular)
-        .SetFontSize(10))
-        .SetBackgroundColor(new DeviceRgb(255, 152, 0))
-       .SetBorder(Border.NO_BORDER)
-        .SetPadding(8));
-  }
-
-    if (baja > 0)
-     {
-  var porcentaje = (baja * 100.0 / total);
-        tablaBarras.AddCell(new Cell()
-        .Add(new Paragraph($"?? Baja: {baja} ({porcentaje:F1}%)")
-.SetFont(_fontRegular)
-  .SetFontSize(10))
-         .SetBackgroundColor(new DeviceRgb(76, 175, 80))
-        .SetBorder(Border.NO_BORDER)
-.SetPadding(8));
-        }
-
-     tabla.AddCell(new Cell()
-         .Add(tablaBarras)
- .SetBorder(Border.NO_BORDER)
-     .SetPadding(5));
-
-     return tabla;
-}
-
+       var imageData = iText.IO.Image.ImageDataFactory.Create(memStream.ToArray());
+    return new iText.Layout.Element.Image(imageData).SetWidth(width).SetHeight(height);
+     }
         private Table CrearSeccionInfoPrincipal(Proyecto proyecto)
         {
             var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 4 }))

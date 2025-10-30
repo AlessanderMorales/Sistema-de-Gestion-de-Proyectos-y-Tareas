@@ -41,15 +41,15 @@ namespace ServiceUsuario.Infrastructure.Persistence.Repositories
         {
             using var connection = _connectionFactory.CreateConnection();
             
-            // ✅ CORREGIDO: Búsqueda case-insensitive y trim de espacios
-       return connection.QueryFirstOrDefault<Usuario>(
-                @"SELECT id_usuario AS Id, nombres AS Nombres, primer_apellido AS PrimerApellido, 
-    segundo_apellido AS SegundoApellido, nombre_usuario AS NombreUsuario,
-   contraseña, email, rol AS Rol, estado AS Estado 
-              FROM Usuario 
-    WHERE (LOWER(TRIM(email)) = LOWER(TRIM(@EmailOrUsername)) 
-            OR LOWER(TRIM(nombre_usuario)) = LOWER(TRIM(@EmailOrUsername)))
-    AND estado = 1
+            // ✅ CORREGIDO: Mantener case sensitivity en nombre_usuario, case insensitive en email
+     return connection.QueryFirstOrDefault<Usuario>(
+         @"SELECT id_usuario AS Id, nombres AS Nombres, primer_apellido AS PrimerApellido, 
+   segundo_apellido AS SegundoApellido, nombre_usuario AS NombreUsuario,
+        contraseña, email, rol AS Rol, estado AS Estado 
+   FROM Usuario 
+ WHERE (LOWER(TRIM(email)) = LOWER(TRIM(@EmailOrUsername)) 
+    OR TRIM(nombre_usuario) = TRIM(@EmailOrUsername))
+             AND estado = 1
          LIMIT 1;",
                 new { EmailOrUsername = emailOrUsername?.Trim() });
         }
