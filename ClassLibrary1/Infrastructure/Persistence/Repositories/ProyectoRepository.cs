@@ -76,14 +76,16 @@ namespace ServiceProyecto.Infrastructure.Persistence.Repositories
             p.descripcion, 
             p.fecha_inicio AS FechaInicio, 
             p.fecha_fin AS FechaFin, 
-            p.estado,
+            p.estado AS Estado,
             
             t.id_tarea AS Id, 
-            t.titulo, 
-            t.descripcion, 
-            t.prioridad, 
-            t.estado,
-            t.id_proyecto
+            t.titulo AS Titulo, 
+            t.descripcion AS Descripcion, 
+            t.prioridad AS Prioridad, 
+            t.estado AS Estado,
+            t.id_proyecto AS IdProyecto,
+            t.id_usuario_asignado AS IdUsuarioAsignado,
+            t.status AS Status
         FROM Proyecto p
         LEFT JOIN Tareas t ON p.id_proyecto = t.id_proyecto
         WHERE p.id_proyecto = @Id;";

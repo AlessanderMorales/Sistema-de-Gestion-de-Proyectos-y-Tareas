@@ -181,22 +181,23 @@ namespace ServiceProyecto.Application.Service.Reportes
                 .UseAllAvailableWidth()
                 .SetMarginBottom(15);
 
-            table.AddHeaderCell(CrearCelda("ID Proyecto:", true));
+            // Use regular cells for label/value rows so headers don't accumulate and break layout
+            table.AddCell(CrearCelda("ID Proyecto:", true));
             table.AddCell(CrearCelda(proyecto.Id.ToString()));
 
-            table.AddHeaderCell(CrearCelda("Nombre:", true));
+            table.AddCell(CrearCelda("Nombre:", true));
             table.AddCell(CrearCelda(proyecto.Nombre));
 
-            table.AddHeaderCell(CrearCelda("Descripción:", true));
+            table.AddCell(CrearCelda("Descripción:", true));
             table.AddCell(CrearCelda(proyecto.Descripcion ?? "N/A"));
 
-            table.AddHeaderCell(CrearCelda("Inicia:", true));
+            table.AddCell(CrearCelda("Inicia:", true));
             table.AddCell(CrearCelda(proyecto.FechaInicio.ToShortDateString()));
 
-            table.AddHeaderCell(CrearCelda("Finaliza:", true));
+            table.AddCell(CrearCelda("Finaliza:", true));
             table.AddCell(CrearCelda(proyecto.FechaFin.ToShortDateString()));
 
-            table.AddHeaderCell(CrearCelda("Estado:", true));
+            table.AddCell(CrearCelda("Estado:", true));
             table.AddCell(CrearCelda(proyecto.Estado == 1 ? "Activo" : "Inactivo"));
 
             return table;
@@ -229,7 +230,10 @@ namespace ServiceProyecto.Application.Service.Reportes
                     table.AddCell(CrearCelda(tarea.Id.ToString()));
                     table.AddCell(CrearCelda(tarea.Titulo));
                     table.AddCell(CrearCelda(tarea.Prioridad?.ToString() ?? "N/A"));
-                    table.AddCell(CrearCelda(tarea.Estado.ToString()));
+
+                    // Use the human-readable Status string (e.g. "SinIniciar", "EnProgreso", etc.)
+                    var estadoTexto = !string.IsNullOrWhiteSpace(tarea.Status) ? tarea.Status : (tarea.Estado.ToString());
+                    table.AddCell(CrearCelda(estadoTexto));
 
                     // Construir lista de usuarios asociados a la tarea
                     var usuariosNombres = new List<string>();
