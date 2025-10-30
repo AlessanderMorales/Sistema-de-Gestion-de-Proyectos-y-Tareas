@@ -240,7 +240,7 @@ namespace ServiceProyecto.Application.Service.Reportes
             table.AddHeaderCell(CrearCelda("Título", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.LEFT));
             table.AddHeaderCell(CrearCelda("Prioridad", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.CENTER));
             table.AddHeaderCell(CrearCelda("Estado", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.CENTER));
-            table.AddHeaderCell(CrearCelda("Usuarios", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.LEFT));
+            table.AddHeaderCell(CrearCelda("Emplead@/s", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.LEFT));
 
             if (proyecto.Tareas == null || !proyecto.Tareas.Any())
             {
