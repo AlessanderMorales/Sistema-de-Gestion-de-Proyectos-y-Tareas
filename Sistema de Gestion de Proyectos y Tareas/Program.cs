@@ -14,7 +14,7 @@ using ServiceTarea.Infrastructure.Persistence.Factories;
 using ServiceUsuario.Application.Service;
 using ServiceUsuario.Domain.Entities;
 using ServiceUsuario.Infrastructure.Persistence.Factories;
-using ServiceProyecto.Application.Service.Reportes; // ✅ NUEVO: Para el ReporteService
+using ServiceProyecto.Application.Service.Reportes; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +37,7 @@ builder.Services.AddAuthorization(options =>
       policy.RequireAssertion(ctx => 
      ctx.User.IsInRole(Roles.JefeDeProyecto) || 
             ctx.User.IsInRole(Roles.Empleado) ||
-    ctx.User.IsInRole(Roles.SuperAdmin))); // ✅ Agregar SuperAdmin
+    ctx.User.IsInRole(Roles.SuperAdmin)));
 
     options.AddPolicy("OnlyJefe", policy =>
         policy.RequireRole(Roles.JefeDeProyecto));
@@ -58,7 +58,7 @@ builder.Services.AddScoped<TareaService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComentarioService>();
 builder.Services.AddScoped<EmailService>(); 
-builder.Services.AddScoped<ReporteService>(); // ✅ NUEVO: Registramos el ReporteService
+builder.Services.AddScoped<ReporteService>(); 
 
 builder.Services.AddRazorPages(options =>
 {
@@ -66,7 +66,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Proyectos", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Tareas", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizeFolder("/Comentarios", "OnlyJefeOrEmpleado");
-    options.Conventions.AuthorizeFolder("/Empleados", "OnlyJefe"); // ✅ NUEVO
+    options.Conventions.AuthorizeFolder("/Empleados", "OnlyJefe"); 
     options.Conventions.AuthorizeFolder("/Configuracion");
     options.Conventions.AuthorizePage("/Index", "OnlyJefeOrEmpleado");
     options.Conventions.AuthorizePage("/Proyectos/Create", "OnlyJefe");
