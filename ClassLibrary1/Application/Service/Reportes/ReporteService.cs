@@ -25,15 +25,17 @@ namespace ServiceProyecto.Application.Service.Reportes
     {
         private readonly ProyectoService _proyectoService;
         private readonly TareaService _tareaService;
+        private readonly UsuarioService _usuario_service_placeholder_removed; // placeholder to avoid accidental references
         private readonly UsuarioService _usuarioService;
 
-        // ✅ Fuentes (una regular y una en negrita)
+        // Fuentes
         private readonly PdfFont _fontRegular;
         private readonly PdfFont _fontBold;
 
         public ReporteService(ProyectoService proyectoService, TareaService tareaService, UsuarioService usuarioService)
         {
             _proyectoService = proyectoService;
+            _tarea_service_placeholder_removed: _ = tareaService; // no-op to avoid accidental older references
             _tareaService = tareaService;
             _usuarioService = usuarioService;
             _fontRegular = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
@@ -53,9 +55,7 @@ namespace ServiceProyecto.Application.Service.Reportes
             if (proyecto.Tareas == null || !proyecto.Tareas.Any())
             {
                 var todas = _tareaService.ObtenerTodasLasTareas() ?? Enumerable.Empty<Tarea>();
-                var tareasFallback = todas.Where(t => t.IdProyecto == proyecto.Id).ToList();
-
-                proyecto.Tareas = tareasFallback;
+                proyecto.Tareas = todas.Where(t => t.IdProyecto == proyecto.Id).ToList();
             }
 
             using var stream = new MemoryStream();
@@ -63,32 +63,37 @@ namespace ServiceProyecto.Application.Service.Reportes
             using var pdf = new PdfDocument(writer);
             var document = new Document(pdf);
 
-            // Título
+            // Título del proyecto (single) - mantengo formato claro pero no demasiado distinto
             var titulo = new Paragraph($"REPORTE DE PROYECTO: {proyecto.Nombre}")
                 .SetFont(_fontBold)
                 .SetFontSize(18)
                 .SetFontColor(ColorConstants.BLUE)
-                .SetTextAlignment(TextAlignment.CENTER);
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetMarginBottom(6);
             document.Add(titulo);
 
-            document.Add(new LineSeparator(new SolidLine()).SetMarginTop(5).SetMarginBottom(10));
+            document.Add(new LineSeparator(new SolidLine()).SetMarginTop(2).SetMarginBottom(8));
 
-            // Info principal
+            // Info principal sin bordes (más elegante)
             document.Add(CrearSeccionInfoPrincipal(proyecto));
 
             // Tareas
             var subtitulo = new Paragraph("Tareas Asignadas")
                 .SetFont(_fontBold)
-                .SetFontSize(14)
-                .SetMarginTop(20);
+                .SetFontSize(13)
+                .SetMarginTop(6)
+                .SetMarginBottom(6)
+                .SetFontColor(ColorConstants.DARK_GRAY);
             document.Add(subtitulo);
+
             document.Add(CrearTablaTareas(proyecto));
 
-            // Nota
+            // Nota pequeña
             document.Add(new Paragraph("Integrantes: (Listado consultado desde UsuarioService según tareas asignadas)")
                 .SetFont(_fontRegular)
-                .SetFontSize(10)
-                .SetFontColor(ColorConstants.GRAY));
+                .SetFontSize(9)
+                .SetFontColor(ColorConstants.GRAY)
+                .SetMarginTop(6));
 
             // Close document to finalize pages
             document.Close();
@@ -99,7 +104,7 @@ namespace ServiceProyecto.Application.Service.Reportes
         }
 
         // -----------------------------
-        // Nuevo método: todos los proyectos (usa ProyectoService para obtenerlos)
+        // Lista de proyectos (general) - título actualizado y más elegante
         // -----------------------------
         public byte[] GenerarReporteGeneralProyectosPdf(string usuarioNombre = "Sistema")
         {
@@ -124,19 +129,20 @@ namespace ServiceProyecto.Application.Service.Reportes
             using var pdf = new PdfDocument(writer);
             var document = new Document(pdf);
 
-            // Título general
-            var tituloGeneral = new Paragraph("REPORTE GENERAL DE PROYECTOS")
+            // Título general elegante y negro
+            var tituloGeneral = new Paragraph("Lista de proyectos")
                 .SetFont(_fontBold)
-                .SetFontSize(18)
-                .SetFontColor(ColorConstants.BLUE)
-                .SetTextAlignment(TextAlignment.CENTER);
+                .SetFontSize(20) // aumentar para que sobresalga
+                .SetFontColor(ColorConstants.BLACK)
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetMarginBottom(8);
             document.Add(tituloGeneral);
 
-            document.Add(new LineSeparator(new SolidLine()).SetMarginTop(5).SetMarginBottom(10));
+            document.Add(new LineSeparator(new SolidLine()).SetMarginTop(2).SetMarginBottom(10));
 
             foreach (var proyecto in proyectos)
             {
-                // Asegurar que las tareas estén cargadas; intentar ObtenerProyectoConTareas y luego fallback a TareaService
+                // Asegurar que las tareas estén cargadas
                 if (proyecto.Tareas == null || !proyecto.Tareas.Any())
                 {
                     var pConTareas = _proyectoService.ObtenerProyectoConTareas(proyecto.Id);
@@ -151,28 +157,34 @@ namespace ServiceProyecto.Application.Service.Reportes
                     }
                 }
 
-                // Info principal
+                // Project title as emphasized header
+                var projectHeader = new Paragraph(proyecto.Nombre)
+                    .SetFont(_fontBold)
+                    .SetFontSize(16) // más grande para destacar
+                    .SetFontColor(ColorConstants.BLACK) // elegante negro
+                    .SetMarginTop(6)
+                    .SetMarginBottom(4);
+                document.Add(projectHeader);
+
+                // Línea sutil para separar
+                document.Add(new LineSeparator(new SolidLine()).SetMarginBottom(6).SetMarginTop(2));
+
+                // Info (borderless table)
                 document.Add(CrearSeccionInfoPrincipal(proyecto));
 
-                // Tareas
+                // Tareas (borderless table with subtle row spacing)
                 var subtitulo = new Paragraph("Tareas Asignadas")
                     .SetFont(_fontBold)
-                    .SetFontSize(14)
-                    .SetMarginTop(10);
+                    .SetFontSize(12)
+                    .SetMarginTop(4)
+                    .SetMarginBottom(6)
+                    .SetFontColor(ColorConstants.DARK_GRAY);
                 document.Add(subtitulo);
+
                 document.Add(CrearTablaTareas(proyecto));
 
-                // Nota
-                document.Add(new Paragraph("Integrantes: (Listado consultado desde UsuarioService según tareas asignadas)")
-                    .SetFont(_fontRegular)
-                    .SetFontSize(10)
-                    .SetFontColor(ColorConstants.GRAY));
-
-                // Salto de página si no es el último proyecto
-                if (proyecto != proyectos.Last())
-                {
-                    document.Add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-                }
+                // Invisible spacing between projects
+                document.Add(new Paragraph().SetMarginBottom(10));
             }
 
             // Close document to finalize pages
@@ -188,28 +200,29 @@ namespace ServiceProyecto.Application.Service.Reportes
         // -----------------------------
         private Table CrearSeccionInfoPrincipal(Proyecto proyecto)
         {
-            var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 3 }))
+            var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 4 }))
                 .UseAllAvailableWidth()
-                .SetMarginBottom(15);
+                .SetMarginBottom(10)
+                .SetBorder(Border.NO_BORDER);
 
-            // Use regular cells for label/value rows so headers don't accumulate and break layout
-            table.AddCell(CrearCelda("ID Proyecto:", true));
-            table.AddCell(CrearCelda(proyecto.Id.ToString()));
+            // Label (negrita) / Value (normal) pairs
+            table.AddCell(CrearCelda("ID Proyecto:", true, null, false, TextAlignment.RIGHT));
+            table.AddCell(CrearCelda(proyecto.Id.ToString(), false, null, false, TextAlignment.LEFT));
 
-            table.AddCell(CrearCelda("Nombre:", true));
-            table.AddCell(CrearCelda(proyecto.Nombre));
+            table.AddCell(CrearCelda("Nombre:", true, null, false, TextAlignment.RIGHT));
+            table.AddCell(CrearCelda(proyecto.Nombre ?? "-", false, null, false, TextAlignment.LEFT));
 
-            table.AddCell(CrearCelda("Descripción:", true));
-            table.AddCell(CrearCelda(proyecto.Descripcion ?? "N/A"));
+            table.AddCell(CrearCelda("Descripción:", true, null, false, TextAlignment.RIGHT));
+            table.AddCell(CrearCelda(proyecto.Descripcion ?? "N/A", false, null, false, TextAlignment.LEFT));
 
-            table.AddCell(CrearCelda("Inicia:", true));
-            table.AddCell(CrearCelda(proyecto.FechaInicio.ToShortDateString()));
+            table.AddCell(CrearCelda("Inicia:", true, null, false, TextAlignment.RIGHT));
+            table.AddCell(CrearCelda(proyecto.FechaInicio.ToShortDateString(), false, null, false, TextAlignment.LEFT));
 
-            table.AddCell(CrearCelda("Finaliza:", true));
-            table.AddCell(CrearCelda(proyecto.FechaFin.ToShortDateString()));
+            table.AddCell(CrearCelda("Finaliza:", true, null, false, TextAlignment.RIGHT));
+            table.AddCell(CrearCelda(proyecto.FechaFin.ToShortDateString(), false, null, false, TextAlignment.LEFT));
 
-            table.AddCell(CrearCelda("Estado:", true));
-            table.AddCell(CrearCelda(proyecto.Estado == 1 ? "Activo" : "Inactivo"));
+            table.AddCell(CrearCelda("Estado:", true, null, false, TextAlignment.RIGHT));
+            table.AddCell(CrearCelda(proyecto.Estado == 1 ? "Activo" : "Inactivo", false, null, false, TextAlignment.LEFT));
 
             return table;
         }
@@ -217,46 +230,49 @@ namespace ServiceProyecto.Application.Service.Reportes
         // Ahora incluye columna "Usuarios" con los usuarios asignados a cada tarea (tanto IdUsuarioAsignado como asignaciones en TareaUsuario)
         private Table CrearTablaTareas(Proyecto proyecto)
         {
-            var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 3, 1, 1, 3 }))
+            var table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 4, 1, 1, 4 }))
                 .UseAllAvailableWidth()
-                .SetBorder(new SolidBorder(ColorConstants.BLACK, 1));
+                .SetBorder(Border.NO_BORDER)
+                .SetMarginBottom(8);
 
-            // Encabezados
-            table.AddHeaderCell(CrearCelda("ID Tarea", true, ColorConstants.LIGHT_GRAY));
-            table.AddHeaderCell(CrearCelda("Título", true, ColorConstants.LIGHT_GRAY));
-            table.AddHeaderCell(CrearCelda("Prioridad", true, ColorConstants.LIGHT_GRAY));
-            table.AddHeaderCell(CrearCelda("Estado", true, ColorConstants.LIGHT_GRAY));
-            table.AddHeaderCell(CrearCelda("Usuarios", true, ColorConstants.LIGHT_GRAY));
+            // Encabezados (sin borde, fondo sutil)
+            table.AddHeaderCell(CrearCelda("ID", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.CENTER));
+            table.AddHeaderCell(CrearCelda("Título", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.LEFT));
+            table.AddHeaderCell(CrearCelda("Prioridad", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.CENTER));
+            table.AddHeaderCell(CrearCelda("Estado", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.CENTER));
+            table.AddHeaderCell(CrearCelda("Usuarios", true, ColorConstants.LIGHT_GRAY, false, TextAlignment.LEFT));
 
             if (proyecto.Tareas == null || !proyecto.Tareas.Any())
             {
                 table.AddCell(new Cell(1, 5)
                     .Add(new Paragraph("No hay tareas asignadas a este proyecto."))
-                    .SetTextAlignment(TextAlignment.CENTER));
+                    .SetTextAlignment(TextAlignment.CENTER)
+                    .SetBorder(Border.NO_BORDER)
+                    .SetPadding(8));
             }
             else
             {
+                int idx = 0;
                 foreach (var tarea in proyecto.Tareas)
                 {
-                    table.AddCell(CrearCelda(tarea.Id.ToString()));
-                    table.AddCell(CrearCelda(tarea.Titulo));
-                    table.AddCell(CrearCelda(tarea.Prioridad?.ToString() ?? "N/A"));
+                    var rowBg = (idx % 2 == 1) ? (Color)new DeviceRgb(250, 250, 250) : null;
 
-                    // Use the human-readable Status string (e.g. "SinIniciar", "EnProgreso", etc.)
-                    var estadoTexto = !string.IsNullOrWhiteSpace(tarea.Status) ? tarea.Status : (tarea.Estado.ToString());
-                    table.AddCell(CrearCelda(estadoTexto));
+                    table.AddCell(CrearCelda(tarea.Id.ToString(), false, rowBg, false, TextAlignment.CENTER));
+                    table.AddCell(CrearCelda(tarea.Titulo ?? "-", false, rowBg, false, TextAlignment.LEFT));
+                    table.AddCell(CrearCelda(tarea.Prioridad ?? "N/A", false, rowBg, false, TextAlignment.CENTER));
 
-                    // Construir lista de usuarios asociados a la tarea
+                    var estadoTexto = MapStatusToFriendly(tarea.Status, tarea.Estado);
+                    var estadoColor = GetStatusColor(estadoTexto);
+                    table.AddCell(CrearCelda(estadoTexto, false, estadoColor ?? rowBg, false, TextAlignment.CENTER));
+
+                    // Usuarios
                     var usuariosNombres = new List<string>();
-
-                    // Usuario asignado directamente en la tarea
                     if (tarea.IdUsuarioAsignado.HasValue)
                     {
                         var usuario = _usuarioService.ObtenerUsuarioPorId(tarea.IdUsuarioAsignado.Value);
                         if (usuario != null)
                         {
-                            var nombreCompleto = $"{usuario.Nombres} {usuario.PrimerApellido}".Trim();
-                            usuariosNombres.Add(nombreCompleto);
+                            usuariosNombres.Add(($"{usuario.Nombres} {usuario.PrimerApellido}").Trim());
                         }
                     }
 
@@ -270,36 +286,82 @@ namespace ServiceProyecto.Application.Service.Reportes
                         var usuario = _usuarioService.ObtenerUsuarioPorId(uid);
                         if (usuario != null)
                         {
-                            var nombreCompleto = $"{usuario.Nombres} {usuario.PrimerApellido}".Trim();
-                            usuariosNombres.Add(nombreCompleto);
+                            usuariosNombres.Add(($"{usuario.Nombres} {usuario.PrimerApellido}").Trim());
                         }
                     }
 
-                    var usuariosStr = usuariosNombres.Any()
-                        ? string.Join(", ", usuariosNombres.Distinct())
-                        : "N/A";
+                    var usuariosStr = usuariosNombres.Any() ? string.Join(", ", usuariosNombres.Distinct()) : "*Sin Empleados Asignados*";
+                    table.AddCell(CrearCelda(usuariosStr, false, rowBg, false, TextAlignment.LEFT));
 
-                    table.AddCell(CrearCelda(usuariosStr));
+                    idx++;
                 }
             }
 
             return table;
         }
 
-        private Cell CrearCelda(string content, bool isHeader = false, iText.Kernel.Colors.Color? bgColor = null)
+        private Color? GetStatusColor(string friendlyStatus)
         {
-            var paragraph = new Paragraph(content)
-                .SetFont(isHeader ? _fontBold : _fontRegular)
-                .SetFontSize(10)
-                .SetPadding(5)
-                .SetBorder(new SolidBorder(ColorConstants.BLACK, 0.5f));
+            if (string.IsNullOrWhiteSpace(friendlyStatus)) return null;
+            var s = friendlyStatus.ToLowerInvariant();
 
-            if (isHeader)
+            if (s.Contains("sin"))
             {
-                paragraph.SetBackgroundColor(bgColor ?? ColorConstants.WHITE);
+                // Sin iniciar -> gris suave
+                return new DeviceRgb(235, 235, 235);
             }
 
-            return new Cell().Add(paragraph);
+            if (s.Contains("en progreso") || s.Contains("enprogreso") || s.Contains("progreso"))
+            {
+                // En progreso -> amarillo/anaranjado suave
+                return new DeviceRgb(255, 244, 179);
+            }
+
+            if (s.Contains("complet") || s.Contains("finaliz") || s.Contains("done"))
+            {
+                // Completado -> verde suave
+                return new DeviceRgb(200, 230, 201);
+            }
+
+            // fallback
+            return null;
+        }
+
+        private string MapStatusToFriendly(string status, int estado)
+        {
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                var s = status.Trim().ToLowerInvariant();
+                if ((s.Contains("sin") && s.Contains("iniciar")) || s.Contains("sininiciar") || s == "sininiciar") return "Sin iniciar";
+                if ((s.Contains("en") && s.Contains("progreso")) || s.Contains("enprogreso") || s.Contains("en progreso")) return "En progreso";
+                if (s.Contains("complet") || s.Contains("finaliz") || s.Contains("done")) return "Completado";
+                // default: capitalize first letter
+                return char.ToUpper(status[0]) + status.Substring(1);
+            }
+
+            // fallback by numeric Estado
+            return estado == 1 ? "Activo" : "Inactivo";
+        }
+
+        private Cell CrearCelda(string content, bool isHeader = false, Color? bgColor = null, bool visibleBorder = false, TextAlignment alignment = TextAlignment.LEFT)
+        {
+            var paragraph = new Paragraph(content ?? "")
+                .SetFont(isHeader ? _fontBold : _fontRegular)
+                .SetFontSize(isHeader ? 10 : 10)
+                .SetFontColor(isHeader ? ColorConstants.DARK_GRAY : ColorConstants.BLACK)
+                .SetTextAlignment(alignment)
+                .SetMargin(0);
+
+            var cell = new Cell().Add(paragraph)
+                                 .SetPadding(6)
+                                 .SetBorder(visibleBorder ? new SolidBorder(ColorConstants.BLACK, 0.5f) : Border.NO_BORDER);
+
+            if (bgColor != null)
+            {
+                cell.SetBackgroundColor(bgColor);
+            }
+
+            return cell;
         }
 
         // Post-process PDF bytes and draw footer on each page
@@ -311,9 +373,11 @@ namespace ServiceProyecto.Application.Service.Reportes
             using var writer = new PdfWriter(outputStream);
             using var pdfDoc = new PdfDocument(reader, writer);
 
-            // create local fonts for this pdf processing (do not reuse _fontRegular/_fontBold)
+            // local fonts for footer stage
             var footerFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
             var footerFontSmall = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
+
+            var timestamp = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
 
             int total = pdfDoc.GetNumberOfPages();
             for (int i = 1; i <= total; i++)
@@ -333,8 +397,7 @@ namespace ServiceProyecto.Application.Service.Reportes
 
                 layoutCanvas.ShowTextAligned(pageNumPara, x, y, TextAlignment.RIGHT);
 
-                var generatedAt = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-                var genPara = new Paragraph($"Reporte Generado Por: {usuarioNombre} - {generatedAt}")
+                var genPara = new Paragraph($"Reporte Generado Por: {usuarioNombre} - {timestamp}")
                     .SetFont(footerFontSmall)
                     .SetFontSize(8)
                     .SetFontColor(ColorConstants.GRAY);
