@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using ServiceCommon.Infrastructure.Persistence.Data;
 using ServiceUsuario.Domain.Entities;
-using ServiceUsuario.Domain.Builders; // ✅ NUEVO: Importar Builder
+using ServiceUsuario.Domain.Builders;
 
 namespace ServiceUsuario.Application.Service
 {
@@ -31,12 +31,8 @@ namespace ServiceUsuario.Application.Service
             return repo.GetByIdAsync(id);
         }
 
-        /// <summary>
-        /// ✅ NUEVO: Crear usuario usando el Builder Pattern
-        /// </summary>
         public string CrearNuevoUsuarioConBuilder(string nombres, string primerApellido, string? segundoApellido, string email, string rol)
         {
-            // ✅ Uso del Builder Pattern
             var (usuario, contraseñaPlana) = new UsuarioBuilder()
                 .ConNombres(nombres)
                 .ConApellidos(primerApellido, segundoApellido)
@@ -45,7 +41,6 @@ namespace ServiceUsuario.Application.Service
                 .ConContraseñaAutomatica()
                 .Construir();
 
-            // Guardar en BD
             var repo = _usuarioFactory.CreateRepository();
             repo.AddAsync(usuario);
 
@@ -120,10 +115,8 @@ namespace ServiceUsuario.Application.Service
 
             if (usuario == null) return null;
 
-            // ✅ Limpiar rol si existe
             if (!string.IsNullOrEmpty(usuario.Rol)) usuario.Rol = usuario.Rol.Trim();
             
-            // ✅ Verificar contraseña hasheada (PBKDF2)
             if (!string.IsNullOrEmpty(usuario.Contraseña) && usuario.Contraseña.StartsWith("PBKDF2:", StringComparison.Ordinal))
    {
      if (VerifyHashedPassword(usuario.Contraseña, password))
@@ -133,7 +126,6 @@ namespace ServiceUsuario.Application.Service
           return null;
        }
 
-    // ✅ Contraseña en texto plano (legacy - actualizar automáticamente)
     if (usuario.Contraseña == password)
             {
 usuario.Contraseña = HashPassword(password);

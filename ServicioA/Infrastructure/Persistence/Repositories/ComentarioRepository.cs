@@ -40,7 +40,8 @@ namespace ServiceComentario.Infrastructure.Persistence.Repositories
                 FROM Comentario c
                 LEFT JOIN Usuario u ON c.id_usuario = u.id_usuario
                 LEFT JOIN Tareas t ON c.id_tarea = t.id_tarea
-                WHERE c.estado = 1;";
+                WHERE c.estado = 1
+                ORDER BY c.id_comentario DESC;";
 
             using var connection = _connectionSingleton.CreateConnection();
             var rows = connection.Query<dynamic>(query).ToList();

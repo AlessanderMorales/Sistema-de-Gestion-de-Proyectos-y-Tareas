@@ -49,13 +49,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
             {
                 foreach (var memberName in validationResult.MemberNames)
                 {
-                    ModelState.AddModelError($"Usuario.{memberName}", validationResult.ErrorMessage ?? "Error de validacion");
+                    ModelState.AddModelError($"Usuario.{memberName}", validationResult.ErrorMessage ?? "Error de validación");
                 }
             }
 
             if (_usuarioService.EmailYaExiste(Usuario.Email))
             {
-                ModelState.AddModelError("Usuario.Email", "Este correo electronico ya esta registrado.");
+                ModelState.AddModelError("Usuario.Email", "Este correo electrónico ya está registrado.");
             }
 
             if (!ModelState.IsValid)
@@ -65,6 +65,27 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
 
             try
             {
+                // ? Aplicar trim automático a campos de texto
+                if (!string.IsNullOrEmpty(Usuario.Nombres))
+                {
+                    Usuario.Nombres = TrimExtraSpaces(Usuario.Nombres);
+                }
+
+                if (!string.IsNullOrEmpty(Usuario.PrimerApellido))
+                {
+                    Usuario.PrimerApellido = TrimExtraSpaces(Usuario.PrimerApellido);
+                }
+
+                if (!string.IsNullOrEmpty(Usuario.SegundoApellido))
+                {
+                    Usuario.SegundoApellido = TrimExtraSpaces(Usuario.SegundoApellido);
+                }
+
+                if (!string.IsNullOrEmpty(Usuario.Email))
+                {
+                    Usuario.Email = Usuario.Email.Trim();
+                }
+
                 string nombreCompleto = !string.IsNullOrEmpty(Usuario.SegundoApellido)
                     ? $"{Usuario.Nombres} {Usuario.PrimerApellido} {Usuario.SegundoApellido}"
                     : $"{Usuario.Nombres} {Usuario.PrimerApellido}";
@@ -95,11 +116,11 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
                     {
                         _usuarioService.EliminarUsuario(usuarioCreado.Id);
 
-                        MensajeError = "ERROR: No se envio el correo con las credenciales. El usuario NO fue creado. Revisa la configuracion del correo e intenta nuevamente.";
+                        MensajeError = "ERROR: No se envió el correo con las credenciales. El usuario NO fue creado. Revisa la configuración del correo e intenta nuevamente.";
                         return RedirectToPage("./Index");
                     }
 
-                    MensajeExito = $"Usuario creado exitosamente. Se envio un correo a {usuarioCreado.Email} con las credenciales de acceso.";
+                    MensajeExito = $"Usuario creado exitosamente. Se envió un correo a {usuarioCreado.Email} con las credenciales de acceso.";
                 }
                 catch (Exception ex)
                 {
@@ -114,6 +135,20 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Usuarios
             }
 
             return RedirectToPage("./Index");
+        }
+
+        /// <summary>
+        /// Elimina espacios al inicio, al final y múltiples espacios consecutivos en el medio
+        /// </summary>
+        private string TrimExtraSpaces(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            // Eliminar espacios al inicio y al final
+            input = input.Trim();
+
+            // Reemplazar múltiples espacios consecutivos por uno solo
+            return System.Text.RegularExpressions.Regex.Replace(input, @"\s+", " ");
         }
     }
 }

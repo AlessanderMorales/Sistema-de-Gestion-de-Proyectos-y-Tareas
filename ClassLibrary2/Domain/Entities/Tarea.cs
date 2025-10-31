@@ -38,87 +38,86 @@ namespace ServiceTarea.Domain.Entities
       
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            string pattern = @"^(?! )[A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñ0-9]+)*$";
-   string multipleSpaces = @" {2,}";
+            string pattern = @"^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$";
 
-   if (string.IsNullOrWhiteSpace(Titulo) || !Regex.IsMatch(Titulo.TrimEnd(), pattern) || Regex.IsMatch(Titulo, multipleSpaces))
-   yield return new ValidationResult("El título solo puede contener letras, números y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(Titulo) });
-
-            if (Titulo != Titulo.TrimStart())
-   yield return new ValidationResult("El título no debe empezar con espacios.", new[] { nameof(Titulo) });
-
-      if (!string.IsNullOrWhiteSpace(Descripcion))
+         if (string.IsNullOrWhiteSpace(Titulo) || !Regex.IsMatch(Titulo, pattern))
      {
-        if (!Regex.IsMatch(Descripcion.TrimEnd(), pattern) || Regex.IsMatch(Descripcion, multipleSpaces))
-       yield return new ValidationResult("La descripción solo puede contener letras, números y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(Descripcion) });
-
-          if (Descripcion != Descripcion.TrimStart())
-    yield return new ValidationResult("La descripción no debe empezar con espacios.", new[] { nameof(Descripcion) });
+   yield return new ValidationResult("El título solo puede contener letras y números.", new[] { nameof(Titulo) });
             }
 
-            if (!string.IsNullOrWhiteSpace(Prioridad))
+            if (!string.IsNullOrWhiteSpace(Descripcion) && !Regex.IsMatch(Descripcion, pattern))
             {
-      if (!Regex.IsMatch(Prioridad.TrimEnd(), pattern) || Regex.IsMatch(Prioridad, multipleSpaces))
-        yield return new ValidationResult("La prioridad solo puede contener letras, números y un espacio entre palabras, sin espacios al inicio/final ni múltiples espacios.", new[] { nameof(Prioridad) });
+     yield return new ValidationResult("La descripción solo puede contener letras y números.", new[] { nameof(Descripcion) });
+      }
 
-       if (Prioridad != Prioridad.TrimStart())
-        yield return new ValidationResult("La prioridad no debe empezar con espacios.", new[] { nameof(Prioridad) });
-        }
-
-        bool ContainsInjection(string input)
-            {
-            if (string.IsNullOrEmpty(input)) return false;
-   string lowerInput = input.ToLowerInvariant();
-
-          var sqlPatterns = new[]
-   {
-               @"(--|;--)",               @"\bunion\s+select\b",
-            @"\bdrop\s+table\b",  @"\binsert\s+into\b",
-   @"\btruncate\s+table\b",     @"\bdelete\s+from\b",
-        @"\bupdate\s+\w+\s+set\b",
-           @"\bexec\s*\(",
- @"\bxp_cmdshell\b",
-    @"\bbenchmark\s*\(",
-              @"\bwaitfor\s+delay\b",
- @"(['""]\s*or\s+['""]?1['""]?\s*=\s*['""]?1['""]?)",
-@"\bor\s+1\s*=\s*1\b",
-         @"\bselect\s+.*\s+from\b",
-       @"\balter\s+table\b"
-         };
-
-       foreach (var p in sqlPatterns)
-                {
- if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
-          return true;
-   }
-
-    var xssPatterns = new[]
-      {
-      @"<\s*script\b",
-   @"<\s*iframe\b",
-     @"javascript\s*:",
-             @"on\w+\s*=",
-  @"<\s*object\b",
-         @"<\s*embed\b"
-    };
-
-         foreach (var p in xssPatterns)
+            if (!string.IsNullOrWhiteSpace(Prioridad) && !Regex.IsMatch(Prioridad, pattern))
      {
- if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
-  return true;
-    }
+                yield return new ValidationResult("La prioridad solo puede contener letras y números.", new[] { nameof(Prioridad) });
+         }
+
+    bool ContainsInjection(string input)
+       {
+                if (string.IsNullOrEmpty(input)) return false;
+        string lowerInput = input.ToLowerInvariant();
+
+        var sqlPatterns = new[]
+           {
+        @"(--|;--)",
+@"\bunion\s+select\b",
+         @"\bdrop\s+table\b",
+     @"\binsert\s+into\b",
+  @"\btruncate\s+table\b",
+   @"\bdelete\s+from\b",
+    @"\bupdate\s+\w+\s+set\b",
+    @"\bexec\s*\(",
+     @"\bxp_cmdshell\b",
+         @"\bbenchmark\s*\(",
+    @"\bwaitfor\s+delay\b",
+           @"(['""]\s*or\s+['""]?1['""]?\s*=\s*['""]?1['""]?)",
+          @"\bor\s+1\s*=\s*1\b",
+ @"\bselect\s+.*\s+from\b",
+            @"\balter\s+table\b"
+           };
+
+   foreach (var p in sqlPatterns)
+ {
+        if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
+       return true;
+       }
+
+          var xssPatterns = new[]
+ {
+           @"<\s*script\b",
+      @"<\s*iframe\b",
+ @"javascript\s*:",
+           @"on\w+\s*=",
+     @"<\s*object\b",
+         @"<\s*embed\b"
+       };
+
+             foreach (var p in xssPatterns)
+       {
+     if (Regex.IsMatch(lowerInput, p, RegexOptions.IgnoreCase | RegexOptions.Singleline))
+             return true;
+            }
 
                 return false;
-            }
+   }
 
-     if (ContainsInjection(Titulo))
-           yield return new ValidationResult("El título contiene intentos explícitos de inyección SQL o contenido HTML/JS peligroso.", new[] { nameof(Titulo) });
+        if (ContainsInjection(Titulo))
+   {
+        yield return new ValidationResult("El título contiene intentos explícitos de inyección SQL o contenido HTML/JS peligroso.", new[] { nameof(Titulo) });
+   }
 
-  if (!string.IsNullOrEmpty(Descripcion) && ContainsInjection(Descripcion))
-   yield return new ValidationResult("La descripción contiene intentos explícitos de inyección SQL o contenido HTML/JS peligroso.", new[] { nameof(Descripcion) });
+       if (!string.IsNullOrEmpty(Descripcion) && ContainsInjection(Descripcion))
+ {
+       yield return new ValidationResult("La descripción contiene intentos explícitos de inyección SQL o contenido HTML/JS peligroso.", new[] { nameof(Descripcion) });
+ }
 
             if (!string.IsNullOrEmpty(Prioridad) && ContainsInjection(Prioridad))
-  yield return new ValidationResult("La prioridad contiene intentos explícitos de inyección SQL o contenido HTML/JS peligroso.", new[] { nameof(Prioridad) });
-      }
-  }
+            {
+     yield return new ValidationResult("La prioridad contiene intentos explícitos de inyección SQL o contenido HTML/JS peligroso.", new[] { nameof(Prioridad) });
+            }
+        }
+    }
 }

@@ -46,13 +46,11 @@ namespace ServiceProyecto.Application.Service.Reportes
 
             var headers = new[]
             {
-                "Proyecto ID",
                 "Proyecto",
                 "Descripción",
                 "Fecha Inicio",
                 "Fecha Fin",
                 "Estado Proyecto",
-                "Tarea ID",
                 "Tarea Título",
                 "Prioridad",
                 "Estado Tarea",
@@ -86,30 +84,27 @@ namespace ServiceProyecto.Application.Service.Reportes
 
                 if (proyecto.Tareas == null || !proyecto.Tareas.Any())
                 {
-                    ws.Cell(row, 1).Value = proyecto.Id;
-                    ws.Cell(row, 2).Value = proyecto.Nombre ?? "-";
-                    ws.Cell(row, 3).Value = proyecto.Descripcion ?? "-";
-                    ws.Cell(row, 4).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                    ws.Cell(row, 5).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                    ws.Cell(row, 6).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
-                    for (int c = 7; c <= 11; c++) ws.Cell(row, c).Value = string.Empty;
+                    ws.Cell(row, 1).Value = proyecto.Nombre ?? "-";
+                    ws.Cell(row, 2).Value = proyecto.Descripcion ?? "-";
+                    ws.Cell(row, 3).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    ws.Cell(row, 4).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    ws.Cell(row, 5).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
+                    for (int c = 6; c <= 9; c++) ws.Cell(row, c).Value = string.Empty;
                     row++;
                 }
                 else
                 {
                     foreach (var tarea in proyecto.Tareas)
                     {
-                        ws.Cell(row, 1).Value = proyecto.Id;
-                        ws.Cell(row, 2).Value = proyecto.Nombre ?? "-";
-                        ws.Cell(row, 3).Value = proyecto.Descripcion ?? "-";
-                        ws.Cell(row, 4).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                        ws.Cell(row, 5).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                        ws.Cell(row, 6).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
+                        ws.Cell(row, 1).Value = proyecto.Nombre ?? "-";
+                        ws.Cell(row, 2).Value = proyecto.Descripcion ?? "-";
+                        ws.Cell(row, 3).Value = proyecto.FechaInicio.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        ws.Cell(row, 4).Value = proyecto.FechaFin.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        ws.Cell(row, 5).Value = proyecto.Estado == 1 ? "Activo" : "Inactivo";
 
-                        ws.Cell(row, 7).Value = tarea.Id;
-                        ws.Cell(row, 8).Value = tarea.Titulo ?? "-";
-                        ws.Cell(row, 9).Value = tarea.Prioridad ?? "-";
-                        ws.Cell(row, 10).Value = MapStatusToFriendly(tarea.Status, tarea.Estado);
+                        ws.Cell(row, 6).Value = tarea.Titulo ?? "-";
+                        ws.Cell(row, 7).Value = tarea.Prioridad ?? "-";
+                        ws.Cell(row, 8).Value = MapStatusToFriendly(tarea.Status, tarea.Estado);
 
                         var usuariosNombres = new List<string>();
                         if (tarea.IdUsuarioAsignado.HasValue)
@@ -129,7 +124,7 @@ namespace ServiceProyecto.Application.Service.Reportes
                         }
 
                         var usuariosStr = usuariosNombres.Any() ? string.Join(", ", usuariosNombres.Distinct()) : "*Sin Empleados Asignados*";
-                        ws.Cell(row, 11).Value = usuariosStr;
+                        ws.Cell(row, 9).Value = usuariosStr;
 
                         row++;
                     }

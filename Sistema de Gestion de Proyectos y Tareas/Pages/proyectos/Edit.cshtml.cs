@@ -43,11 +43,36 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
             {
                 return Page();
             }
+
+            // ? Aplicar trim automático a campos de texto
+            if (!string.IsNullOrEmpty(Proyecto.Nombre))
+            {
+                Proyecto.Nombre = TrimExtraSpaces(Proyecto.Nombre);
+            }
+
+            if (!string.IsNullOrEmpty(Proyecto.Descripcion))
+            {
+                Proyecto.Descripcion = TrimExtraSpaces(Proyecto.Descripcion);
+            }
             
             _proyectoService.ActualizarProyecto(Proyecto);
 
             TempData["SuccessMessage"] = "Proyecto actualizado correctamente.";
             return RedirectToPage("./Index");
+        }
+
+        /// <summary>
+        /// Elimina espacios al inicio, al final y múltiples espacios consecutivos en el medio
+        /// </summary>
+        private string TrimExtraSpaces(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            
+            // Eliminar espacios al inicio y al final
+            input = input.Trim();
+     
+            // Reemplazar múltiples espacios consecutivos por uno solo
+            return System.Text.RegularExpressions.Regex.Replace(input, @"\s+", " ");
         }
     }
 }

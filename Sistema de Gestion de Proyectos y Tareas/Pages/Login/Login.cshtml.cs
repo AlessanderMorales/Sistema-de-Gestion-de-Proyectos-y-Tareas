@@ -67,14 +67,21 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages
                         new Claim(ClaimTypes.Name, usuario.Email),
                         new Claim("Username", usuario.NombreUsuario ?? usuario.Email),
                         new Claim("FullName", nombreCompleto),
-                        new Claim(ClaimTypes.Role, normalizedRole)
+                        new Claim(ClaimTypes.Role, normalizedRole),
+                        new Claim("RequiereCambioContraseña", usuario.RequiereCambioContraseña.ToString())
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
                     var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                     await HttpContext.SignInAsync("MyCookieAuth", claimsPrincipal);
 
-                    // ? Redirigir según el rol del usuario
+                    if (usuario.RequiereCambioContraseña)
+                    {
+                        TempData["RequiereCambioContraseña"] = "Por seguridad, debes cambiar tu contraseña temporal.";
+                        return RedirectToPage("/Configuracion/CambiarContraseña");
+                    }
+
+                    // Redirigir según el rol del usuario
                     if (normalizedRole == Roles.SuperAdmin)
                     {
                         return RedirectToPage("/Usuarios/Index");

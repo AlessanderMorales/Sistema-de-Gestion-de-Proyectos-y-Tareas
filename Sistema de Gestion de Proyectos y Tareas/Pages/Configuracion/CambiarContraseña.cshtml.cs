@@ -67,6 +67,14 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Configuracion
 
             int usuarioId = int.Parse(usuarioIdClaim.Value);
 
+            // ? MEJORA 1: Validar que la nueva contraseña NO sea igual a la actual
+            if (Input.ContraseñaActual == Input.NuevaContraseña)
+            {
+                ModelState.AddModelError("Input.NuevaContraseña", 
+                    "La nueva contraseña no puede ser igual a la contraseña actual.");
+                return Page();
+            }
+
             if (!ValidarContraseña(Input.NuevaContraseña))
             {
                 ModelState.AddModelError("Input.NuevaContraseña", 

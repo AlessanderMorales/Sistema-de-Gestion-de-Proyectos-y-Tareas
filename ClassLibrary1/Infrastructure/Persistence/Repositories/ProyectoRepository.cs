@@ -18,7 +18,8 @@ namespace ServiceProyecto.Infrastructure.Persistence.Repositories
         public IEnumerable<Proyecto> GetAllAsync() 
         {
             string query = @"SELECT id_proyecto AS Id, nombre, descripcion, fecha_inicio AS FechaInicio, fecha_fin AS FechaFin ,estado as Estado
-                              FROM Proyecto WHERE estado = 1 ORDER BY nombre";
+                              FROM Proyecto WHERE estado = 1 
+  ORDER BY id_proyecto DESC";
             return _connectionSignleton.ExcuteCommandWithDataReturn<Proyecto>(query);
         }
 

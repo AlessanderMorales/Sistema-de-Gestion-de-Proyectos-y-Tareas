@@ -4,6 +4,7 @@ using ServiceCommon.Domain.Port;
 using ServiceCommon.Infrastructure.Persistence.Data;
 using ServiceTarea.Domain.Entities;
 using ServiceTarea.Infrastructure.Persistence.Repositories;
+using Dapper;
 
 namespace ServiceTarea.Application.Service
 {
@@ -65,30 +66,81 @@ namespace ServiceTarea.Application.Service
             _comentarioManager.DesactivarPorTareaId(tarea.Id);
         }
 
-        public void AsignarTareaAUsuario(int idTarea, int idUsuario)
+        public bool AsignarTareaAUsuario(int idTarea, int idUsuario)
         {
             var repo = _tareaFactory.CreateRepository();
             var tarea = repo.GetByIdAsync(idTarea);
-            if (tarea != null)
-            {
-                tarea.IdUsuarioAsignado = idUsuario;
-                repo.UpdateAsync(tarea);
+       
+         if (tarea == null)
+       return false;
 
-                var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
-                tareaUsuarioRepo.AsignarUsuario(idTarea, idUsuario);
+            tarea.IdUsuarioAsignado = idUsuario;
+       repo.UpdateAsync(tarea);
+
+          var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
+            tareaUsuarioRepo.AsignarUsuario(idTarea, idUsuario);
+
+   bool usuarioAsignadoAlProyecto = VerificarUsuarioEnProyecto(tarea.IdProyecto, idUsuario);
+
+            if (!usuarioAsignadoAlProyecto)
+      {
+           AsignarUsuarioAProyecto(tarea.IdProyecto, idUsuario);
+      return true;
+  }
+
+        return false;
+  }
+
+  public void AsignarMultiplesUsuarios(int idTarea, List<int> idsUsuarios)
+        {
+          var repo = _tareaFactory.CreateRepository();
+            var tarea = repo.GetByIdAsync(idTarea);
+
+         if (tarea == null)
+  return;
+
+  var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
+            tareaUsuarioRepo.ReemplazarUsuarios(idTarea, idsUsuarios);
+
+ foreach (var idUsuario in idsUsuarios)
+      {
+        bool usuarioEnProyecto = VerificarUsuarioEnProyecto(tarea.IdProyecto, idUsuario);
+                
+ if (!usuarioEnProyecto)
+             {
+    AsignarUsuarioAProyecto(tarea.IdProyecto, idUsuario);
+          }
             }
         }
 
-        public void AsignarMultiplesUsuarios(int idTarea, List<int> idsUsuarios)
+ public IEnumerable<int> ObtenerIdsUsuariosAsignados(int idTarea)
         {
-            var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
-            tareaUsuarioRepo.ReemplazarUsuarios(idTarea, idsUsuarios);
+    var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
+    return tareaUsuarioRepo.GetUsuariosIdsByTareaId(idTarea);
         }
 
-        public IEnumerable<int> ObtenerIdsUsuariosAsignados(int idTarea)
+        private bool VerificarUsuarioEnProyecto(int idProyecto, int idUsuario)
         {
-            var tareaUsuarioRepo = new TareaUsuarioRepository(_connectionSingleton);
-            return tareaUsuarioRepo.GetUsuariosIdsByTareaId(idTarea);
+    using var connection = _connectionSingleton.CreateConnection();
+
+            string query = @"
+  SELECT COUNT(*) 
+           FROM Proyecto_Usuario 
+  WHERE id_proyecto = @IdProyecto 
+      AND id_usuario = @IdUsuario 
+          AND estado = 1;";
+
+            var count = connection.QueryFirstOrDefault<int>(query, new { IdProyecto = idProyecto, IdUsuario = idUsuario });
+ return count > 0;
+        }
+
+        private void AsignarUsuarioAProyecto(int idProyecto, int idUsuario)
+{
+   using var connection = _connectionSingleton.CreateConnection();
+        
+            connection.Execute(
+       "CALL sp_asignar_usuario_proyecto(@IdProyecto, @IdUsuario)",
+     new { IdProyecto = idProyecto, IdUsuario = idUsuario });
         }
     }
 }

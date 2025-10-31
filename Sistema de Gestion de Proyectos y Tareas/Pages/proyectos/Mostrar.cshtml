@@ -56,76 +56,76 @@
 {
     <h1 class="title-volcanic">@Model.Proyecto.Nombre</h1>
 
-    <div>
-     <h4>Informacion del Proyecto</h4>
+<div>
+     <h4>Información del Proyecto</h4>
   <dl class="row details-list">
- <dt class="col-sm-3 col-md-2">Descripcion</dt>
+ <dt class="col-sm-3 col-md-2">Descripción</dt>
        <dd class="col-sm-9 col-md-10">@Model.Proyecto.Descripcion</dd>
 
    <dt class="col-sm-3 col-md-2">Fecha de Inicio</dt>
-            <dd class="col-sm-9 col-md-10">@Model.Proyecto.FechaInicio.ToShortDateString()</dd>
+       <dd class="col-sm-9 col-md-10">@Model.Proyecto.FechaInicio.ToShortDateString()</dd>
 
-        <dt class="col-sm-3 col-md-2">Fecha de Fin</dt>
-          <dd class="col-sm-9 col-md-10">@Model.Proyecto.FechaFin.ToShortDateString()</dd>
+    <dt class="col-sm-3 col-md-2">Fecha de Fin</dt>
+       <dd class="col-sm-9 col-md-10">@Model.Proyecto.FechaFin.ToShortDateString()</dd>
         </dl>
-    </div>
+  </div>
 
     <hr class="section-divider" />
 
     <div>
-        <h4>Tareas Asociadas</h4>
+   <h4>Tareas Asociadas</h4>
    @if (Model.Proyecto.Tareas != null && Model.Proyecto.Tareas.Any())
         {
-        <table class="table table-volcanic">
+      <table class="table table-volcanic">
    <thead>
 <tr>
-       <th>Titulo</th>
-   <th>Descripcion</th>
-              <th>Prioridad</th>
-          @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
+       <th>Título</th>
+   <th>Descripción</th>
+            <th>Prioridad</th>
+       @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
          {
-      <th>Acciones</th>
+ <th>Acciones</th>
          }
  </tr>
-  </thead>
-      <tbody>
+</thead>
+<tbody>
   @foreach (var tarea in Model.Proyecto.Tareas)
        {
       <tr>
-               <td>@tarea.Titulo</td>
+   <td>@tarea.Titulo</td>
        <td>@tarea.Descripcion</td>
-     <td>@tarea.Prioridad</td>
+   <td>@tarea.Prioridad</td>
           @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
-          {
+      {
         <td>
         <a asp-page="/Tareas/Edit" asp-route-id="@tarea.Id" class="btn btn-sm btn-outline-warning">Editar Tarea</a>
-           </td>
+        </td>
         }
               </tr>
   }
     </tbody>
-            </table>
+      </table>
         }
       else
-        {
+    {
      <div class="alert alert-secondary bg-dark text-white" role="alert">
-        Este proyecto no tiene tareas asignadas todavia.
+        Este proyecto no tiene tareas asignadas todavía.
     </div>
         }
     </div>
 
-    <div class="mt-4">
+<div class="mt-4">
         @if (User.IsInRole("JefeDeProyecto") || User.IsInRole("SuperAdmin"))
         {
-            <a asp-page="/Tareas/Create" asp-route-idProyecto="@Model.Proyecto.Id" class="btn btn-volcanic-primary">Anadir Nueva Tarea</a>
+  <a asp-page="/Tareas/Create" asp-route-idProyecto="@Model.Proyecto.Id" class="btn btn-volcanic-primary">Añadir Nueva Tarea</a>
         }
-    <a asp-page="./Index" class="btn btn-volcanic-secondary ms-2">Volver a la Lista</a>
+<a asp-page="./Index" class="btn btn-volcanic-secondary ms-2">Volver a la Lista</a>
     </div>
 }
 else
 {
     <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Proyecto no encontrado</h4>
+    <h4 class="alert-heading">Proyecto no encontrado</h4>
         <p>El proyecto que buscas no existe o fue eliminado.</p>
         <hr>
         <a asp-page="./Index" class="btn btn-primary">Volver a la Lista</a>

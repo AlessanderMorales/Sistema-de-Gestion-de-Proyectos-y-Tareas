@@ -200,13 +200,13 @@ font-size: 0.85rem;
 
      <div class="employee-info">
         <!-- Proyectos Asignados -->
-   <div class="info-section">
+ <div class="info-section">
        <div class="info-title">
     ?? Proyectos Asignados
-          <span class="info-count">@emp.TotalProyectos</span>
+ <span class="info-count">@emp.TotalProyectos</span>
     </div>
-        @if (emp.ProyectosAsignados.Any())
-                {
+     @if (emp.ProyectosAsignados.Any())
+       {
  <ul class="assignment-list">
    @foreach (var proyecto in emp.ProyectosAsignados)
            {
@@ -216,27 +216,27 @@ font-size: 0.85rem;
          }
   else
   {
-              <p class="no-assignments">Sin proyectos asignados</p>
-     }
+       <p class="no-assignments">Sin proyectos asignados</p>
+  }
     </div>
 
         <!-- Tareas Asignadas -->
     <div class="info-section">
        <div class="info-title">
-              ? Tareas Asignadas
+         ? Tareas Asignadas
          <span class="info-count">@emp.TotalTareas</span>
-            </div>
-                 @if (emp.TareasAsignadas.Any())
+          </div>
+           @if (emp.TareasAsignadas.Any())
      {
       <ul class="assignment-list">
       @foreach (var tarea in emp.TareasAsignadas.Take(5))
-      {
+  {
      <li>@tarea</li>
        }
       @if (emp.TareasAsignadas.Count > 5)
-         {
+ {
       <li class="text-muted">... y @(emp.TareasAsignadas.Count - 5) más</li>
-                  }
+              }
      </ul>
                 }
   else
@@ -252,6 +252,6 @@ else
 {
     <div class="alert alert-info">
         <h4>No hay empleados registrados</h4>
-        <p>Actualmente no hay empleados o jefes de proyecto en el sistema.</p>
+     <p>Actualmente no hay empleados o jefes de proyecto en el sistema.</p>
     </div>
 }

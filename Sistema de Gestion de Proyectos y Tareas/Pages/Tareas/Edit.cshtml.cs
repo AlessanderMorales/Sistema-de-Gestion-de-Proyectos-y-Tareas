@@ -19,6 +19,7 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
         public Tarea Tarea { get; set; } = default!;
 
         public SelectList ProyectosDisponibles { get; set; }
+        
         public EditModel(TareaService tareaService, ProyectoService proyectoService)
         {
             _tareaService = tareaService;
@@ -54,9 +55,35 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
                 return Page();
             }
 
-            _tareaService.ActualizarTarea(Tarea);
+            // ✅ Aplicar trim automático a campos de texto
+            if (!string.IsNullOrEmpty(Tarea.Titulo))
+            {
+                Tarea.Titulo = TrimExtraSpaces(Tarea.Titulo);
+            }
 
+            if (!string.IsNullOrEmpty(Tarea.Descripcion))
+            {
+                Tarea.Descripcion = TrimExtraSpaces(Tarea.Descripcion);
+            }
+
+            _tareaService.ActualizarTarea(Tarea);
+ 
+            TempData["SuccessMessage"] = "Tarea actualizada exitosamente.";
             return RedirectToPage("./Index");
+        }
+
+        /// <summary>
+        /// Elimina espacios al inicio, al final y múltiples espacios consecutivos en el medio
+        /// </summary>
+        private string TrimExtraSpaces(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+        
+            // Eliminar espacios al inicio y al final
+            input = input.Trim();
+        
+            // Reemplazar múltiples espacios consecutivos por uno solo
+            return System.Text.RegularExpressions.Regex.Replace(input, @"\s+", " ");
         }
     }
 }

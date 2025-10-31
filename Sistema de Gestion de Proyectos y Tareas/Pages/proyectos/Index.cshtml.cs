@@ -52,6 +52,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 
         public IActionResult OnPostGenerarPdfGeneral()
         {
+            // ✅ SEGURIDAD: Validar que solo Jefe de Proyecto pueda generar reportes
+            if (!User.IsInRole("JefeDeProyecto") && !User.IsInRole("SuperAdmin"))
+            {
+                TempData["ErrorMessage"] = "No tienes permisos para generar reportes.";
+                return RedirectToPage("./Index");
+            }
+
             var proyectos = _proyectoService.ObtenerTodosLosProyectos();
 
             var usuarioNombre = User.FindFirst(ClaimTypes.Email)?.Value
@@ -66,6 +73,13 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Proyectos
 
         public IActionResult OnPostGenerarExcelGeneral()
         {
+            // ✅ SEGURIDAD: Validar que solo Jefe de Proyecto pueda generar reportes
+            if (!User.IsInRole("JefeDeProyecto") && !User.IsInRole("SuperAdmin"))
+            {
+                TempData["ErrorMessage"] = "No tienes permisos para generar reportes.";
+                return RedirectToPage("./Index");
+            }
+
             var proyectos = _proyectoService.ObtenerTodosLosProyectos();
 
             var usuarioNombre = User.FindFirst(ClaimTypes.Email)?.Value

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering; // ? CORREGIDO
 using ServiceTarea.Application.Service;
 using ServiceUsuario.Application.Service;
 using ServiceUsuario.Domain.Entities;
@@ -13,76 +13,84 @@ namespace Sistema_de_Gestion_de_Proyectos_y_Tareas.Pages.Tareas
 {
     [Authorize(Policy = "OnlyJefe")]
     public class AsignarModel : PageModel
-    {
+{
         private readonly TareaService _tareaService;
         private readonly UsuarioService _usuarioService;
 
       [BindProperty]
-        public int TareaId { get; set; }
+  public int TareaId { get; set; }
 
         [BindProperty]
    public List<int> UsuariosIds { get; set; } = new List<int>();
 
  public MultiSelectList UsuariosDisponibles { get; set; }
         public IEnumerable<Usuario> UsuariosActualmenteAsignados { get; set; }
-        public string NombreTarea { get; set; }
+ public string NombreTarea { get; set; }
 
-        public AsignarModel(TareaService tareaService, UsuarioService usuarioService)
+     public AsignarModel(TareaService tareaService, UsuarioService usuarioService)
   {
-            _tareaService = tareaService;
-            _usuarioService = usuarioService;
+   _tareaService = tareaService;
+     _usuarioService = usuarioService;
         }
 
   public void OnGet(int id)
      {
    TareaId = id;
-      
+     
          var tarea = _tareaService.ObtenerTareaPorId(id);
    NombreTarea = tarea?.Titulo ?? "Tarea desconocida";
-            
-            var usuarios = _usuarioService.ObtenerTodosLosUsuarios()
+          
+      var usuarios = _usuarioService.ObtenerTodosLosUsuarios()
  .Where(u => u.Rol != "SuperAdmin")
     .Select(u => new {
     u.Id,
-         NombreCompleto = $"{u.Nombres} {u.PrimerApellido}" + 
-            (string.IsNullOrEmpty(u.SegundoApellido) ? "" : $" {u.SegundoApellido}")
-        })
+NombreCompleto = $"{u.Nombres} {u.PrimerApellido}" + 
+        (string.IsNullOrEmpty(u.SegundoApellido) ? "" : $" {u.SegundoApellido}")
+     })
      .ToList();
   
-            var idsAsignados = _tareaService.ObtenerIdsUsuariosAsignados(id).ToList();
+  var idsAsignados = _tareaService.ObtenerIdsUsuariosAsignados(id).ToList();
    
     UsuariosActualmenteAsignados = _usuarioService.ObtenerTodosLosUsuarios()
-                .Where(u => idsAsignados.Contains(u.Id))
+ .Where(u => idsAsignados.Contains(u.Id))
  .ToList();
 
-            UsuariosDisponibles = new MultiSelectList(usuarios, "Id", "NombreCompleto", idsAsignados);
+ UsuariosDisponibles = new MultiSelectList(usuarios, "Id", "NombreCompleto", idsAsignados);
  }
 
         public IActionResult OnPost()
         {
-            if (TareaId <= 0)
+       if (TareaId <= 0)
    {
-          TempData["ErrorMessage"] = "ID de tarea inválido.";
+    TempData["ErrorMessage"] = "ID de tarea inválido.";
         return RedirectToPage("Index");
   }
 
       if (UsuariosIds == null || !UsuariosIds.Any())
-          {
+        {
       TempData["ErrorMessage"] = "Debe seleccionar al menos un usuario.";
     return RedirectToPage(new { id = TareaId });
          }
 
    try
-            {
+     {
+// ? MEJORA 4: Asignar múltiples usuarios (incluye asignación automática al proyecto)
   _tareaService.AsignarMultiplesUsuarios(TareaId, UsuariosIds);
-        TempData["SuccessMessage"] = $"Tarea asignada exitosamente a {UsuariosIds.Count} usuario(s).";
-           return RedirectToPage("Index");
+      
+  // ? NUEVO: Mensaje mejorado informando sobre asignación automática al proyecto
+  var tarea = _tareaService.ObtenerTareaPorId(TareaId);
+     var nombreProyecto = tarea?.ProyectoNombre ?? "el proyecto";
+ 
+    TempData["SuccessMessage"] = $"? Tarea asignada exitosamente a {UsuariosIds.Count} usuario(s). " +
+$"Los usuarios fueron agregados automáticamente a {nombreProyecto} si no estaban asignados.";
+    
+        return RedirectToPage("Index");
   }
       catch (Exception ex)
-   {
+ {
         TempData["ErrorMessage"] = $"Error al asignar la tarea: {ex.Message}";
      return RedirectToPage(new { id = TareaId });
-            }
+    }
         }
     }
 }

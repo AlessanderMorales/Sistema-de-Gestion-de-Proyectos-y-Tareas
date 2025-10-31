@@ -52,12 +52,12 @@ transition: all 0.3s ease;
     <div>
   <dl class="row details-list">
       <dt class="col-sm-3 col-md-2">Contenido</dt>
-            <dd class="col-sm-9 col-md-10">@Model.Comentario.Contenido</dd>
+       <dd class="col-sm-9 col-md-10">@Model.Comentario.Contenido</dd>
 
-            <dt class="col-sm-3 col-md-2">Fecha de Creacion</dt>
+       <dt class="col-sm-3 col-md-2">Fecha de Creación</dt>
             <dd class="col-sm-9 col-md-10">@Model.Comentario.Fecha.ToString("F")</dd>
 
-      @if (Model.Comentario.Tarea != null)
+   @if (Model.Comentario.Tarea != null)
      {
        <dt class="col-sm-3 col-md-2">Tarea</dt>
  <dd class="col-sm-9 col-md-10">@Model.Comentario.Tarea.Titulo</dd>
@@ -70,7 +70,7 @@ transition: all 0.3s ease;
      }
 
  @if (Model.Comentario.Usuario != null)
-            {
+        {
          <dt class="col-sm-3 col-md-2">Autor</dt>
     <dd class="col-sm-9 col-md-10">@($"{Model.Comentario.Usuario.Nombres} {Model.Comentario.Usuario.PrimerApellido}")</dd>
           }
@@ -88,7 +88,7 @@ transition: all 0.3s ease;
 
     <div class="mt-4">
         <a asp-page="Index" class="btn btn-volcanic-secondary">Volver a la Lista</a>
-    </div>
+ </div>
 }
 else
 {
